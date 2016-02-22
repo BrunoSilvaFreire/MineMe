@@ -5,8 +5,10 @@
  */
 package me.ddevil.mineme.mines;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -28,4 +30,13 @@ public interface Mine extends Iterable<Block> {
 
     public abstract void setBroadcastOnReset(boolean broadcastOnReset);
 
+    public abstract MineType getType();
+
+    public boolean contains(int x, int y, int z);
+
+    public boolean contains(Block b);
+
+    public boolean contains(Location l);
+
+    public boolean contains(Player p);
 }

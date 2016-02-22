@@ -7,12 +7,17 @@ import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 public class MineMe extends CustomPlugin {
     
     public static FileConfiguration config;
     private static File pluginFolder;
     private static File minesFolder;
+
+    public static void sendMessage(Player p, String string) {
+        p.sendMessage(string);
+    }
     private WorldEditPlugin worldEdit;
     
     @Override

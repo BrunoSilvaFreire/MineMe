@@ -1,14 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package me.ddevil.mineme.mines.impl;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
+import me.ddevil.mineme.mines.MineType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,15 +17,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.json.simple.JSONObject;
 
-/**
- *
- * @author Selma
- */
 public class CuboidMine implements Mine, ConfigurationSerializable {
-
+    
     protected final String name;
     protected final String world;
     protected final Vector pos1;
@@ -39,7 +29,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable {
     protected Map<Material, Double> composition;
     protected int resetDelay;
     protected boolean broadcastOnReset;
-
+    
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition) {
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
@@ -56,15 +46,15 @@ public class CuboidMine implements Mine, ConfigurationSerializable {
         this.pos2 = l2.toVector();
         this.composition = composition;
     }
-
+    
     public void setComposition(Map<Material, Double> composition) {
         this.composition = composition;
     }
-
+    
     public int getResetDelay() {
         return resetDelay;
     }
-
+    
     public void setResetDelay(int resetDelay) {
         this.resetDelay = resetDelay;
     }
@@ -168,48 +158,54 @@ public class CuboidMine implements Mine, ConfigurationSerializable {
     public int getUpperZ() {
         return this.pos2.getBlockZ();
     }
-
+    
     @Override
     public Iterator<Block> iterator() {
         return new CuboidMineIterator(this.getWorld(), this.pos1.getBlockX(), this.pos1.getBlockY(), this.pos1.getBlockZ(), this.pos2.getBlockX(), this.pos2.getBlockY(), this.pos2.getBlockZ());
     }
-
+    
     @Override
     public void delete() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public void reset() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public void save() {
-        YamlConfiguration file = YamlConfiguration.loadConfiguration(MineMe.getMineFile(this));
+        File mineFile = MineMe.getMineFile(this);
+        YamlConfiguration file = YamlConfiguration.loadConfiguration(mineFile);
         file.set("mine", this);
+        try {
+            file.save(mineFile);
+        } catch (IOException ex) {
+            Logger.getLogger(CuboidMine.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
+    
     @Override
     public Material[] getMaterials() {
         return composition.keySet().toArray(new Material[composition.keySet().size()]);
     }
-
+    
     @Override
     public String getName() {
         return name;
     }
-
+    
     @Override
     public boolean isBroadcastOnReset() {
         return broadcastOnReset;
     }
-
+    
     @Override
     public void setBroadcastOnReset(boolean broadcastOnReset) {
         this.broadcastOnReset = broadcastOnReset;
     }
-
+    
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> me = new HashMap<String, Object>();
@@ -222,18 +218,67 @@ public class CuboidMine implements Mine, ConfigurationSerializable {
         me.put("name", name);
         me.put("world", world);
         me.put("composition", composition);
-
         me.put("resetDelay", resetDelay);
         return me;
     }
+    
+    @Override
+    public MineType getType() {
+        return MineType.CUBOID;
+    }
 
+    /**
+     * Return true if the point at (x,y,z) is contained within this Cuboid.
+     *
+     * @param x - The X co-ordinate
+     * @param y - The Y co-ordinate
+     * @param z - The Z co-ordinate
+     * @return true if the given point is within this Cuboid, false otherwise
+     */
+    @Override
+    public boolean contains(int x, int y, int z) {
+        return x >= this.pos1.getBlockX() && x <= this.pos2.getBlockX()
+                && y >= this.pos1.getBlockY() && y <= this.pos2.getBlockY()
+                && z >= this.pos1.getBlockZ() && z <= this.pos2.getBlockZ();
+    }
+
+    /**
+     * Check if the given Block is contained within this Cuboid.
+     *
+     * @param b - The Block to check for
+     * @return true if the Block is within this Cuboid, false otherwise
+     */
+    @Override
+    public boolean contains(Block b) {
+        return this.contains(b.getLocation());
+    }
+
+    /**
+     * Check if the given Location is contained within this Cuboid.
+     *
+     * @param l - The Location to check for
+     * @return true if the Location is within this Cuboid, false otherwise
+     */
+    @Override
+    public boolean contains(Location l) {
+        if (!world.equals(l.getWorld().getName())) {
+            return false;
+        }
+        return contains(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+    }
+    
+    @Override
+    public boolean contains(Player p) {
+        return contains(p.getLocation());
+    }
+    
     public class CuboidMineIterator implements Iterator<Block> {
-
-        private World w;
-        private int baseX, baseY, baseZ;
+        
+        private final World w;
+        private final int baseX, baseY, baseZ;
         private int x, y, z;
-        private int sizeX, sizeY, sizeZ;
-
+        private final int sizeX, sizeY, sizeZ;
+        
         public CuboidMineIterator(World w, int x1, int y1, int z1, int x2, int y2, int z2) {
             this.w = w;
             this.baseX = x1;
@@ -244,12 +289,12 @@ public class CuboidMine implements Mine, ConfigurationSerializable {
             this.sizeZ = Math.abs(z2 - z1) + 1;
             this.x = this.y = this.z = 0;
         }
-
+        
         @Override
         public boolean hasNext() {
             return this.x < this.sizeX && this.y < this.sizeY && this.z < this.sizeZ;
         }
-
+        
         @Override
         public Block next() {
             Block b = this.w.getBlockAt(this.baseX + this.x, this.baseY + this.y, this.baseZ + this.z);
@@ -262,16 +307,16 @@ public class CuboidMine implements Mine, ConfigurationSerializable {
             }
             return b;
         }
-
+        
         @Override
         public void remove() {
         }
     }
-
+    
     public enum CuboidDirection {
-
+        
         North, East, South, West, Up, Down, Horizontal, Vertical, Both, Unknown;
-
+        
         public CuboidDirection opposite() {
             switch (this) {
                 case North:

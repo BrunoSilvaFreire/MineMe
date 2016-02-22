@@ -1,0 +1,4 @@
+#Messages
+ messagePrefix: "&e&lMine&a&lMe"
+ messageSeparator: " &6&l> &7"
+ resetMessage: "The mine %mine% has been reseted!"

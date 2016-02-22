@@ -1,15 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package me.ddevil.core;
 
 import java.lang.reflect.Field;
-import java.util.logging.Level;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,10 +11,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- *
- * @author BRUNO II
- */
 public class CustomPlugin extends JavaPlugin implements Listener {
 
     public static CustomPlugin instance;
@@ -54,18 +42,18 @@ public class CustomPlugin extends JavaPlugin implements Listener {
         commandMap.register(pl, cmd);
     }
 
-    public static boolean isPermissionRegistered(String nome) {
+    public static boolean isPermissionRegistered(String permission) {
         for (Permission p : Bukkit.getPluginManager().getPermissions()) {
-            if (p.getName().equalsIgnoreCase(nome)) {
+            if (p.getName().equalsIgnoreCase(permission)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static void registrarPermissao(String p) {
-        if (!isPermissionRegistered(p)) {
-            Bukkit.getPluginManager().addPermission(new Permission(p));
+    public static void registerPermission(String permission) {
+        if (!isPermissionRegistered(permission)) {
+            Bukkit.getPluginManager().addPermission(new Permission(permission));
         }
     }
 
