@@ -7,6 +7,7 @@ public class MessageManager {
     private static final HashMap<String, String> messages = new HashMap();
 
     public static void loadMessages() {
+        messages.put("resetMessage", null);
     }
 
     public static String getMessage(String msg) {

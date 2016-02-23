@@ -9,6 +9,10 @@ import org.bukkit.entity.Player;
 
 public class MineCommand extends CustomCommand {
 
+    private static final String[] usageMessages = {
+        "§b/ "
+    };
+
     public MineCommand() {
         super("mineme", "mine.admin", Arrays.asList(new String[]{}), "Command to manage MineMe mines");
     }
@@ -21,7 +25,7 @@ public class MineCommand extends CustomCommand {
                 switch (args[0]) {
                 }
             } else {
-                MineMe.sendMessage(p, "");
+                MineMe.sendMessage(p, usageMessages);
             }
         } else {
             sender.sendMessage("You can only use this command ingame");

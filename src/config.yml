@@ -1,2 +1,16 @@
 #Very complex config v96.0
-isThisPluginAwesome: true
+
+#Everything below here will affect ~ALL~ the mines
+global:
+  isThisPluginAwesome: true
+  #This will only work if you have Holographic Displays
+  forceHologramOnAllMine: false
+  
+  
+  #This is the preset that will be setup to all the mines
+  #is forceHologramOnAllMines is enabled
+  globalHologramDisplay:
+      - '%mine%'
+      - '%resettime%'
+      - '%blocksmined%'
+      - 'I like potatoes!'

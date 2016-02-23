@@ -10,24 +10,37 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class MineMe extends CustomPlugin {
-    
-    public static FileConfiguration config;
+
+    public static FileConfiguration pluginConfig;
     private static File pluginFolder;
     private static File minesFolder;
 
     public static void sendMessage(Player p, String string) {
         p.sendMessage(string);
     }
+
+    public static void sendMessage(Player p, String[] usageMessages) {
+        for (String usageMessage : usageMessages) {
+            sendMessage(p, usageMessage);
+        }
+    }
     private WorldEditPlugin worldEdit;
-    
+
     @Override
     public void onEnable() {
         super.onEnable();
         setupConfig();
+
+        //Try to get dependencies
         if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
             worldEdit = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
         }
-        debug("Starting to load mines");
+        if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
+            ConfigManager.enableHolograms();
+            ConfigManager.setForceHologramsUse(pluginConfig.getBoolean("global.forceHologramOnAllMine"));
+        }
+        //load mines
+        debug("Loading mines");
         File[] mineFiles = new File(getDataFolder(), "mines").listFiles();
         for (File file : mineFiles) {
             FileConfiguration fileConf = YamlConfiguration.loadConfiguration(file);
@@ -45,19 +58,19 @@ public class MineMe extends CustomPlugin {
             }
         }
     }
-    
+
     public void debug(String msg) {
         getLogger().info(msg);
     }
-    
+
     public static File getMineFile(Mine m) {
         return new File(pluginFolder.getPath() + "/" + m.getName() + ".yml");
-        
+
     }
-    
+
     private void setupConfig() {
         pluginFolder = getDataFolder();
-        config = loadConfig();
+        pluginConfig = loadConfig();
         if (!pluginFolder.exists()) {
             pluginFolder.mkdir();
         }

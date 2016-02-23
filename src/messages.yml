@@ -1,4 +1,26 @@
+#Colors
+ #The are colors which you can use and modify however you like :D
+ #These were made to make messages easier to customize.
+ #Try to remember those like this:
+ # Use $1 on messages about ALL the mines
+ # Use $2 on messages about a single mine
+ # Use $3 on simple messages / The one who no one ever reads
+ # Use $4 on warning/error messages, I believe red would be the better
+ # for this, but I won't stop from putting that bright shiny and beautiful pink color on warnings :D
+ 
+ # And of course you don't need to use global colors at all, you still use '&a', thats fine :)
+ 
+ # This is $1
+ primaryColor: "e"
+ # This is $2
+ secondaryColor: "a"
+ # This is $3
+ neutralColor: "7"
+ # This is $4
+ warningColor: "c"
+ 
 #Messages
- messagePrefix: "&e&lMine&a&lMe"
- messageSeparator: " &6&l> &7"
- resetMessage: "The mine %mine% has been reseted!"
+ messages:
+    messagePrefix: "&e&lMine&a&lMe"
+    messageSeparator: " &6&l> $3"
+    resetMessage: "$2The mine %mine% has been reseted!"

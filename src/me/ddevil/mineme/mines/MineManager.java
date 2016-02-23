@@ -6,6 +6,7 @@
 package me.ddevil.mineme.mines;
 
 import java.util.ArrayList;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -23,6 +24,19 @@ public class MineManager {
         for (Mine mine : MINES) {
             if (mine.getName().equalsIgnoreCase(name)) {
                 return mine;
+            }
+        }
+        return null;
+    }
+
+    public static boolean isPlayerInAMine(Player p) {
+        return getMineWith(p) != null;
+    }
+
+    public static Mine getMineWith(Player p) {
+        for (Mine m : MINES) {
+            if (m.contains(p)) {
+                return m;
             }
         }
         return null;
