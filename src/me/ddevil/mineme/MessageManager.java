@@ -1,20 +1,17 @@
 package me.ddevil.mineme;
 
-import java.util.HashMap;
+import me.ddevil.mineme.mines.Mine;
+import net.md_5.bungee.api.ChatColor;
 
 public class MessageManager {
 
-    private static final HashMap<String, String> messages = new HashMap();
-
-    public static void loadMessages() {
-        messages.put("resetMessage", null);
+    public static String translateTags(String get, Mine m) {
+        get = get.replaceAll("%mine%", m.getName());
+        get = get.replaceAll("%mine%", m.getName());
+        get = get.replaceAll("%mine%", m.getName());
+        get = get.replaceAll("%mine%", m.getName());
+        get = get.replaceAll("%mine%", m.getName());
+        return ChatColor.translateAlternateColorCodes('&', get);
     }
 
-    public static String getMessage(String msg) {
-        return parseTags(messages.get(msg));
-    }
-
-    private static String parseTags(String input) {
-        return input;
-    }
 }

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 public class MineMe extends CustomPlugin {
 
     public static FileConfiguration pluginConfig;
+    public static FileConfiguration messagesConfig;
     private static File pluginFolder;
     private static File minesFolder;
 
@@ -36,8 +37,8 @@ public class MineMe extends CustomPlugin {
             worldEdit = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
         }
         if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
-            ConfigManager.enableHolograms();
-            ConfigManager.setForceHologramsUse(pluginConfig.getBoolean("global.forceHologramOnAllMine"));
+            enableHolograms();
+            setForceHologramsUse(pluginConfig.getBoolean("global.forceHologramOnAllMine"));
         }
         //load mines
         debug("Loading mines");
@@ -63,6 +64,10 @@ public class MineMe extends CustomPlugin {
         getLogger().info(msg);
     }
 
+    public static FileConfiguration getYAMLMineFile(Mine m) {
+        return YamlConfiguration.loadConfiguration(getMineFile(m));
+    }
+
     public static File getMineFile(Mine m) {
         return new File(pluginFolder.getPath() + "/" + m.getName() + ".yml");
 
@@ -79,4 +84,24 @@ public class MineMe extends CustomPlugin {
             pluginFolder.mkdir();
         }
     }
+
+    public static boolean hologramsUsable = false;
+    public static boolean forceHologramsUse = false;
+
+    public static void enableHolograms() {
+        hologramsUsable = true;
+    }
+
+    public static void setHologramsUsable(boolean hologramsUsable) {
+        MineMe.hologramsUsable = hologramsUsable;
+    }
+
+    public static void setForceHologramsUse(boolean forceHologramsUse) {
+        MineMe.forceHologramsUse = forceHologramsUse;
+    }
+
+    public static boolean isForceHologramsUse() {
+        return forceHologramsUse;
+    }
+
 }

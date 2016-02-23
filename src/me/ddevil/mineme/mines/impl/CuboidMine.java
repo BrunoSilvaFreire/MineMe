@@ -1,11 +1,14 @@
 package me.ddevil.mineme.mines.impl;
 
+import me.ddevil.mineme.MessageManager;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +35,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
     protected Map<Material, Double> composition;
     protected int resetDelay;
     protected boolean broadcastOnReset;
+    protected File saveFile;
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition) {
         if (!l1.getWorld().equals(l2.getWorld())) {
@@ -60,6 +64,41 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
 
     public void setResetDelay(int resetDelay) {
         this.resetDelay = resetDelay;
+    }
+
+    public File getSaveFile() {
+        return saveFile;
+    }
+
+    public void setSaveFile(File saveFile) {
+        this.saveFile = saveFile;
+    }
+
+    /**
+     * Get the size of this Cuboid along the X axis
+     *
+     * @return Size of Cuboid along the X axis
+     */
+    public int getSizeX() {
+        return (this.pos2.getBlockX() - this.pos1.getBlockX()) + 1;
+    }
+
+    /**
+     * Get the size of this Cuboid along the Y axis
+     *
+     * @return Size of Cuboid along the Y axis
+     */
+    public int getSizeY() {
+        return (this.pos2.getBlockY() - this.pos1.getBlockY()) + 1;
+    }
+
+    /**
+     * Get the size of this Cuboid along the Z axis
+     *
+     * @return Size of Cuboid along the Z axis
+     */
+    public int getSizeZ() {
+        return (this.pos2.getBlockZ() - this.pos1.getBlockZ()) + 1;
     }
 
     /**
@@ -169,7 +208,8 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
 
     @Override
     public void delete() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        saveFile.delete();
+
     }
 
     @Override
@@ -288,8 +328,26 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
 
     @Override
     public void setupHolograms() {
-        Location holo = getCenter();
-        holo.setY(getUpperY() + 3);
+        Location l = getCenter();
+        Location temp;
+
+        temp = l.clone();
+        temp.setY(getUpperY() + 3);
+        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        holograms.add(HologramsAPI.createHologram(MineMe.instance, l));
+        temp = l.clone();
+        temp.add(getSizeX() / 2, 0, 0);
+        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        temp = l.clone();
+        temp.add((getSizeX() / 2) * -1, 0, 0);
+        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        temp = l.clone();
+        temp.add(0, 0, getSizeZ() / 2);
+        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        temp = l.clone();
+        temp.add(0, 0, (getSizeZ() / 2) * -1);
+        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+
         updateHolograms();
     }
 
@@ -308,7 +366,11 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
     @Override
     public void updateHolograms() {
         for (Hologram m : holograms) {
-
+            m.clearLines();
+            List<String> list = MineMe.getYAMLMineFile(this).getStringList("hologramsText");
+            for (int i = 0; i < list.size(); i++) {
+                m.appendTextLine(MessageManager.translateTags(list.get(i), this));
+            }
         }
     }
 

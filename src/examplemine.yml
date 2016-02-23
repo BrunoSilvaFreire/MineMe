@@ -22,7 +22,7 @@
  - REDSTONE_ORE:25
  - COBBLESTONE:2
  
- hologramDisplay:
+ hologramsText:
  - '%mine%'
  - '%resettime%'
  - '%blocksmined%'
