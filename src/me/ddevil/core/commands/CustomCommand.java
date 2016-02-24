@@ -2,11 +2,14 @@ package me.ddevil.core.commands;
 
 import java.util.List;
 import me.ddevil.core.CustomPlugin;
+import me.ddevil.mineme.MineMe;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public abstract class CustomCommand extends Command {
+
+    private String[] usageMessages;
 
     public CustomCommand(String name, String permission) {
         super(name);
@@ -56,6 +59,10 @@ public abstract class CustomCommand extends Command {
 
     public boolean checkPerm(Player p) {
         return p.hasPermission(permission);
+    }
+
+    public void sendUsage(Player p) {
+        MineMe.sendMessage(p, usageMessages);
     }
 
     public abstract boolean handleExecute(CommandSender sender, String[] args);

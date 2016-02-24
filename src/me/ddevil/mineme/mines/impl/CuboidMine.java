@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
+import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,9 +34,11 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
     protected final Vector pos1;
     protected final Vector pos2;
     protected Map<Material, Double> composition;
-    protected int resetDelay;
+    protected int resetMinutesDelay;
     protected boolean broadcastOnReset;
+    protected String broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
     protected File saveFile;
+    private int resetDelay;
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition) {
         if (!l1.getWorld().equals(l2.getWorld())) {
@@ -49,21 +52,31 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
         l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
         this.world = l1.getWorld().getName();
         this.name = name;
+        this.resetMinutesDelay = 1;
+        resetDelay = resetMinutesDelay;
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
     }
 
+    public void setResetMinutesDelay(int resetMinutesDelay) {
+        this.resetMinutesDelay = resetMinutesDelay;
+    }
+
+    public int getResetMinutesDelay() {
+        return resetMinutesDelay;
+    }
+
+    @Override
+    public void tictoc() {
+        resetDelay--;
+        if (resetDelay <= 0) {
+            reset();
+        }
+    }
+
     public void setComposition(Map<Material, Double> composition) {
         this.composition = composition;
-    }
-
-    public int getResetDelay() {
-        return resetDelay;
-    }
-
-    public void setResetDelay(int resetDelay) {
-        this.resetDelay = resetDelay;
     }
 
     public File getSaveFile() {
@@ -223,6 +236,25 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
                 p.teleport(l);
             }
         }
+        resetDelay = resetMinutesDelay;
+        new MineRepopulator().repopulate(this);
+        if (broadcastOnReset) {
+            Bukkit.broadcastMessage(MessageManager.translateTags(broadcastMessage, this));
+        }
+    }
+
+    @Override
+    public Map<Material, Double> getComposition() {
+        return composition;
+    }
+
+    @Override
+    public List<Block> getBlocks() {
+        ArrayList<Block> blocks = new ArrayList<>();
+        for (Block thi : this) {
+            blocks.add(thi);
+        }
+        return blocks;
     }
 
     @Override
@@ -269,7 +301,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
         me.put("name", name);
         me.put("world", world);
         me.put("composition", composition);
-        me.put("resetDelay", resetDelay);
+        me.put("resetDelay", resetMinutesDelay);
         return me;
     }
 

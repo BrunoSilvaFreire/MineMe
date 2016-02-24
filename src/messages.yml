@@ -1,6 +1,7 @@
-#Colors
- #The are colors which you can use and modify however you like :D
- #These were made to make messages easier to customize.
+#Color pallete, inspired by PlotSquared, take a look at it! Best plot plugin ever 10/10 would use again.
+
+ #These are colors which you can use and modify however you like :D
+ #They were made to make messages easier to customize.
  #Try to remember those like this:
  # Use $1 on messages about ALL the mines
  # Use $2 on messages about a single mine
@@ -10,6 +11,7 @@
  
  # And of course you don't need to use global colors at all, you still use '&a', thats fine :)
  
+ #Actual color pallete below
  # This is $1
  primaryColor: "e"
  # This is $2
@@ -21,6 +23,12 @@
  
 #Messages
  messages:
+    #Chat messages
     messagePrefix: "&e&lMine&a&lMe"
     messageSeparator: " &6&l> $3"
+    
+    #Mine messages
     resetMessage: "$2The mine %mine% has been reseted!"
+    
+    #Warning messages
+    noPermission: "$4You don't have permission to do this!"

@@ -14,14 +14,18 @@ import org.bukkit.entity.Player;
  */
 public class MineManager {
 
-    private static final ArrayList<Mine> MINES = new ArrayList();
+    private static final ArrayList<Mine> mines = new ArrayList();
+
+    public static ArrayList<Mine> getMines() {
+        return mines;
+    }
 
     public static void registerMine(Mine m) {
-        MINES.add(m);
+        mines.add(m);
     }
 
     public static Mine getMine(String name) {
-        for (Mine mine : MINES) {
+        for (Mine mine : mines) {
             if (mine.getName().equalsIgnoreCase(name)) {
                 return mine;
             }
@@ -34,7 +38,7 @@ public class MineManager {
     }
 
     public static Mine getMineWith(Player p) {
-        for (Mine m : MINES) {
+        for (Mine m : mines) {
             if (m.contains(p)) {
                 return m;
             }

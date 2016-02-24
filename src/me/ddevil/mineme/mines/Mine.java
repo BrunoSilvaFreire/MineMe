@@ -5,6 +5,8 @@
  */
 package me.ddevil.mineme.mines;
 
+import java.util.List;
+import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,7 +24,7 @@ public interface Mine extends Iterable<Block> {
 
     public abstract void save();
 
-    public String getName();
+    public abstract String getName();
 
     public abstract Material[] getMaterials();
 
@@ -32,11 +34,17 @@ public interface Mine extends Iterable<Block> {
 
     public abstract MineType getType();
 
-    public boolean contains(int x, int y, int z);
+    public abstract boolean contains(int x, int y, int z);
 
-    public boolean contains(Block b);
+    public abstract boolean contains(Block b);
 
-    public boolean contains(Location l);
+    public abstract boolean contains(Location l);
 
-    public boolean contains(Player p);
+    public abstract boolean contains(Player p);
+
+    public abstract List<Block> getBlocks();
+
+    public abstract Map<Material, Double> getComposition();
+
+    public abstract void tictoc();
 }
