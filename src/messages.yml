@@ -1,8 +1,9 @@
 #Color pallete, inspired by PlotSquared, take a look at it! Best plot plugin ever 10/10 would use again.
-
  #These are colors which you can use and modify however you like :D
+ #They are very useful when "designing" chat appearrence, because any 
+ #change you make to them will update on all the messages
  #They were made to make messages easier to customize.
- #Try to remember those like this:
+ #If you can't remember which is which, try this:
  # Use $1 on messages about ALL the mines
  # Use $2 on messages about a single mine
  # Use $3 on simple messages / The one who no one ever reads

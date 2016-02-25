@@ -37,7 +37,7 @@ public class MineCommand extends CustomCommand {
             "$2Others cool aliases: $1mrl, mm, mine, mines",
             "$1/mineme $2create (name) $3Creates a new mine full of stone :D",
             "$1/mineme $2delete (name) $3Deletes the specified mine",
-            "$1/mineme $2info (name) $3Deletes the specified mine",
+            "$1/mineme $2info (name) $3Displays infos about the specified mine",
             "$1/mineme $2list $3List all the loaded mines.",
             "$1/mineme $2help $3Shows this.",
             "$1/mineme $2reload $3Reloads the config. :)",

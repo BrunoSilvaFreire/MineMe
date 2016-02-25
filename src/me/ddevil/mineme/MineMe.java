@@ -19,7 +19,6 @@ package me.ddevil.mineme;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
@@ -27,13 +26,8 @@ import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
-import me.ddevil.mineme.mines.impl.CuboidMine;
 import me.ddevil.mineme.thread.PluginLoader;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -146,14 +140,7 @@ public class MineMe extends CustomPlugin {
     }
 
     private void unloadEverything() {
-        File messages = new File(getDataFolder() + "/messages.yml");
-        File config = new File(getDataFolder() + "/config.yml");
-        try {
-            pluginConfig.save(config);
-            messagesConfig.save(messages);
-        } catch (IOException ex) {
-            Logger.getLogger(MineMe.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MineManager.unregisterMines();
         pluginConfig = null;
         pluginFolder = null;
         messagesConfig = null;

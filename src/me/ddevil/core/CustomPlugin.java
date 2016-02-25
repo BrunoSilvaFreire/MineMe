@@ -81,7 +81,6 @@ public class CustomPlugin extends JavaPlugin implements Listener {
 
     public FileConfiguration loadConfig() {
         FileConfiguration fc = getConfig();
-        fc.options().copyDefaults(true);
         saveConfig();
         return fc;
     }

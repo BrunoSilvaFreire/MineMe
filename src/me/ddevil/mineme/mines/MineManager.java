@@ -40,6 +40,7 @@ public class MineManager {
 
     public static void unregisterMines() {
         mines.clear();
+        MineMe.getInstance().debug("Unloaded all mines!");
     }
 
     public static Mine getMine(String name) {

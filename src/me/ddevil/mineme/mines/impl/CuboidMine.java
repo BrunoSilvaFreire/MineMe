@@ -53,11 +53,13 @@ public class CuboidMine implements Mine, HologramCompatible {
     protected Map<Material, Double> composition;
     protected int resetMinutesDelay;
     protected boolean broadcastOnReset;
+    protected boolean nearbyBroadcast;
     protected String broadcastMessage;
     protected File saveFile;
+    protected double broadcastRadius;
     private int resetDelay;
 
-    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, boolean broadcastOnReset) {
+    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
@@ -76,14 +78,8 @@ public class CuboidMine implements Mine, HologramCompatible {
         this.pos2 = l2.toVector();
         this.composition = composition;
         this.broadcastOnReset = broadcastOnReset;
-    }
-
-    public void setResetMinutesDelay(int resetMinutesDelay) {
-        this.resetMinutesDelay = resetMinutesDelay;
-    }
-
-    public int getResetMinutesDelay() {
-        return resetMinutesDelay;
+        this.nearbyBroadcast = nearbyBroadcast;
+        this.broadcastRadius = broadcastRadius;
     }
 
     @Override
@@ -259,7 +255,14 @@ public class CuboidMine implements Mine, HologramCompatible {
         new MineRepopulator().repopulate(this);
         if (broadcastOnReset) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
+                if (nearbyBroadcast) {
+                    if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
+                        p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
+
+                    }
+                } else {
+                    p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
+                }
             }
         }
     }
@@ -308,6 +311,38 @@ public class CuboidMine implements Mine, HologramCompatible {
     @Override
     public void setBroadcastOnReset(boolean broadcastOnReset) {
         this.broadcastOnReset = broadcastOnReset;
+    }
+
+    public void setResetDelay(int resetDelay) {
+        this.resetDelay = resetDelay;
+    }
+
+    public void setNearbyBroadcast(boolean nearbyBroadcast) {
+        this.nearbyBroadcast = nearbyBroadcast;
+    }
+
+    public void setBroadcastRadius(double broadcastRadius) {
+        this.broadcastRadius = broadcastRadius;
+    }
+
+    public void setBroadcastMessage(String broadcastMessage) {
+        this.broadcastMessage = broadcastMessage;
+    }
+
+    public double getBroadcastRadius() {
+        return broadcastRadius;
+    }
+
+    public String getBroadcastMessage() {
+        return broadcastMessage;
+    }
+
+    public void setResetMinutesDelay(int resetMinutesDelay) {
+        this.resetMinutesDelay = resetMinutesDelay;
+    }
+
+    public int getResetMinutesDelay() {
+        return resetMinutesDelay;
     }
 
     public FileConfiguration toConfig() {
@@ -511,4 +546,5 @@ public class CuboidMine implements Mine, HologramCompatible {
             }
         }
     }
+
 }
