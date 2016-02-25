@@ -12,17 +12,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this progra  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.ddevil.mineme.mines.impl;
 
-import me.ddevil.mineme.MessageManager;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import me.ddevil.mineme.MessageManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +30,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.HologramCompatible;
-import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
+import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,22 +44,16 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-public class CuboidMine implements Mine, HologramCompatible {
+public class CuboidMine extends BasicMine implements HologramCompatible {
 
-    protected final String name;
-    protected final String world;
+    protected final World world;
     protected final Vector pos1;
     protected final Vector pos2;
     protected Map<Material, Double> composition;
-    protected int resetMinutesDelay;
-    protected boolean broadcastOnReset;
-    protected boolean nearbyBroadcast;
-    protected String broadcastMessage;
     protected File saveFile;
-    protected double broadcastRadius;
-    private int resetDelay;
 
-    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
+    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
+        super(name, broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
@@ -69,25 +63,34 @@ public class CuboidMine implements Mine, HologramCompatible {
         l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
         l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
         l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
-        broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
-        this.world = l1.getWorld().getName();
-        this.name = name;
-        this.resetMinutesDelay = 1;
-        resetDelay = resetMinutesDelay;
+        this.world = l1.getWorld();
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
-        this.broadcastOnReset = broadcastOnReset;
-        this.nearbyBroadcast = nearbyBroadcast;
-        this.broadcastRadius = broadcastRadius;
     }
 
-    @Override
-    public void tictoc() {
-        resetDelay--;
-        if (resetDelay <= 0) {
-            reset();
+    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
+        super(name, broadcastOnReset, nearbyBroadcast, resetMsg, broadcastRadius, delay);
+        if (!l1.getWorld().equals(l2.getWorld())) {
+            throw new IllegalArgumentException("Locations must be on the same world");
         }
+        l1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
+        l1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
+        l1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
+        l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
+        l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
+        l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
+        this.world = l1.getWorld();
+        this.pos1 = l1.toVector();
+        this.pos2 = l2.toVector();
+        this.composition = composition;
+    }
+
+    public CuboidMine(MineConfig config) {
+        super(config);
+        this.world = config.getWorld();
+        this.pos1 = null;
+        this.pos2 = null;
     }
 
     public void setComposition(Map<Material, Double> composition) {
@@ -153,13 +156,8 @@ public class CuboidMine implements Mine, HologramCompatible {
      * Get the Mine's world.
      *
      * @return The World object representing this Mine's world
-     * @throws IllegalStateException if the world is not loaded
      */
     public World getWorld() {
-        World world = Bukkit.getWorld(this.world);
-        if (world == null) {
-            throw new IllegalStateException("World '" + this.world + "' is not loaded");
-        }
         return world;
     }
 
@@ -251,20 +249,24 @@ public class CuboidMine implements Mine, HologramCompatible {
                 p.teleport(l);
             }
         }
-        resetDelay = resetMinutesDelay;
+        currentResetDelay = totalResetDelay;
         new MineRepopulator().repopulate(this);
         if (broadcastOnReset) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (nearbyBroadcast) {
+                if (broadcastNearby) {
                     if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
                         p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
-
                     }
                 } else {
                     p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
                 }
             }
         }
+    }
+
+    @Override
+    public Location getLocation() {
+        return getCenter();
     }
 
     @Override
@@ -303,46 +305,12 @@ public class CuboidMine implements Mine, HologramCompatible {
         return name;
     }
 
-    @Override
-    public boolean isBroadcastOnReset() {
-        return broadcastOnReset;
-    }
-
-    @Override
-    public void setBroadcastOnReset(boolean broadcastOnReset) {
-        this.broadcastOnReset = broadcastOnReset;
-    }
-
-    public void setResetDelay(int resetDelay) {
-        this.resetDelay = resetDelay;
-    }
-
-    public void setNearbyBroadcast(boolean nearbyBroadcast) {
-        this.nearbyBroadcast = nearbyBroadcast;
-    }
-
-    public void setBroadcastRadius(double broadcastRadius) {
-        this.broadcastRadius = broadcastRadius;
-    }
-
-    public void setBroadcastMessage(String broadcastMessage) {
-        this.broadcastMessage = broadcastMessage;
-    }
-
-    public double getBroadcastRadius() {
-        return broadcastRadius;
-    }
-
-    public String getBroadcastMessage() {
-        return broadcastMessage;
-    }
-
     public void setResetMinutesDelay(int resetMinutesDelay) {
-        this.resetMinutesDelay = resetMinutesDelay;
+        this.totalResetDelay = resetMinutesDelay;
     }
 
     public int getResetMinutesDelay() {
-        return resetMinutesDelay;
+        return totalResetDelay;
     }
 
     public FileConfiguration toConfig() {
@@ -362,7 +330,7 @@ public class CuboidMine implements Mine, HologramCompatible {
                 al.add(m + "=" + composition.get(m));
             }
             config.set("composition", al);
-            config.set("resetDelay", resetMinutesDelay);
+            config.set("resetDelay", totalResetDelay);
             return config;
         } catch (IOException ex) {
             return null;
@@ -456,24 +424,24 @@ public class CuboidMine implements Mine, HologramCompatible {
     @Override
     public void hideHolograms() {
         for (Hologram m : holograms) {
-            m.delete();
+            delete();
         }
     }
 
     @Override
     public void updateHolograms() {
-        for (Hologram m : holograms) {
-            m.clearLines();
+        for (Hologram h : holograms) {
+            h.clearLines();
             List<String> list = MineMe.getYAMLMineFile(this).getStringList("hologramsText");
             for (int i = 0; i < list.size(); i++) {
-                m.appendTextLine(MessageManager.translateTagsAndColors(list.get(i), this));
+                h.appendTextLine(MessageManager.translateTagsAndColors(list.get(i), this));
             }
         }
     }
 
     @Override
     public boolean isHologramsVisible() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
     public class CuboidMineIterator implements Iterator<Block> {

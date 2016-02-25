@@ -35,7 +35,8 @@ public class MineCommand extends CustomCommand {
         super("mineme", "mine.admin", Arrays.asList(new String[]{"mrl", "mm", "mine", "mines"}), "Command to manage MineMe mines");
         usageMessages = MessageManager.translateTagsAndColors(new String[]{
             "$2Others cool aliases: $1mrl, mm, mine, mines",
-            "$1/mineme $2create (name) $3Creates a new mine full of stone :D",
+            "$4 () = Obligatory $1/$4 [] = optional",
+            "$1/mineme $2create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] $3Creates a new mine full of stone :D",
             "$1/mineme $2delete (name) $3Deletes the specified mine",
             "$1/mineme $2info (name) $3Displays infos about the specified mine",
             "$1/mineme $2list $3List all the loaded mines.",
@@ -56,7 +57,7 @@ public class MineCommand extends CustomCommand {
                 if (func.equals("create")) {
                     //create
                     if (args.length > 1) {
-                        String mineName = args[0];
+                        String mineName = args[1];
                         Location loc1 = MineMe.WEP.getSelection(p).getMaximumPoint();
                         Location loc2 = MineMe.WEP.getSelection(p).getMinimumPoint();
                         if (loc1 == null) {
@@ -67,8 +68,35 @@ public class MineCommand extends CustomCommand {
                             MineMe.sendMessage(p, "You don't have a location 2 selected in WorldEdit!");
                             return true;
                         }
-
-                        createNewMine(p, mineName, loc1, loc2);
+                        int delay;
+                        if (args.length > 2) {
+                            delay = Integer.valueOf(args[2]);
+                        } else {
+                            delay = 5;
+                        }
+                        boolean broadcast;
+                        if (args.length > 3) {
+                            broadcast = Boolean.valueOf(args[3]);
+                        } else {
+                            broadcast = true;
+                        }
+                        boolean nearby;
+                        if (args.length > 4) {
+                            nearby = Boolean.valueOf(args[4]);
+                        } else {
+                            nearby = true;
+                        }
+                        double radius;
+                        if (args.length > 5) {
+                            try {
+                                radius = Double.valueOf(args[5]);
+                            } catch (Exception e) {
+                                radius = 50;
+                            }
+                        } else {
+                            radius = 50;
+                        }
+                        createNewMine(p, mineName, loc1, loc2, delay, broadcast, nearby, radius);
                     } else {
                         MineMe.sendMessage(p, new String[]{
                             MessageManager.invalidArguments,
@@ -107,17 +135,17 @@ public class MineCommand extends CustomCommand {
         return true;
     }
 
-    private void createNewMine(Player p, String name, Location loc1, Location loc2) {
+    private void createNewMine(Player p, String name, Location loc1, Location loc2, Integer delay, boolean broadcastMessage, boolean nearby, double radius) {
         if (!checkPerm(p)) {
             MineMe.sendMessage(p, MessageManager.noPermission);
             return;
         }
-
         HashMap<Material, Double> map = new HashMap<>();
         map.put(Material.STONE, 100d);
-        Mine m = new CuboidMine(name, loc1, loc2, map, true);
+        Mine m = new CuboidMine(name, loc1, loc2, map, delay, broadcastMessage, nearby, radius);
         m.reset();
         MineManager.registerMine(m);
+        MineMe.sendMessage(p, MessageManager.translateTagsAndColors(MessageManager.mineCreateMessage, m));
     }
 
 }

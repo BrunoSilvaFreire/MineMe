@@ -26,6 +26,7 @@ public class MessageManager {
     private static final char colorChar = '&';
     //Mine Messages
     public static String globalResetMessage;
+    public static String mineCreateMessage;
 
     //Global Messages
     public static String pluginPrefix;
@@ -40,35 +41,45 @@ public class MessageManager {
     public static String secondaryColor;
     public static String neutralColor;
     public static String warningColor;
+    private static MineMe mineMe;
 
     public static void setup() {
-        MineMe.getInstance().debug("Loading colors...");
-        //Colors
-        primaryColor = MineMe.messagesConfig.getString("primaryColor");
-        secondaryColor = MineMe.messagesConfig.getString("secondaryColor");
-        neutralColor = MineMe.messagesConfig.getString("neutralColor");
-        warningColor = MineMe.messagesConfig.getString("warningColor");
-        MineMe.getInstance().debug(new String[]{
-            "Colors set to:",
-            "Primary: " + primaryColor,
-            "Secondary: " + secondaryColor,
-            "Neutral: " + neutralColor,
-            "Warning: " + warningColor,
-            "Colors loaded!"});
-        MineMe.getInstance().debug();
-        MineMe.getInstance().debug("Loading messages...");
-        //Mine Messages
-        globalResetMessage = translateColors(MineMe.messagesConfig.getString("messages.resetMessage"));
+        mineMe = MineMe.getInstance();
+        mineMe.debug("Loading colors...");
+        try {
+            //Colors
+            primaryColor = MineMe.messagesConfig.getString("primaryColor");
+            secondaryColor = MineMe.messagesConfig.getString("secondaryColor");
+            neutralColor = MineMe.messagesConfig.getString("neutralColor");
+            warningColor = MineMe.messagesConfig.getString("warningColor");
+            mineMe.debug(new String[]{
+                "Colors set to:",
+                "Primary: " + primaryColor,
+                "Secondary: " + secondaryColor,
+                "Neutral: " + neutralColor,
+                "Warning: " + warningColor,
+                "Colors loaded!"});
+            mineMe.debug();
+            mineMe.debug("Loading messages...");
+            //Mine Messages
+            globalResetMessage = translateColors(MineMe.messagesConfig.getString("messages.mineReset"));
+            mineCreateMessage = translateColors(MineMe.messagesConfig.getString("messages.mineCreate"));
 
-        //Global Messages
-        messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
-        pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
+            //Global Messages
+            messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
+            pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
 
-        //Error Messages
-        noPermission = translateColors(MineMe.messagesConfig.getString("messages.noPermission"));
-        invalidArguments = translateColors(MineMe.messagesConfig.getString("messages.invalidArguments"));
-        MineMe.getInstance().debug("Messages loaded!");
-        MineMe.getInstance().debug();
+            //Error Messages
+            noPermission = translateColors(MineMe.messagesConfig.getString("messages.noPermission"));
+            invalidArguments = translateColors(MineMe.messagesConfig.getString("messages.invalidArguments"));
+            mineMe.debug("Messages loaded!");
+            mineMe.debug();
+        } catch (Exception e) {
+            mineMe.debug("Something went wrong while loading messages :(");
+            mineMe.debug("--== Error ==--");
+            e.printStackTrace();
+            mineMe.debug("--== Error ==--");
+        }
     }
 
     public static String translateTagsAndColors(String get, Mine m) {
@@ -118,7 +129,7 @@ public class MessageManager {
                     b[i] = ChatColor.COLOR_CHAR;
                     b[i + 1] = s.charAt(0);
                 } else {
-                    MineMe.getInstance().debug("Message \"" + trans + "\" is badly color coded! Remeber to only use $1 to $4 !");
+                    mineMe.debug("Message \"" + trans + "\" is badly color coded! Remeber to only use $1 to $4 !");
                 }
             }
         }

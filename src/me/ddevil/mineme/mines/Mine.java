@@ -53,9 +53,19 @@ public interface Mine extends Iterable<Block> {
 
     public abstract boolean contains(Player p);
 
+    public abstract boolean broadcastOnReset();
+
+    public abstract boolean broadcastToNearbyOnly();
+
+    public abstract double broadcastRadius();
+
     public abstract List<Block> getBlocks();
+
+    public abstract List<String> getInfo();
 
     public abstract Map<Material, Double> getComposition();
 
     public abstract void tictoc();
+
+    public abstract Location getLocation();
 }

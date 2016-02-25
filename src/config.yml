@@ -3,6 +3,8 @@
 #Everything below here will affect ~ALL~ the mines
 global:
   isThisPluginAwesome: true
+  
+  
   #Uses HolographicDisplays to displays Hologram information about mines!
   #You can configurate holograms individualy on their respective files, or you can force
   #them to use the default hologram pattern, which is right below.

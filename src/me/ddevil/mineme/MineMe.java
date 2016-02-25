@@ -19,6 +19,7 @@ package me.ddevil.mineme;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
@@ -49,6 +50,12 @@ public class MineMe extends CustomPlugin {
     }
 
     public static void sendMessage(Player p, String[] messages) {
+        for (String usageMessage : messages) {
+            sendMessage(p, usageMessage);
+        }
+    }
+
+    public static void sendMessage(Player p, List<String> messages) {
         for (String usageMessage : messages) {
             sendMessage(p, usageMessage);
         }

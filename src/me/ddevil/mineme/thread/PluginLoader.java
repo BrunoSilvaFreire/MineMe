@@ -34,6 +34,7 @@ import static me.ddevil.mineme.MineMe.setForceHologramsUse;
 import static me.ddevil.mineme.MineMe.setHologramsUsable;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -155,37 +156,10 @@ public class PluginLoader extends CustomThread {
             //Load mine
             try {
                 mineMe.debug("Loading...");
-                //Get world
-                World w = Bukkit.getWorld(mine.getString("world"));
-
-                //Get Composition
-                HashMap<Material, Double> comp = new HashMap();
-                for (String s : mine.getStringList("composition")) {
-                    String[] split = s.split("=");
-                    try {
-                        comp.put(Material.valueOf(split[0]), Double.valueOf(split[1]));
-                    } catch (NumberFormatException e) {
-                        mineMe.debug(split[1] + " in " + s + "isn't a number!");
-                        mineMe.debug("Skipping mine " + name);
-                    }
-
-                }
-
+                MineConfig config = new MineConfig(mine);
                 //Instanciate
-                mineMe.debug("Instancializating mine " + name + " in world " + w.getName());
-                Mine m = new CuboidMine(
-                        name,
-                        new Location(w,
-                                mine.getDouble("X1"),
-                                mine.getDouble("Y1"),
-                                mine.getDouble("Z1")),
-                        new Location(w,
-                                mine.getDouble("X2"),
-                                mine.getDouble("Y2"),
-                                mine.getDouble("Z2")),
-                        comp,
-                        mine.getBoolean("broadcastOnReset")
-                );
+                mineMe.debug("Instancializating mine " + name + " in world " + config.getWorld().getName());
+                Mine m = new CuboidMine(config);
                 Bukkit.getScheduler().callSyncMethod(mineMe, new Callable<Mine>() {
 
                     @Override

@@ -17,7 +17,9 @@
 package me.ddevil.mineme.mines;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import me.ddevil.mineme.MineMe;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
@@ -27,6 +29,11 @@ import org.bukkit.entity.Player;
 public class MineManager {
 
     private static final ArrayList<Mine> mines = new ArrayList();
+    private static MineMe mineMe;
+
+    public static void setup() {
+        mineMe = MineMe.getInstance();
+    }
 
     public static ArrayList<Mine> getMines() {
         return mines;
@@ -63,5 +70,9 @@ public class MineManager {
             }
         }
         return null;
+    }
+
+    public static void sendInfo(Player p, Mine m) {
+        MineMe.sendMessage(p, m.getInfo());
     }
 }
