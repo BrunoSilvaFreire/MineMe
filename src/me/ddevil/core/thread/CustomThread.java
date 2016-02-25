@@ -14,29 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.mines;
+package me.ddevil.core.thread;
 
-import me.ddevil.mineme.mines.impl.Cuboid;
-import me.ddevil.mineme.mines.impl.CuboidMine;
+import java.util.ArrayList;
 
 /**
  *
  * @author Selma
  */
-public enum MineType {
+public abstract class CustomThread extends Thread {
 
-    CUBOID(CuboidMine.class),
-    CIRCULAR(null),
-    CUSTOM(null);
+    private final ArrayList<FinishListener> listeners = new ArrayList<>();
 
-    private final Class<? extends Mine> mineClass;
-
-    private MineType(Class<? extends Mine> mineClass) {
-        this.mineClass = mineClass;
+    public final void addListener(final FinishListener listener) {
+        listeners.add(listener);
     }
 
-    public Class<? extends Mine> getMineClass() {
-        return mineClass;
+    public final void removeListener(final FinishListener listener) {
+        listeners.remove(listener);
     }
 
+    private void notifyListeners() {
+        for (FinishListener listener : listeners) {
+            listener.onFinish();
+        }
+    }
+
+    @Override
+    public final void run() {
+        try {
+            doRun();
+        } finally {
+            notifyListeners();
+        }
+    }
+
+    public abstract void doRun();
 }

@@ -9,6 +9,9 @@
  #DO. NOT. PUT. CIRCULAR. OR. CUSTOM. BELOW
  #Actually don't even touch this
  type: CUBOID
+ 
+ #In minutes
+ resetTime: 5
  broadcastOnReset: true 
  #Mine coordinates
  X1: 0

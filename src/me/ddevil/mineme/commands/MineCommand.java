@@ -1,3 +1,19 @@
+/* 
+ * Copyright (C) 2016 Selma
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.ddevil.mineme.commands;
 
 import java.util.Arrays;
@@ -18,14 +34,13 @@ public class MineCommand extends CustomCommand {
     public MineCommand() {
         super("mineme", "mine.admin", Arrays.asList(new String[]{"mrl", "mm", "mine", "mines"}), "Command to manage MineMe mines");
         usageMessages = MessageManager.translateTagsAndColors(new String[]{
-            "%prefix%",
             "$2Others cool aliases: $1mrl, mm, mine, mines",
-            "$1- /mineme $2create (name) $3Creates a new mine full of stone :D",
-            "$1- /mineme $2delete (name) $3Deletes the specified mine",
-            "$1- /mineme $2info (name) $3Deletes the specified mine",
-            "$1- /mineme $2list $3List all the loaded mines.",
-            "$1- /mineme $2help $3Shows this.",
-            "$1- /mineme $2reload $3Reloads the config. :)",
+            "$1/mineme $2create (name) $3Creates a new mine full of stone :D",
+            "$1/mineme $2delete (name) $3Deletes the specified mine",
+            "$1/mineme $2info (name) $3Deletes the specified mine",
+            "$1/mineme $2list $3List all the loaded mines.",
+            "$1/mineme $2help $3Shows this.",
+            "$1/mineme $2reload $3Reloads the config. :)",
             "$4NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)"
 
         });

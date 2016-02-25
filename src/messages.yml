@@ -32,10 +32,10 @@
  messages:
     #Chat messages
     messagePrefix: "&e&lMine&a&lMe"
-    messageSeparator: " &6&l> $3"
+    messageSeparator: " &6&l>$3 "
     
     #Mine messages
-    resetMessage: "%prefix% %separator% $2The mine %mine% $2has been reseted!"
+    resetMessage: "%prefix%%separator%$2The mine %mine% $2has been reseted!"
     
     #Warning messages
     noPermission: "$4You don't have permission to do this!"

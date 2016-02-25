@@ -14,29 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.mines;
-
-import me.ddevil.mineme.mines.impl.Cuboid;
-import me.ddevil.mineme.mines.impl.CuboidMine;
+package me.ddevil.core.thread;
 
 /**
  *
  * @author Selma
  */
-public enum MineType {
+public interface FinishListener {
 
-    CUBOID(CuboidMine.class),
-    CIRCULAR(null),
-    CUSTOM(null);
-
-    private final Class<? extends Mine> mineClass;
-
-    private MineType(Class<? extends Mine> mineClass) {
-        this.mineClass = mineClass;
-    }
-
-    public Class<? extends Mine> getMineClass() {
-        return mineClass;
-    }
-
+    public abstract void onFinish();
 }

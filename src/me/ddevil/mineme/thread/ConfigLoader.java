@@ -14,29 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.mines;
+package me.ddevil.mineme.thread;
 
-import me.ddevil.mineme.mines.impl.Cuboid;
-import me.ddevil.mineme.mines.impl.CuboidMine;
+import me.ddevil.core.thread.CustomThread;
 
-/**
- *
- * @author Selma
- */
-public enum MineType {
+public abstract class ConfigLoader extends CustomThread {
 
-    CUBOID(CuboidMine.class),
-    CIRCULAR(null),
-    CUSTOM(null);
+    @Override
+    public void doRun() {
 
-    private final Class<? extends Mine> mineClass;
-
-    private MineType(Class<? extends Mine> mineClass) {
-        this.mineClass = mineClass;
-    }
-
-    public Class<? extends Mine> getMineClass() {
-        return mineClass;
     }
 
 }

@@ -1,3 +1,19 @@
+/* 
+ * Copyright (C) 2016 Selma
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.ddevil.mineme;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -47,6 +63,8 @@ public class MineMe extends CustomPlugin {
     @Override
     public void onEnable() {
         super.onEnable();
+        setupConfig();
+        MessageManager.setup();
         setupDependencies();
         setupPlugin();
         debug("Plugin loaded!");
@@ -80,15 +98,18 @@ public class MineMe extends CustomPlugin {
         pluginFolder = getDataFolder();
         pluginConfig = loadConfig();
         if (!pluginFolder.exists()) {
+            debug("Plugin folder not found! Making one...");
             pluginFolder.mkdir();
         }
-        minesFolder = new File(pluginFolder.getPath() + "/mines");
-        if (!pluginFolder.exists()) {
-            pluginFolder.mkdir();
+        minesFolder = new File(pluginFolder.getPath(), "mines");
+        if (!minesFolder.exists()) {
+            debug("Mines folder not found! Making one...");
+            minesFolder.mkdir();
         }
-        File messages = new File(getDataFolder() + "/messages.yml");
+        File messages = new File(getDataFolder(), "messages.yml");
         if (!messages.exists()) {
             //Load from plugin
+            debug("Messages file not found! Making one...");
             saveResource("messages.yml", false);
         }
         messagesConfig = YamlConfiguration.loadConfiguration(messages);
@@ -119,22 +140,23 @@ public class MineMe extends CustomPlugin {
 
     public void reload(Player p) {
         sendMessage(p, "Reloading config...");
+        debug("Stopping reseter task...");
+        Bukkit.getScheduler().cancelTask(resetId);
+        debug("Unloading...");
         unloadEverything();
+        debug("Reloading config...");
+        setupConfig();
+        debug("Preparing Message Manager...");
+        MessageManager.setup();
+        debug("Preparing Plugin...");
         setupPlugin();
+        debug("Reload complete!");
         sendMessage(p, "Reloaded! :D");
     }
 
     private void unloadEverything() {
         File messages = new File(getDataFolder() + "/messages.yml");
-        if (!messages.exists()) {
-            //Load from plugin
-            saveResource("messages.yml", false);
-        }
         File config = new File(getDataFolder() + "/config.yml");
-        if (!config.exists()) {
-            //Load from plugin
-            saveResource("config.yml", false);
-        }
         try {
             pluginConfig.save(config);
             messagesConfig.save(messages);
@@ -144,17 +166,14 @@ public class MineMe extends CustomPlugin {
         pluginConfig = null;
         pluginFolder = null;
         messagesConfig = null;
-        Bukkit.getScheduler().cancelTask(resetId);
         resetId = null;
     }
 
     private void setupPlugin() {
-        setupConfig();
-        MessageManager.setup();
-
         //Get mines folder
         minesFolder = new File(getDataFolder(), "mines");
         if (!minesFolder.exists()) {
+            debug("Mines folder not found! Making one...");
             minesFolder.mkdir();
         }
         if (minesFolder.listFiles().length == 0) {
@@ -169,10 +188,12 @@ public class MineMe extends CustomPlugin {
         }
         //load mines
         debug("Loading mines");
+        debug();
         File[] mineFiles = minesFolder.listFiles();
         int i = 0;
         for (File file : mineFiles) {
             String filename = file.getName();
+            debug("Attempting to load " + filename + "...");
 
             String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
             if (!"yml".equals(extension)) {
@@ -188,6 +209,7 @@ public class MineMe extends CustomPlugin {
             }
             //Load mine
             try {
+                debug("Loading...");
                 //Get world
                 World w = Bukkit.getWorld(mine.getString("world"));
 
@@ -205,6 +227,7 @@ public class MineMe extends CustomPlugin {
                 }
 
                 //Instanciate
+                debug("Instancializating mine " + name + " in world " + w.getName());
                 Mine m = new CuboidMine(
                         name,
                         new Location(w,
@@ -221,12 +244,14 @@ public class MineMe extends CustomPlugin {
                 m.reset();
                 MineManager.registerMine(m);
                 debug("Loaded mine " + m.getName() + ".");
+                debug();
                 i++;
             } catch (Throwable t) {
                 debug("Something went wrong while loading " + file.getName() + " :(");
                 debug("--== Error ==--");
                 t.printStackTrace();
                 debug("--== Error ==--");
+                debug();
             }
             debug("Loaded  " + i + " mines :D");
         }
