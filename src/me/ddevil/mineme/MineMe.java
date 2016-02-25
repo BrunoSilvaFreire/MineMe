@@ -33,7 +33,7 @@ public class MineMe extends CustomPlugin {
     }
 
     public static void sendMessage(Player p, String string) {
-        p.sendMessage(string);
+        p.sendMessage(MessageManager.pluginPrefix + MessageManager.messageSeparator + string);
     }
 
     public static void sendMessage(Player p, String[] messages) {
@@ -41,25 +41,117 @@ public class MineMe extends CustomPlugin {
             sendMessage(p, usageMessage);
         }
     }
-    private int resetId;
+    private Integer resetId;
+    private boolean useHolograms;
 
     @Override
     public void onEnable() {
         super.onEnable();
+        setupDependencies();
+        setupPlugin();
+        debug("Plugin loaded!");
+        debug("It's all right, it's all favorable :D");
+    }
+
+    public void debug(String[] msg) {
+        for (String m : msg) {
+            debug(m);
+        }
+    }
+
+    public void debug(String msg) {
+        getLogger().info(msg);
+    }
+
+    public void debug() {
+        getLogger().info("");
+    }
+
+    public static FileConfiguration getYAMLMineFile(Mine m) {
+        return YamlConfiguration.loadConfiguration(getMineFile(m));
+    }
+
+    public static File getMineFile(Mine m) {
+        return new File(pluginFolder.getPath() + "/" + m.getName() + ".yml");
+
+    }
+
+    private void setupConfig() {
+        pluginFolder = getDataFolder();
+        pluginConfig = loadConfig();
+        if (!pluginFolder.exists()) {
+            pluginFolder.mkdir();
+        }
+        minesFolder = new File(pluginFolder.getPath() + "/mines");
+        if (!pluginFolder.exists()) {
+            pluginFolder.mkdir();
+        }
+        File messages = new File(getDataFolder() + "/messages.yml");
+        if (!messages.exists()) {
+            //Load from plugin
+            saveResource("messages.yml", false);
+        }
+        messagesConfig = YamlConfiguration.loadConfiguration(messages);
+    }
+
+    public static boolean hologramsUsable = false;
+    public static boolean forceDefaultHolograms = false;
+
+    public static void setHologramsUsable() {
+        hologramsUsable = true;
+    }
+
+    public static void setHologramsUsable(boolean hologramsUsable) {
+        MineMe.hologramsUsable = hologramsUsable;
+    }
+
+    public static void setForceHologramsUse(boolean forceHologramsUse) {
+        MineMe.forceDefaultHolograms = forceHologramsUse;
+    }
+
+    public static boolean isForceHologramsUse() {
+        return forceDefaultHolograms;
+    }
+
+    private void registerBaseCommands() {
+        registerCommand(new MineCommand());
+    }
+
+    public void reload(Player p) {
+        sendMessage(p, "Reloading config...");
+        unloadEverything();
+        setupPlugin();
+        sendMessage(p, "Reloaded! :D");
+    }
+
+    private void unloadEverything() {
+        File messages = new File(getDataFolder() + "/messages.yml");
+        if (!messages.exists()) {
+            //Load from plugin
+            saveResource("messages.yml", false);
+        }
+        File config = new File(getDataFolder() + "/config.yml");
+        if (!config.exists()) {
+            //Load from plugin
+            saveResource("config.yml", false);
+        }
+        try {
+            pluginConfig.save(config);
+            messagesConfig.save(messages);
+        } catch (IOException ex) {
+            Logger.getLogger(MineMe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        pluginConfig = null;
+        pluginFolder = null;
+        messagesConfig = null;
+        Bukkit.getScheduler().cancelTask(resetId);
+        resetId = null;
+    }
+
+    private void setupPlugin() {
         setupConfig();
         MessageManager.setup();
-        //Try to get dependencies
-        if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
-            WEP = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
-        }
-        if (WEP == null) {
 
-            return;
-        }
-        if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
-            enableHolograms();
-            setForceHologramsUse(pluginConfig.getBoolean("global.forceHologramOnAllMine"));
-        }
         //Get mines folder
         minesFolder = new File(getDataFolder(), "mines");
         if (!minesFolder.exists()) {
@@ -150,95 +242,38 @@ public class MineMe extends CustomPlugin {
                 }
             }
         }, minute, minute);
-        debug("Plugin loaded!");
-        debug("It's all right, it's all favorable :D");
+
     }
 
-    public void debug(String[] msg) {
-        for (String m : msg) {
-            debug(m);
+    public void setupDependencies() {
+        //Try to get dependencies
+        if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
+            WEP = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
         }
-    }
-
-    public void debug(String msg) {
-        getLogger().info(msg);
-    }
-
-    public void debug() {
-        getLogger().info("");
-    }
-
-    public static FileConfiguration getYAMLMineFile(Mine m) {
-        return YamlConfiguration.loadConfiguration(getMineFile(m));
-    }
-
-    public static File getMineFile(Mine m) {
-        return new File(pluginFolder.getPath() + "/" + m.getName() + ".yml");
-
-    }
-
-    private void setupConfig() {
-        pluginFolder = getDataFolder();
-        pluginConfig = loadConfig();
-        if (!pluginFolder.exists()) {
-            pluginFolder.mkdir();
-        }
-        minesFolder = new File(pluginFolder.getPath() + "/mines");
-        if (!pluginFolder.exists()) {
-            pluginFolder.mkdir();
-        }
-        File messages = new File(getDataFolder() + "/messages.yml");
-        if (!messages.exists()) {
-            //Load from plugin
-            saveResource("messages.yml", false);
-        }
-        messagesConfig = YamlConfiguration.loadConfiguration(messages);
-    }
-
-    public static boolean hologramsUsable = false;
-    public static boolean forceHologramsUse = false;
-
-    public static void enableHolograms() {
-        hologramsUsable = true;
-    }
-
-    public static void setHologramsUsable(boolean hologramsUsable) {
-        MineMe.hologramsUsable = hologramsUsable;
-    }
-
-    public static void setForceHologramsUse(boolean forceHologramsUse) {
-        MineMe.forceHologramsUse = forceHologramsUse;
-    }
-
-    public static boolean isForceHologramsUse() {
-        return forceHologramsUse;
-    }
-
-    private void registerBaseCommands() {
-        registerCommand(new MineCommand());
-    }
-
-    public void reload(Player p) {
-        sendMessage(p, "Reloading config...");
-        File messages = new File(getDataFolder() + "/messages.yml");
-        if (!messages.exists()) {
-            //Load from plugin
-            saveResource("messages.yml", false);
-        }
-        File config = new File(getDataFolder() + "/config.yml");
-        if (!config.exists()) {
-            //Load from plugin
-            saveResource("config.yml", false);
+        if (WEP == null) {
+            debug("World edit is need for this plugin to work! :(");
+            debug("Please download and install it for it to work!");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
-        try {
-            pluginConfig.save(config);
-            messagesConfig.save(messages);
-        } catch (IOException ex) {
-            Logger.getLogger(MineMe.class.getName()).log(Level.SEVERE, null, ex);
+        //HolographicDisplays
+        if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
+            debug();
+            debug("Detected HolographicDisplays!");
+            setHologramsUsable();
+            useHolograms = pluginConfig.getBoolean("global.useHolographicDisplays");
+            forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
+            if (useHolograms) {
+                debug("Holograms enabled!");
+                setForceHologramsUse(forceDefaultHolograms);
+                if (forceDefaultHolograms) {
+                    debug("Forcing allHolograms to use default preset.");
+                }
+            } else {
+                debug("Holograms are usable, but not enabled.");
+            }
+            debug();
         }
-        pluginConfig = loadConfig();
-        MessageManager.setup();
-        sendMessage(p, "Reloaded! :D");
     }
 }

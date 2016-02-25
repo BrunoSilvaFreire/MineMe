@@ -24,6 +24,10 @@ public class MineManager {
         mines.add(m);
     }
 
+    public static void unregisterMines() {
+        mines.clear();
+    }
+
     public static Mine getMine(String name) {
         for (Mine mine : mines) {
             if (mine.getName().equalsIgnoreCase(name)) {

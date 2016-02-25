@@ -17,7 +17,7 @@ public class MineCommand extends CustomCommand {
 
     public MineCommand() {
         super("mineme", "mine.admin", Arrays.asList(new String[]{"mrl", "mm", "mine", "mines"}), "Command to manage MineMe mines");
-        usageMessages = MessageManager.translateColors(new String[]{
+        usageMessages = MessageManager.translateTagsAndColors(new String[]{
             "%prefix%",
             "$2Others cool aliases: $1mrl, mm, mine, mines",
             "$1- /mineme $2create (name) $3Creates a new mine full of stone :D",

@@ -1,8 +1,7 @@
 package me.ddevil.mineme;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import me.ddevil.core.utils.StringUtils;
 import me.ddevil.mineme.mines.Mine;
 import net.md_5.bungee.api.ChatColor;
 
@@ -46,8 +45,8 @@ public class MessageManager {
         globalResetMessage = translateColors(MineMe.messagesConfig.getString("messages.resetMessage"));
 
         //Global Messages
-        pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
-        messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
+        messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
+        pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
 
         //Error Messages
         noPermission = translateColors(MineMe.messagesConfig.getString("messages.noPermission"));
@@ -59,6 +58,13 @@ public class MessageManager {
     public static String translateTagsAndColors(String get, Mine m) {
         get = get.replaceAll("%mine%", m.getName());
         get = get.replaceAll("%prefix%", pluginPrefix);
+        get = get.replaceAll("%sepatator%", messageSeparator);
+        return translateColors(get);
+    }
+
+    public static String translateTagsAndColor(String get) {
+        get = get.replaceAll("%prefix%", pluginPrefix);
+        get = get.replaceAll("%sepatator%", messageSeparator);
         return translateColors(get);
     }
 
@@ -100,13 +106,21 @@ public class MessageManager {
                 }
             }
         }
-        return ChatColor.translateAlternateColorCodes(colorChar, new String(b));
+        return StringUtils.optimizeColors(ChatColor.translateAlternateColorCodes(colorChar, new String(b)));
     }
 
     public static String[] translateColors(String[] trans) {
         ArrayList<String> afinal = new ArrayList();
         for (String s : trans) {
             afinal.add(translateColors(s));
+        }
+        return afinal.toArray(new String[afinal.size()]);
+    }
+
+    public static String[] translateTagsAndColors(String[] trans) {
+        ArrayList<String> afinal = new ArrayList();
+        for (String s : trans) {
+            afinal.add(translateTagsAndColor(s));
         }
         return afinal.toArray(new String[afinal.size()]);
     }

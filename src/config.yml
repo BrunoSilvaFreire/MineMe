@@ -3,13 +3,18 @@
 #Everything below here will affect ~ALL~ the mines
 global:
   isThisPluginAwesome: true
-  #This will only work if you have Holographic Displays
-  forceHologramOnAllMine: false
+  #Uses HolographicDisplays to displays Hologram information about mines!
+  #You can configurate holograms individualy on their respective files, or you can force
+  #them to use the default hologram pattern, which is right below.
+  #This will only work if you have Holographic Displays installed on your server!
+  useHolographicDisplays: false
   
+  #Forces mine to use the hologram config below
+  forceDefaultHologramOnAllMines: false
   
   #This is the preset that will be setup to all the mines
-  #is forceHologramOnAllMines is enabled
-  globalHologramDisplay:
+  #if forceHologramOnAllMines is enabled
+  defaultHologramDisplay:
       - '%mine%'
       - '%resettime%'
       - '%blocksmined%'
