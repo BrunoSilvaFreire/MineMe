@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
+import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.impl.CuboidMine;
+import me.ddevil.mineme.thread.PluginLoader;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -57,18 +59,26 @@ public class MineMe extends CustomPlugin {
             sendMessage(p, usageMessage);
         }
     }
-    private Integer resetId;
-    private boolean useHolograms;
+    public static Integer resetId;
+    public static boolean useHolograms;
 
     @Override
     public void onEnable() {
         super.onEnable();
-        setupConfig();
-        MessageManager.setup();
-        setupDependencies();
-        setupPlugin();
-        debug("Plugin loaded!");
-        debug("It's all right, it's all favorable :D");
+        PluginLoader pLoader = new PluginLoader();
+        pLoader.start();
+        pLoader.addListener(new FinishListener() {
+
+            @Override
+            public void onFinish() {
+                //Register commands
+                registerBaseCommands();
+
+                debug("Plugin loaded!");
+                debug("It's all right, it's all favorable :D");
+            }
+        });
+
     }
 
     public void debug(String[] msg) {
@@ -92,27 +102,6 @@ public class MineMe extends CustomPlugin {
     public static File getMineFile(Mine m) {
         return new File(pluginFolder.getPath() + "/" + m.getName() + ".yml");
 
-    }
-
-    private void setupConfig() {
-        pluginFolder = getDataFolder();
-        pluginConfig = loadConfig();
-        if (!pluginFolder.exists()) {
-            debug("Plugin folder not found! Making one...");
-            pluginFolder.mkdir();
-        }
-        minesFolder = new File(pluginFolder.getPath(), "mines");
-        if (!minesFolder.exists()) {
-            debug("Mines folder not found! Making one...");
-            minesFolder.mkdir();
-        }
-        File messages = new File(getDataFolder(), "messages.yml");
-        if (!messages.exists()) {
-            //Load from plugin
-            debug("Messages file not found! Making one...");
-            saveResource("messages.yml", false);
-        }
-        messagesConfig = YamlConfiguration.loadConfiguration(messages);
     }
 
     public static boolean hologramsUsable = false;
@@ -144,14 +133,16 @@ public class MineMe extends CustomPlugin {
         Bukkit.getScheduler().cancelTask(resetId);
         debug("Unloading...");
         unloadEverything();
-        debug("Reloading config...");
-        setupConfig();
-        debug("Preparing Message Manager...");
-        MessageManager.setup();
-        debug("Preparing Plugin...");
-        setupPlugin();
-        debug("Reload complete!");
-        sendMessage(p, "Reloaded! :D");
+        PluginLoader l = new PluginLoader();
+        l.start();
+        l.addListener(new FinishListener() {
+
+            @Override
+            public void onFinish() {
+                debug("Reload complete!");
+                sendMessage(p, "Reloaded! :D");
+            }
+        });
     }
 
     private void unloadEverything() {
@@ -167,138 +158,5 @@ public class MineMe extends CustomPlugin {
         pluginFolder = null;
         messagesConfig = null;
         resetId = null;
-    }
-
-    private void setupPlugin() {
-        //Get mines folder
-        minesFolder = new File(getDataFolder(), "mines");
-        if (!minesFolder.exists()) {
-            debug("Mines folder not found! Making one...");
-            minesFolder.mkdir();
-        }
-        if (minesFolder.listFiles().length == 0) {
-            saveResource("examplemine.yml", false);
-            File f = new File(getDataFolder() + "/examplemine.yml");
-            try {
-                FileUtils.moveFileToDirectory(f, minesFolder, false);
-            } catch (IOException ex) {
-                f.delete();
-                debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.");
-            }
-        }
-        //load mines
-        debug("Loading mines");
-        debug();
-        File[] mineFiles = minesFolder.listFiles();
-        int i = 0;
-        for (File file : mineFiles) {
-            String filename = file.getName();
-            debug("Attempting to load " + filename + "...");
-
-            String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
-            if (!"yml".equals(extension)) {
-                debug(filename + " isn't a .yml file! Skipping.");
-                continue;
-            }
-            FileConfiguration mine = YamlConfiguration.loadConfiguration(file);
-            //Get name
-            String name = mine.getString("name");
-            if (!mine.getBoolean("enabled")) {
-                debug("Mine " + name + " is disabled, skipping.");
-                continue;
-            }
-            //Load mine
-            try {
-                debug("Loading...");
-                //Get world
-                World w = Bukkit.getWorld(mine.getString("world"));
-
-                //Get Composition
-                HashMap<Material, Double> comp = new HashMap();
-                for (String s : mine.getStringList("composition")) {
-                    String[] split = s.split("=");
-                    try {
-                        comp.put(Material.valueOf(split[0]), Double.valueOf(split[1]));
-                    } catch (NumberFormatException e) {
-                        debug(split[1] + " in " + s + "isn't a number!");
-                        debug("Skipping mine " + name);
-                    }
-
-                }
-
-                //Instanciate
-                debug("Instancializating mine " + name + " in world " + w.getName());
-                Mine m = new CuboidMine(
-                        name,
-                        new Location(w,
-                                mine.getDouble("X1"),
-                                mine.getDouble("Y1"),
-                                mine.getDouble("Z1")),
-                        new Location(w,
-                                mine.getDouble("X2"),
-                                mine.getDouble("Y2"),
-                                mine.getDouble("Z2")),
-                        comp,
-                        mine.getBoolean("broadcastOnReset")
-                );
-                m.reset();
-                MineManager.registerMine(m);
-                debug("Loaded mine " + m.getName() + ".");
-                debug();
-                i++;
-            } catch (Throwable t) {
-                debug("Something went wrong while loading " + file.getName() + " :(");
-                debug("--== Error ==--");
-                t.printStackTrace();
-                debug("--== Error ==--");
-                debug();
-            }
-            debug("Loaded  " + i + " mines :D");
-        }
-        long minute = 60 * 20L;
-        //Register commands
-        registerBaseCommands();
-        //Start timer
-        resetId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                for (Mine mine : MineManager.getMines()) {
-                    mine.tictoc();
-                }
-            }
-        }, minute, minute);
-
-    }
-
-    public void setupDependencies() {
-        //Try to get dependencies
-        if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
-            WEP = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
-        }
-        if (WEP == null) {
-            debug("World edit is need for this plugin to work! :(");
-            debug("Please download and install it for it to work!");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        //HolographicDisplays
-        if (getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
-            debug();
-            debug("Detected HolographicDisplays!");
-            setHologramsUsable();
-            useHolograms = pluginConfig.getBoolean("global.useHolographicDisplays");
-            forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
-            if (useHolograms) {
-                debug("Holograms enabled!");
-                setForceHologramsUse(forceDefaultHolograms);
-                if (forceDefaultHolograms) {
-                    debug("Forcing allHolograms to use default preset.");
-                }
-            } else {
-                debug("Holograms are usable, but not enabled.");
-            }
-            debug();
-        }
     }
 }

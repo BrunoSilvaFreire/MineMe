@@ -270,7 +270,7 @@ public class CuboidMine implements Mine, HologramCompatible {
     }
 
     @Override
-    public List<Block> getBlocks() {
+    public synchronized List<Block> getBlocks() {
         ArrayList<Block> blocks = new ArrayList<>();
         for (Block thi : this) {
             blocks.add(thi);
