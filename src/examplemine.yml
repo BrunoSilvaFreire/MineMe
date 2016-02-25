@@ -1,26 +1,31 @@
  #This will prevent the mine from being loaded
- enabled: false
+ enabled: true
 
  #The mine name, Duh
  name: "&3Miku &bHatsune"
- #Available types are: CUBOID, CIRCULAR, CUSTOM
+ world: "world"
+ #For now, planned types are: CUBOID, CIRCULAR, CUSTOM
  #CIRCULAR AND CUSTOM ARE ~NOT~ READY YET, so whatever you do
  #DO. NOT. PUT. CIRCULAR. OR. CUSTOM. BELOW
+ #Actually don't even touch this
  type: CUBOID
-
+ broadcastOnReset: true 
  #Mine coordinates
  X1: 0
  Y1: 64
  Z1: 0
 
  X2: 20
- Y2: 64
+ Y2: 84
  Z2: 20
  composition:
- - STONE:25
- - LAPIS_ORE:25
- - REDSTONE_ORE:25
- - COBBLESTONE:2
+ #{Material}:[Data(Optional)]={Percentage}
+ #STONE=25
+ #WOOL:9=25
+ - STONE=25
+ - LAPIS_ORE=25
+ - REDSTONE_ORE=25
+ - COBBLESTONE=25
  
  hologramsText:
  - '%mine%'

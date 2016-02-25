@@ -1,10 +1,12 @@
 package me.ddevil.core;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
@@ -63,9 +65,16 @@ public class CustomPlugin extends JavaPlugin implements Listener {
 
     public FileConfiguration loadConfig() {
         FileConfiguration fc = getConfig();
-        fc.addDefault("lol", "I did!");
         fc.options().copyDefaults(true);
         saveConfig();
         return fc;
+    }
+
+    public FileConfiguration loadResource(File config, String resource) {
+        if (!config.exists()) {
+            //Load from plugin
+            saveResource("messages.yml", false);
+        }
+        return YamlConfiguration.loadConfiguration(config);
     }
 }

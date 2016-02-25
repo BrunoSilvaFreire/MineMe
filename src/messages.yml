@@ -32,3 +32,4 @@
     
     #Warning messages
     noPermission: "$4You don't have permission to do this!"
+    invalidArguments: "$4Invalid arguments! Check usage!"

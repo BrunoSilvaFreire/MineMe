@@ -2,17 +2,20 @@ package me.ddevil.mineme;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
+import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.mines.impl.CuboidMine;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -21,9 +24,13 @@ public class MineMe extends CustomPlugin {
 
     public static FileConfiguration pluginConfig;
     public static FileConfiguration messagesConfig;
-    private static File pluginFolder;
-    private static File minesFolder;
+    public static File pluginFolder;
+    public static File minesFolder;
     public static WorldEditPlugin WEP;
+
+    public static MineMe getInstance() {
+        return (MineMe) instance;
+    }
 
     public static void sendMessage(Player p, String string) {
         p.sendMessage(string);
@@ -40,7 +47,7 @@ public class MineMe extends CustomPlugin {
     public void onEnable() {
         super.onEnable();
         setupConfig();
-
+        MessageManager.setup();
         //Try to get dependencies
         if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
             WEP = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
@@ -53,43 +60,87 @@ public class MineMe extends CustomPlugin {
             enableHolograms();
             setForceHologramsUse(pluginConfig.getBoolean("global.forceHologramOnAllMine"));
         }
-
-        //load mines
-        debug("Loading mines");
+        //Get mines folder
         minesFolder = new File(getDataFolder(), "mines");
         if (!minesFolder.exists()) {
             minesFolder.mkdir();
-            Reader defConfigStream;
+        }
+        if (minesFolder.listFiles().length == 0) {
+            saveResource("examplemine.yml", false);
+            File f = new File(getDataFolder() + "/examplemine.yml");
             try {
-                defConfigStream = new InputStreamReader(this.getResource("examplemine.yml"), "UTF8");
-                YamlConfiguration.loadConfiguration(defConfigStream);
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(MineMe.class.getName()).log(Level.SEVERE, null, ex);
+                FileUtils.moveFileToDirectory(f, minesFolder, false);
+            } catch (IOException ex) {
+                f.delete();
+                debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.");
             }
         }
+        //load mines
+        debug("Loading mines");
         File[] mineFiles = minesFolder.listFiles();
         int i = 0;
         for (File file : mineFiles) {
-            FileConfiguration fileConf = YamlConfiguration.loadConfiguration(file);
+            String filename = file.getName();
+
+            String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
+            if (!"yml".equals(extension)) {
+                debug(filename + " isn't a .yml file! Skipping.");
+                continue;
+            }
+            FileConfiguration mine = YamlConfiguration.loadConfiguration(file);
+            //Get name
+            String name = mine.getString("name");
+            if (!mine.getBoolean("enabled")) {
+                debug("Mine " + name + " is disabled, skipping.");
+                continue;
+            }
+            //Load mine
             try {
-                Object o = fileConf.get("mine");
-                if (!(o instanceof Mine)) {
-                    debug("Hey man, take a look at " + file.getName() + ".");
-                    debug("It isn't a Mine file!");
-                    continue;
+                //Get world
+                World w = Bukkit.getWorld(mine.getString("world"));
+
+                //Get Composition
+                HashMap<Material, Double> comp = new HashMap();
+                for (String s : mine.getStringList("composition")) {
+                    String[] split = s.split("=");
+                    try {
+                        comp.put(Material.valueOf(split[0]), Double.valueOf(split[1]));
+                    } catch (NumberFormatException e) {
+                        debug(split[1] + " in " + s + "isn't a number!");
+                        debug("Skipping mine " + name);
+                    }
+
                 }
-                Mine mine = (Mine) o;
-                mine.reset();
-                MineManager.registerMine(mine);
-                debug("Loaded mine " + mine.getName() + ".");
+
+                //Instanciate
+                Mine m = new CuboidMine(
+                        name,
+                        new Location(w,
+                                mine.getDouble("X1"),
+                                mine.getDouble("Y1"),
+                                mine.getDouble("Z1")),
+                        new Location(w,
+                                mine.getDouble("X2"),
+                                mine.getDouble("Y2"),
+                                mine.getDouble("Z2")),
+                        comp,
+                        mine.getBoolean("broadcastOnReset")
+                );
+                m.reset();
+                MineManager.registerMine(m);
+                debug("Loaded mine " + m.getName() + ".");
                 i++;
             } catch (Throwable t) {
                 debug("Something went wrong while loading " + file.getName() + " :(");
+                debug("--== Error ==--");
+                t.printStackTrace();
+                debug("--== Error ==--");
             }
             debug("Loaded  " + i + " mines :D");
         }
         long minute = 60 * 20L;
-
+        //Register commands
+        registerBaseCommands();
         //Start timer
         resetId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
@@ -99,10 +150,22 @@ public class MineMe extends CustomPlugin {
                 }
             }
         }, minute, minute);
+        debug("Plugin loaded!");
+        debug("It's all right, it's all favorable :D");
+    }
+
+    public void debug(String[] msg) {
+        for (String m : msg) {
+            debug(m);
+        }
     }
 
     public void debug(String msg) {
         getLogger().info(msg);
+    }
+
+    public void debug() {
+        getLogger().info("");
     }
 
     public static FileConfiguration getYAMLMineFile(Mine m) {
@@ -124,6 +187,12 @@ public class MineMe extends CustomPlugin {
         if (!pluginFolder.exists()) {
             pluginFolder.mkdir();
         }
+        File messages = new File(getDataFolder() + "/messages.yml");
+        if (!messages.exists()) {
+            //Load from plugin
+            saveResource("messages.yml", false);
+        }
+        messagesConfig = YamlConfiguration.loadConfiguration(messages);
     }
 
     public static boolean hologramsUsable = false;
@@ -145,4 +214,31 @@ public class MineMe extends CustomPlugin {
         return forceHologramsUse;
     }
 
+    private void registerBaseCommands() {
+        registerCommand(new MineCommand());
+    }
+
+    public void reload(Player p) {
+        sendMessage(p, "Reloading config...");
+        File messages = new File(getDataFolder() + "/messages.yml");
+        if (!messages.exists()) {
+            //Load from plugin
+            saveResource("messages.yml", false);
+        }
+        File config = new File(getDataFolder() + "/config.yml");
+        if (!config.exists()) {
+            //Load from plugin
+            saveResource("config.yml", false);
+        }
+
+        try {
+            pluginConfig.save(config);
+            messagesConfig.save(messages);
+        } catch (IOException ex) {
+            Logger.getLogger(MineMe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        pluginConfig = loadConfig();
+        MessageManager.setup();
+        sendMessage(p, "Reloaded! :D");
+    }
 }

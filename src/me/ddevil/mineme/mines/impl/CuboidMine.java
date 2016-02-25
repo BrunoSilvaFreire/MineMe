@@ -22,12 +22,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
+
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-public class CuboidMine implements Mine, ConfigurationSerializable, HologramCompatible {
+public class CuboidMine implements Mine, HologramCompatible {
 
     protected final String name;
     protected final String world;
@@ -36,11 +37,11 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
     protected Map<Material, Double> composition;
     protected int resetMinutesDelay;
     protected boolean broadcastOnReset;
-    protected String broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
+    protected String broadcastMessage;
     protected File saveFile;
     private int resetDelay;
 
-    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition) {
+    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, boolean broadcastOnReset) {
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
@@ -50,6 +51,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
         l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
         l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
         l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
+        broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
         this.world = l1.getWorld().getName();
         this.name = name;
         this.resetMinutesDelay = 1;
@@ -57,6 +59,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
+        this.broadcastOnReset = broadcastOnReset;
     }
 
     public void setResetMinutesDelay(int resetMinutesDelay) {
@@ -239,7 +242,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
         resetDelay = resetMinutesDelay;
         new MineRepopulator().repopulate(this);
         if (broadcastOnReset) {
-            Bukkit.broadcastMessage(MessageManager.translateTags(broadcastMessage, this));
+            Bukkit.broadcastMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
         }
     }
 
@@ -289,20 +292,29 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
         this.broadcastOnReset = broadcastOnReset;
     }
 
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> me = new HashMap<String, Object>();
-        me.put("X1", pos1.getBlockX());
-        me.put("Y1", pos1.getBlockY());
-        me.put("Z1", pos1.getBlockZ());
-        me.put("X2", pos2.getBlockX());
-        me.put("Y2", pos2.getBlockY());
-        me.put("Z2", pos2.getBlockZ());
-        me.put("name", name);
-        me.put("world", world);
-        me.put("composition", composition);
-        me.put("resetDelay", resetMinutesDelay);
-        return me;
+    public FileConfiguration toConfig() {
+        try {
+            File f = new File(MineMe.minesFolder.getCanonicalPath() + "/" + name + ".yml");
+            FileConfiguration config = YamlConfiguration.loadConfiguration(f);
+            config.set("X1", pos1.getBlockX());
+            config.set("Y1", pos1.getBlockY());
+            config.set("Z1", pos1.getBlockZ());
+            config.set("X2", pos2.getBlockX());
+            config.set("Y2", pos2.getBlockY());
+            config.set("Z2", pos2.getBlockZ());
+            config.set("name", name);
+            config.set("world", world);
+            ArrayList<String> al = new ArrayList<>();
+            for (Material m : getMaterials()) {
+                al.add(m + "=" + composition.get(m));
+            }
+            config.set("composition", al);
+            config.set("resetDelay", resetMinutesDelay);
+            return config;
+        } catch (IOException ex) {
+            return null;
+        }
+
     }
 
     @Override
@@ -401,7 +413,7 @@ public class CuboidMine implements Mine, ConfigurationSerializable, HologramComp
             m.clearLines();
             List<String> list = MineMe.getYAMLMineFile(this).getStringList("hologramsText");
             for (int i = 0; i < list.size(); i++) {
-                m.appendTextLine(MessageManager.translateTags(list.get(i), this));
+                m.appendTextLine(MessageManager.translateTagsAndColors(list.get(i), this));
             }
         }
     }
