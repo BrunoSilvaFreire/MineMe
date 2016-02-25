@@ -89,12 +89,26 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     public CuboidMine(MineConfig config) {
         super(config);
         this.world = config.getWorld();
-        this.pos1 = null;
-        this.pos2 = null;
+        this.pos1 = new Location(world,
+                config.getConfig().getDouble("X1"),
+                config.getConfig().getDouble("Y1"),
+                config.getConfig().getDouble("Z1")).toVector();
+        this.pos2 = new Location(world,
+                config.getConfig().getDouble("X2"),
+                config.getConfig().getDouble("Y2"),
+                config.getConfig().getDouble("Z2")).toVector();
     }
 
     public void setComposition(Map<Material, Double> composition) {
         this.composition = composition;
+    }
+
+    public Vector getPos2() {
+        return pos2;
+    }
+
+    public Vector getPos1() {
+        return pos1;
     }
 
     public File getSaveFile() {
