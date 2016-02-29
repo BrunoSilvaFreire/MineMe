@@ -23,17 +23,26 @@ import me.ddevil.mineme.mines.MineManager;
 import org.bukkit.entity.Player;
 
 /**
+ * Do you like potatoes?
  *
  * @author Selma
  */
 public class MineMeAPI {
 
+    /**
+     * Searches the MineManager for a mine with this name.
+     * <b>Will return null if there isn't a mine with this name!</b>
+     *
+     * @param name the name to search for
+     * @return A mine will this name
+     */
     public static Mine getMine(String name) {
         return MineManager.getMine(name);
     }
 
     /**
      * Searches the MineManager for a mine that contains this players
+     * <b>Will return null if the player isn't on a mine!</b>
      *
      * @param player The player to use
      * @return The mine that contains this player

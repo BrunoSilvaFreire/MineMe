@@ -6,6 +6,14 @@
   #This will only work if you have Holographic Displays installed on your server!
   useHolographicDisplays: false
   
+  #The minimum priority level for messages to be logged into the console
+  # 0 = All (by myseeeeeeelf, together weeeeeee)
+  # 1 = Secondary mine updates (Hologram Updates) (Includes all level 2 msgs)
+  # 2 = Priority mine updates (Resets, Saves, Loads) (Includes all level 3 msgs) (Loading mines from config messages are always shown btw)
+  # 3 = Loading/Unloading (Loads, Unloads, Reloads, Configs, etc)
+  # 4 = None
+  # Errors will always be displayed, trust me, you'll need them.
+  minimumDebugLevel: 0
 #Everything below here will affect ~ALL~ the mines
  global:
   

@@ -63,26 +63,28 @@ public class PluginLoader extends CustomThread {
     private void setupConfig() {
         pluginFolder = mineMe.getDataFolder();
         if (!pluginFolder.exists()) {
-            mineMe.debug("Plugin folder not found! Making one...");
+            mineMe.debug("Plugin folder not found! Making one...", 3);
             pluginFolder.mkdir();
         }
 
         File config = new File(mineMe.getDataFolder(), "config.yml");
         if (!config.exists()) {
             //Load from plugin
-            mineMe.debug("Config file not found! Making one...");
+            mineMe.debug("Config file not found! Making one...", 3);
             mineMe.saveResource("config.yml", false);
         }
         pluginConfig = YamlConfiguration.loadConfiguration(config);
+        mineMe.minimumDebugPriotity = pluginConfig.getInt("settings.minimumDebugLevel");
+
         minesFolder = new File(pluginFolder.getPath(), "mines");
         if (!minesFolder.exists()) {
-            mineMe.debug("Mines folder not found! Making one...");
+            mineMe.debug("Mines folder not found! Making one...", 3);
             minesFolder.mkdir();
         }
         File messages = new File(mineMe.getDataFolder(), "messages.yml");
         if (!messages.exists()) {
             //Load from plugin
-            mineMe.debug("Messages file not found! Making one...");
+            mineMe.debug("Messages file not found! Making one...", 3);
             mineMe.saveResource("messages.yml", false);
         }
         messagesConfig = YamlConfiguration.loadConfiguration(messages);
@@ -95,25 +97,26 @@ public class PluginLoader extends CustomThread {
             WEP = (WorldEditPlugin) mineMe.getServer().getPluginManager().getPlugin("WorldEdit");
         }
         if (WEP == null) {
-            mineMe.debug("WorldEdit is need for this plugin to work! :(");
-            mineMe.debug("Please download and install it!");
+            mineMe.debug("WorldEdit is need for this plugin to work! :(", true);
+            mineMe.debug("Please download and install it!", true);
             Bukkit.getPluginManager().disablePlugin(mineMe);
             return;
         }
         MineMe.hologramsUsable = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
         if (MineMe.hologramsUsable) {
             mineMe.debug();
-            mineMe.debug("Detected HolographicDisplays!");
+            mineMe.debug("Detected HolographicDisplays!", 3);
             MineMe.useHolograms = pluginConfig.getBoolean("settings.useHolographicDisplays");
             MineMe.forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
             if (MineMe.useHolograms) {
-                mineMe.debug("Holograms enabled!");
+                mineMe.debug("Holograms enabled!", 3);
                 setForceHologramsUse(forceDefaultHolograms);
                 if (forceDefaultHolograms) {
-                    mineMe.debug("Forcing allHolograms to use default preset.");
+                    mineMe.debug("Forcing allHolograms to use default preset.", 3);
                 }
             } else {
-                mineMe.debug("Holograms are usable, but not enabled.");
+                mineMe.debug("Holograms are usable, but not enabled.", true);
+                mineMe.debug("If you wish to use them, enable useHolographicDisplays in config.yml", true);
             }
             mineMe.debug();
         }
@@ -123,41 +126,41 @@ public class PluginLoader extends CustomThread {
         //Get mines folder
         minesFolder = new File(mineMe.getDataFolder(), "mines");
         if (!minesFolder.exists()) {
-            mineMe.debug("Mines folder not found! Making one...");
+            mineMe.debug("Mines folder not found! Making one...", 3);
             minesFolder.mkdir();
         }
         if (minesFolder.listFiles().length == 0) {
-            mineMe.debug("Mines folder is empty! Adding examplemine.yml");
+            mineMe.debug("Mines folder is empty! Adding examplemine.yml", 3);
             mineMe.saveResource("examplemine.yml", false);
             File f = new File(mineMe.getDataFolder() + "/examplemine.yml");
             try {
                 FileUtils.moveFileToDirectory(f, minesFolder, false);
-                mineMe.debug("examplemine.yml added!");
+                mineMe.debug("examplemine.yml added!", 3);
             } catch (IOException ex) {
                 f.delete();
-                mineMe.debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.");
+                mineMe.debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.", true);
             }
         }
         mineMe.debug();
         //load mines
-        mineMe.debug("Loading mines");
+        mineMe.debug("Loading mines", true);
         mineMe.debug();
         File[] mineFiles = minesFolder.listFiles();
         int i = 0;
         for (File file : mineFiles) {
             String filename = file.getName();
-            mineMe.debug("Attempting to load " + filename + "...");
+            mineMe.debug("Attempting to load " + filename + "...", 3);
 
             String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
             if (!"yml".equals(extension)) {
-                mineMe.debug(filename + " isn't a .yml file! Skipping.");
+                mineMe.debug(filename + " isn't a .yml file! This shouldn't be here! Skipping.", true);
                 continue;
             }
             FileConfiguration mine = YamlConfiguration.loadConfiguration(file);
             //Get name
             String name = mine.getString("name");
             if (!mine.getBoolean("enabled")) {
-                mineMe.debug("Mine " + name + " is disabled, skipping.");
+                mineMe.debug("Mine " + name + " is disabled, skipping.", 3);
                 continue;
             }
             //Load mine
@@ -165,7 +168,7 @@ public class PluginLoader extends CustomThread {
                 mineMe.debug("Loading...");
                 MineConfig config = new MineConfig(mine);
                 //Instanciate
-                mineMe.debug("Instancializating mine " + name + " in world " + config.getWorld().getName());
+                mineMe.debug("Instancializating mine " + name + " in world " + config.getWorld().getName(), 3);
                 Mine m = new CuboidMine(config);
                 Bukkit.getScheduler().callSyncMethod(mineMe, new Callable<Mine>() {
 
@@ -182,17 +185,17 @@ public class PluginLoader extends CustomThread {
                     }
                 });
                 MineManager.registerMine(m);
-                mineMe.debug("Loaded mine " + m.getName() + ".");
+                mineMe.debug("Loaded mine " + m.getName() + ".", true);
                 mineMe.debug();
                 i++;
             } catch (Throwable t) {
-                mineMe.debug("Something went wrong while loading " + file.getName() + " :(");
-                mineMe.debug("--== Error ==--");
+                mineMe.debug("Something went wrong while loading " + file.getName() + " :(", true);
+                mineMe.debug("--== Error ==--", true);
                 t.printStackTrace();
-                mineMe.debug("--== Error ==--");
+                mineMe.debug("--== Error ==--", true);
                 mineMe.debug();
             }
-            mineMe.debug("Loaded  " + i + " mines :D");
+            mineMe.debug("Loaded  " + i + " mines :D", true);
         }
         long minute = 60 * 20L;
         //Check if timer is running
