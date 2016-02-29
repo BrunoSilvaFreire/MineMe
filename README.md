@@ -1,2 +1,2 @@
 # MineMe
-Bukkit Prison, FullPvP, CPS (whatever you wan't to call it) Mine plugin.
+Bukkit Prison, FullPvP, CPS (whatever you want to call it) Mine plugin.
