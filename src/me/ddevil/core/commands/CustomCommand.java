@@ -16,6 +16,7 @@
  */
 package me.ddevil.core.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import me.ddevil.core.CustomPlugin;
 import me.ddevil.mineme.MineMe;
@@ -63,6 +64,20 @@ public abstract class CustomCommand extends Command {
     public boolean execute(CommandSender cs, String string, String[] strings) {
         return handleExecute(cs, strings);
     }
+    private final ArrayList<SubCommand> subCommands = new ArrayList();
+
+    public void addSubCommand(SubCommand cmd) {
+        subCommands.add(cmd);
+    }
+
+    public SubCommand getSubCommand(String name) {
+        for (SubCommand command : subCommands) {
+            if (command.getName().equals(name) || command.getAliases().contains(name)) {
+                return command;
+            }
+        }
+        return null;
+    }
 
     public static boolean isInteger(String s) {
         try {
@@ -78,7 +93,7 @@ public abstract class CustomCommand extends Command {
     }
 
     public void sendUsage(Player p) {
-        MineMe.sendMessage(p, usageMessages);
+        CustomPlugin.messageManager.sendMessage(p, usageMessages);
     }
 
     public abstract boolean handleExecute(CommandSender sender, String[] args);

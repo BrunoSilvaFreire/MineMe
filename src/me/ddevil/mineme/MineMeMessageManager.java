@@ -17,20 +17,18 @@
 package me.ddevil.mineme;
 
 import java.util.ArrayList;
+import me.ddevil.core.chat.BasicMessageManager;
+import me.ddevil.core.chat.MessageManager;
 import me.ddevil.core.utils.StringUtils;
 import me.ddevil.mineme.mines.Mine;
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 
-public class MessageManager {
+public class MineMeMessageManager extends BasicMessageManager {
 
     private static final char colorChar = '&';
     //Mine Messages
     public static String globalResetMessage;
     public static String mineCreateMessage;
-
-    //Global Messages
-    public static String pluginPrefix;
-    public static String messageSeparator;
 
     //Error Messages
     public static String noPermission;
@@ -43,7 +41,8 @@ public class MessageManager {
     public static String warningColor;
     private static MineMe mineMe;
 
-    public static void setup() {
+    @Override
+    public void setup() {
         mineMe = MineMe.getInstance();
         mineMe.debug("Loading colors...");
         try {
@@ -84,6 +83,7 @@ public class MessageManager {
 
     public static String translateTagsAndColors(String get, Mine m) {
         get = get.replaceAll("%mine%", m.getName());
+        get = get.replaceAll("%alias%", m.getAlias());
         get = get.replaceAll("%prefix%", pluginPrefix);
         get = get.replaceAll("%separator%", messageSeparator);
         return translateColors(get);
@@ -159,4 +159,5 @@ public class MessageManager {
         }
         return afinal.toArray(new String[afinal.size()]);
     }
+
 }

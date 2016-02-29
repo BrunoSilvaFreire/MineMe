@@ -2,8 +2,9 @@
 
 #Everything below here will affect ~ALL~ the mines
 global:
-  isThisPluginAwesome: true
   
+  #Forces all the mines to use the default broadcast message in messages.yml
+  forceDefaultBroadcastMessage: true
   
   #Uses HolographicDisplays to displays Hologram information about mines!
   #You can configurate holograms individualy on their respective files, or you can force
@@ -17,7 +18,7 @@ global:
   #This is the preset that will be setup to all the mines
   #if forceHologramOnAllMines is enabled
   defaultHologramDisplay:
-      - '%mine%'
-      - '%resettime%'
-      - '%blocksmined%'
-      - 'I like potatoes!'
+   - '%alias%'
+   - '&eBanana'
+   - '&6Potato'
+   - '&eBanana'

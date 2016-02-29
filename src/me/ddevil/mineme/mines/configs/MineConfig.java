@@ -30,17 +30,22 @@ import org.bukkit.configuration.file.FileConfiguration;
  */
 public class MineConfig {
 
+    //General info
+    private final boolean enabled;
     private final FileConfiguration config;
     private final World world;
     private final MineType type;
-    private final boolean broadcastOnReset;
-    private final boolean nearbyBroadcast;
-    private final boolean enabled;
-
-    private final String broadcastMessage;
-    private final double broadcastRadius;
-    private final int resetDelay;
     private final String name;
+    private final String alias;
+
+    //Broadcast info
+    private final String broadcastMessage;
+    private final boolean broadcastOnReset;
+    private final boolean broadcastNearby;
+    private final double broadcastRadius;
+
+    //Tecnical info
+    private final int resetDelay;
     private final HashMap<Material, Double> composition;
     private final boolean useCustomBroadcast;
 
@@ -49,9 +54,10 @@ public class MineConfig {
         world = Bukkit.getWorld(mine.getString("world"));
         type = MineType.valueOf(mine.getString("type"));
         name = mine.getString("name");
+        alias = mine.getString("alias");
         enabled = mine.getBoolean("enabled");
         broadcastOnReset = mine.getBoolean("broadcastOnReset");
-        nearbyBroadcast = mine.getBoolean("broadcastToNearbyOnly");
+        broadcastNearby = mine.getBoolean("broadcastToNearbyOnly");
         useCustomBroadcast = mine.getBoolean("useCustomBroadcast");
         broadcastMessage = mine.getString("customBroadcast");
         broadcastRadius = mine.getDouble("broadcastRadius");
@@ -86,7 +92,7 @@ public class MineConfig {
     }
 
     public boolean isNearbyBroadcast() {
-        return nearbyBroadcast;
+        return broadcastNearby;
     }
 
     public boolean isBroadcastOnReset() {
@@ -115,6 +121,10 @@ public class MineConfig {
 
     public FileConfiguration getConfig() {
         return config;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
 }

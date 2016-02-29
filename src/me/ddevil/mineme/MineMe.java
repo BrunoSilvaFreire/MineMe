@@ -16,12 +16,10 @@
  */
 package me.ddevil.mineme;
 
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
@@ -40,28 +38,15 @@ public class MineMe extends CustomPlugin {
     public static File pluginFolder;
     public static File minesFolder;
     public static WorldEditPlugin WEP;
+    public static Integer resetId;
+    public static boolean useHolograms = false;
+    public static boolean forceDefaultBroadcastMessage = true;
+    public static boolean hologramsUsable = false;
+    public static boolean forceDefaultHolograms = false;
 
     public static MineMe getInstance() {
         return (MineMe) instance;
     }
-
-    public static void sendMessage(Player p, String string) {
-        p.sendMessage(MessageManager.pluginPrefix + MessageManager.messageSeparator + string);
-    }
-
-    public static void sendMessage(Player p, String[] messages) {
-        for (String usageMessage : messages) {
-            sendMessage(p, usageMessage);
-        }
-    }
-
-    public static void sendMessage(Player p, List<String> messages) {
-        for (String usageMessage : messages) {
-            sendMessage(p, usageMessage);
-        }
-    }
-    public static Integer resetId;
-    public static boolean useHolograms;
 
     @Override
     public void onEnable() {
@@ -80,6 +65,11 @@ public class MineMe extends CustomPlugin {
             }
         });
 
+    }
+
+    @Override
+    public void onDisable() {
+        unloadEverything();
     }
 
     public void debug(String[] msg) {
@@ -101,15 +91,8 @@ public class MineMe extends CustomPlugin {
     }
 
     public static File getMineFile(Mine m) {
-        return new File(pluginFolder.getPath() + "/" + m.getName() + ".yml");
+        return new File(minesFolder.getPath(), m.getName() + ".yml");
 
-    }
-
-    public static boolean hologramsUsable = false;
-    public static boolean forceDefaultHolograms = false;
-
-    public static void setHologramsUsable() {
-        hologramsUsable = true;
     }
 
     public static void setHologramsUsable(boolean hologramsUsable) {
@@ -129,7 +112,7 @@ public class MineMe extends CustomPlugin {
     }
 
     public void reload(Player p) {
-        sendMessage(p, "Reloading config...");
+        messageManager.sendMessage(p, "Reloading config...");
         debug("Stopping reseter task...");
         Bukkit.getScheduler().cancelTask(resetId);
         debug("Unloading...");
@@ -141,12 +124,17 @@ public class MineMe extends CustomPlugin {
             @Override
             public void onFinish() {
                 debug("Reload complete!");
-                sendMessage(p, "Reloaded! :D");
+                messageManager.sendMessage(p, "Reloaded! :D");
             }
         });
     }
 
     private void unloadEverything() {
+        if (useHolograms) {
+            for (Hologram h : HologramsAPI.getHolograms(this)) {
+                h.delete();
+            }
+        }
         MineManager.unregisterMines();
         pluginConfig = null;
         pluginFolder = null;

@@ -19,6 +19,7 @@ package me.ddevil.mineme.mines.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import me.ddevil.mineme.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.configs.MineConfig;
@@ -31,18 +32,22 @@ public abstract class BasicMine implements Mine {
     protected double broadcastRadius;
     protected boolean broadcastNearby;
     protected final String name;
+    protected final String alias;
 
     protected int currentResetDelay;
     protected int totalResetDelay;
 
     public BasicMine(MineConfig config) {
-        this.broadcastMessage = config.getBroadcastMessage();
+        this.broadcastMessage = MineMe.forceDefaultBroadcastMessage
+                ? MineMeMessageManager.globalResetMessage
+                : config.isUseCustomBroadcast() ? config.getBroadcastMessage() : MineMeMessageManager.globalResetMessage;
         this.broadcastOnReset = config.isBroadcastOnReset();
         this.broadcastRadius = config.getBroadcastRadius();
         this.broadcastNearby = config.isNearbyBroadcast();
         this.currentResetDelay = totalResetDelay;
         this.totalResetDelay = config.getResetDelay();
         this.name = config.getName();
+        this.alias = config.getAlias();
     }
 
     public BasicMine(String name, boolean broadcastOnReset, boolean nearbyBroadcast, String broadcastMessage, double broadcastRadius, int resetMinutesDelay) {
@@ -53,6 +58,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         this.broadcastMessage = broadcastMessage;
         this.name = name;
+        this.alias = name;
     }
 
     public BasicMine(String name, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay) {
@@ -63,6 +69,29 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
         this.name = name;
+        this.alias = name;
+    }
+
+    public BasicMine(String name, String alias, boolean broadcastOnReset, boolean nearbyBroadcast, String broadcastMessage, double broadcastRadius, int resetMinutesDelay) {
+        this.broadcastOnReset = broadcastOnReset;
+        this.broadcastNearby = nearbyBroadcast;
+        this.broadcastRadius = broadcastRadius;
+        this.totalResetDelay = resetMinutesDelay;
+        this.currentResetDelay = totalResetDelay;
+        this.broadcastMessage = broadcastMessage;
+        this.name = name;
+        this.alias = alias;
+    }
+
+    public BasicMine(String name, String alias, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay) {
+        this.broadcastOnReset = broadcastOnReset;
+        this.broadcastNearby = nearbyBroadcast;
+        this.broadcastRadius = broadcastRadius;
+        this.totalResetDelay = resetMinutesDelay;
+        this.currentResetDelay = totalResetDelay;
+        broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
+        this.name = name;
+        this.alias = alias;
     }
 
     @Override
@@ -125,6 +154,11 @@ public abstract class BasicMine implements Mine {
 
     public String getBroadcastMessage() {
         return broadcastMessage;
+    }
+
+    @Override
+    public String getAlias() {
+        return alias;
     }
 
     @Override

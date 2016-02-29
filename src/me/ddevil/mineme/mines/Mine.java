@@ -29,43 +29,45 @@ import org.bukkit.entity.Player;
  */
 public interface Mine extends Iterable<Block> {
 
-    public abstract void delete();
+    public void delete();
 
-    public abstract void reset();
+    public void reset();
 
-    public abstract void save();
+    public void save();
 
-    public abstract String getName();
+    public String getName();
 
-    public abstract Material[] getMaterials();
+    public Material[] getMaterials();
 
-    public abstract boolean isBroadcastOnReset();
+    public boolean isBroadcastOnReset();
 
-    public abstract void setBroadcastOnReset(boolean broadcastOnReset);
+    public void setBroadcastOnReset(boolean broadcastOnReset);
 
-    public abstract MineType getType();
+    public MineType getType();
 
-    public abstract boolean contains(int x, int y, int z);
+    public boolean contains(int x, int y, int z);
 
-    public abstract boolean contains(Block b);
+    public boolean contains(Block b);
 
-    public abstract boolean contains(Location l);
+    public boolean contains(Location l);
 
-    public abstract boolean contains(Player p);
+    public boolean contains(Player p);
 
-    public abstract boolean broadcastOnReset();
+    public boolean broadcastOnReset();
 
-    public abstract boolean broadcastToNearbyOnly();
+    public boolean broadcastToNearbyOnly();
 
-    public abstract double broadcastRadius();
+    public double broadcastRadius();
 
-    public abstract List<Block> getBlocks();
+    public List<Block> getBlocks();
 
-    public abstract List<String> getInfo();
+    public List<String> getInfo();
 
-    public abstract Map<Material, Double> getComposition();
+    public Map<Material, Double> getComposition();
 
-    public abstract void tictoc();
+    public void tictoc();
 
-    public abstract Location getLocation();
+    public Location getLocation();
+
+    public String getAlias();
 }

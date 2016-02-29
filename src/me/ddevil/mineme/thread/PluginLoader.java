@@ -19,10 +19,9 @@ package me.ddevil.mineme.thread;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.concurrent.Callable;
 import me.ddevil.core.thread.CustomThread;
-import me.ddevil.mineme.MessageManager;
+import me.ddevil.mineme.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import static me.ddevil.mineme.MineMe.WEP;
 import static me.ddevil.mineme.MineMe.forceDefaultHolograms;
@@ -31,16 +30,13 @@ import static me.ddevil.mineme.MineMe.minesFolder;
 import static me.ddevil.mineme.MineMe.pluginConfig;
 import static me.ddevil.mineme.MineMe.pluginFolder;
 import static me.ddevil.mineme.MineMe.setForceHologramsUse;
-import static me.ddevil.mineme.MineMe.setHologramsUsable;
+import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -50,22 +46,34 @@ public class PluginLoader extends CustomThread {
 
     @Override
     public void doRun() {
-
         mineMe.debug("Loading config...");
         setupConfig();
-        mineMe.debug("Preparing Message Manager...");
-        MessageManager.setup();
-        mineMe.debug("Preparing Plugin...");
+        mineMe.debug("Config loaded!");
+        mineMe.debug("Loading Message Manager...");
+        MineMe.messageManager = new MineMeMessageManager();
+        MineMe.messageManager.setup();
+        mineMe.debug("Message Manager loaded!");
+        mineMe.debug("Looking for extra dependencies...");
+        setupDependencies();
+        mineMe.debug("Loading Plugin...");
         setupPlugin();
+        mineMe.debug("Plugin loaded!");
     }
 
     private void setupConfig() {
         pluginFolder = mineMe.getDataFolder();
-        pluginConfig = mineMe.loadConfig();
         if (!pluginFolder.exists()) {
             mineMe.debug("Plugin folder not found! Making one...");
             pluginFolder.mkdir();
         }
+
+        File config = new File(mineMe.getDataFolder(), "config.yml");
+        if (!config.exists()) {
+            //Load from plugin
+            mineMe.debug("Config file not found! Making one...");
+            mineMe.saveResource("config.yml", false);
+        }
+        pluginConfig = YamlConfiguration.loadConfiguration(config);
         minesFolder = new File(pluginFolder.getPath(), "mines");
         if (!minesFolder.exists()) {
             mineMe.debug("Mines folder not found! Making one...");
@@ -78,27 +86,26 @@ public class PluginLoader extends CustomThread {
             mineMe.saveResource("messages.yml", false);
         }
         messagesConfig = YamlConfiguration.loadConfiguration(messages);
+        MineMe.forceDefaultBroadcastMessage = messagesConfig.getBoolean("global.forceDefaultBroadcastMessage");
     }
 
     public void setupDependencies() {
         //Try to get dependencies
-        if (mineMe.getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
             WEP = (WorldEditPlugin) mineMe.getServer().getPluginManager().getPlugin("WorldEdit");
         }
         if (WEP == null) {
-            mineMe.debug("World edit is need for this plugin to work! :(");
-            mineMe.debug("Please download and install it for it to work!");
+            mineMe.debug("WorldEdit is need for this plugin to work! :(");
+            mineMe.debug("Please download and install it!");
             Bukkit.getPluginManager().disablePlugin(mineMe);
             return;
         }
-
-        //HolographicDisplays
-        if (mineMe.getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
+        MineMe.hologramsUsable = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
+        if (MineMe.hologramsUsable) {
             mineMe.debug();
             mineMe.debug("Detected HolographicDisplays!");
-            setHologramsUsable();
             MineMe.useHolograms = pluginConfig.getBoolean("global.useHolographicDisplays");
-            forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
+            MineMe.forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
             if (MineMe.useHolograms) {
                 mineMe.debug("Holograms enabled!");
                 setForceHologramsUse(forceDefaultHolograms);
@@ -165,6 +172,12 @@ public class PluginLoader extends CustomThread {
                     @Override
                     public Mine call() throws Exception {
                         m.reset();
+                        if (MineMe.useHolograms) {
+                            if (m instanceof HologramCompatible) {
+                                HologramCompatible h = (HologramCompatible) m;
+                                h.setupHolograms();
+                            }
+                        }
                         return m;
                     }
                 });

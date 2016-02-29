@@ -35,8 +35,12 @@ public class MineRepopulator {
 
         private RepopulateMap(Mine m) {
             randomCollection = new RandomCollection<>();
-            for (Material m1 : m.getComposition().keySet()) {
-                randomCollection.add(m.getComposition().get(m1), m1);
+            for (Material m1
+                    : m.getComposition().
+                    keySet()) {
+                randomCollection.add(
+                        m.getComposition().get(m1),
+                        m1);
             }
 
         }

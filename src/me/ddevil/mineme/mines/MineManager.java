@@ -17,9 +17,7 @@
 package me.ddevil.mineme.mines;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import me.ddevil.mineme.MineMe;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
@@ -73,6 +71,6 @@ public class MineManager {
     }
 
     public static void sendInfo(Player p, Mine m) {
-        MineMe.sendMessage(p, m.getInfo());
+        MineMe.messageManager.sendMessage(p, m.getInfo());
     }
 }

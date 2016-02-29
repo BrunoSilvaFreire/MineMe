@@ -16,14 +16,17 @@
  */
 package me.ddevil.core;
 
+import me.ddevil.core.chat.MessageManager;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
@@ -33,6 +36,9 @@ public class CustomPlugin extends JavaPlugin implements Listener {
 
     public static CustomPlugin instance;
     protected static CommandMap commandMap;
+    public static MessageManager messageManager;
+    public static String pluginPrefix = "Plugin prefix was not setup";
+    public static String messageSeparator = "Message separator was not setup";
 
     @Override
     public void onEnable() {
@@ -44,7 +50,7 @@ public class CustomPlugin extends JavaPlugin implements Listener {
                 commandMap = (CommandMap) f.get(Bukkit.getServer());
             }
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            Bukkit.getServer().shutdown();
+            Bukkit.getPluginManager().disablePlugin(this);
         }
     }
 

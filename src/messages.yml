@@ -27,7 +27,8 @@
 # %prefix% - Replaced by messagePrefix (The one right below)
 # %separator% - Replaced by messageSeparator
 #
-# %mine% - Replaced by the mine name (Usable only on Mine messages!)
+# %mine% - Replaced by the mine -> NAME <- (Usable only on Mine messages!)
+# %alias% - Replaced by the mine -> ALIAS <- (Usable only on Mine messages!)
 #
 #Messages
  messages:
@@ -36,8 +37,11 @@
     messageSeparator: " &6&l>$3 "
     
     #Mine messages
+    #Message
     mineCreate: "%prefix%%separator%$2Mine %mine% $2has been created!"
-    mineReset: "%prefix%%separator%$2The mine %mine% $2has been reseted!"
+    #if forceDefaultBroadcastMessage is enabled, this message will be used on all mines
+    #on reset... ALL... MINES...
+    mineReset: "%prefix%%separator%$2The mine %alias% $2has been reseted!"
     
     #Warning messages
     noPermission: "$4You don't have permission to do this!"

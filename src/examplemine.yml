@@ -1,8 +1,11 @@
  #This will prevent the mine from being loaded
  enabled: true
 
- #The mine name, Duh
- name: "&3Miku &bHatsune"
+ #The mine name, this name won't be displayed at all, this is mostly for
+ #technical reasons(Like finding itself in things like /mineme info).
+ name: "examplemine"
+ #The name that
+ alias: "&3Miku &bHatsune"
  world: "world"
  #For now, planned types are: CUBOID, CIRCULAR, CUSTOM
  #CIRCULAR AND CUSTOM ARE ~NOT~ READY YET, so whatever you do
@@ -24,7 +27,7 @@
  #false uses the broadcast message in config.yml
  #true uses the customBroadcast below
  useCustomBroadcast: false
- customBroadcast: "IMMA CUSTOM BROADCAST :D"
+ customBroadcast: "%prefix%%separator%I BE A CUSTOM BROADCAST :D"
  #Mine coordinates
  X1: 0
  Y1: 64
@@ -43,7 +46,7 @@
  - COBBLESTONE=25
  
  hologramsText:
- - '%mine%'
- - '%resettime%'
- - 'Banana'
- - 'I like bananas!'
+  - '%alias%'
+  - '&6Potato'
+  - '&eBanana'
+  - '&6Potato'

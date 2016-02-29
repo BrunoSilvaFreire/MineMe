@@ -18,7 +18,7 @@ package me.ddevil.mineme.mines.impl;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import me.ddevil.mineme.MessageManager;
+import me.ddevil.mineme.MineMeMessageManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +42,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.util.Vector;
 
 public class CuboidMine extends BasicMine implements HologramCompatible {
@@ -51,6 +53,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     protected final Vector pos2;
     protected Map<Material, Double> composition;
     protected File saveFile;
+    private List<String> hologramsLines;
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
         super(name, broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
@@ -97,6 +100,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 config.getConfig().getDouble("X2"),
                 config.getConfig().getDouble("Y2"),
                 config.getConfig().getDouble("Z2")).toVector();
+        composition = config.getComposition();
     }
 
     public void setComposition(Map<Material, Double> composition) {
@@ -264,15 +268,16 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             }
         }
         currentResetDelay = totalResetDelay;
-        new MineRepopulator().repopulate(this);
+        new MineRepopulator().
+                repopulate(this);
         if (broadcastOnReset) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (broadcastNearby) {
                     if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
-                        p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
+                        p.sendMessage(MineMeMessageManager.translateTagsAndColors(broadcastMessage, this));
                     }
                 } else {
-                    p.sendMessage(MessageManager.translateTagsAndColors(broadcastMessage, this));
+                    p.sendMessage(MineMeMessageManager.translateTagsAndColors(broadcastMessage, this));
                 }
             }
         }
@@ -407,48 +412,52 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     @Override
     public void setupHolograms() {
+        MineMe.getInstance().debug("Creating holograms for " + name + "...");
         Location l = getCenter();
         Location temp;
-
         temp = l.clone();
         temp.setY(getUpperY() + 3);
         holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
-        holograms.add(HologramsAPI.createHologram(MineMe.instance, l));
         temp = l.clone();
-        temp.add(getSizeX() / 2, 0, 0);
+        temp.add(getSizeX() / 2 + 1, 0, 0);
         holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
         temp = l.clone();
-        temp.add((getSizeX() / 2) * -1, 0, 0);
+        temp.add(((getSizeX() / 2) * -1) - 1, 0, 0);
         holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
         temp = l.clone();
-        temp.add(0, 0, getSizeZ() / 2);
+        temp.add(0, 0, (getSizeZ() / 2) + 1);
         holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
         temp = l.clone();
-        temp.add(0, 0, (getSizeZ() / 2) * -1);
+        temp.add(0, 0, ((getSizeZ() / 2) * -1) - 1);
         holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
-
+        MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
+        hologramsLines = MineMe.forceDefaultHolograms ? MineMe.pluginConfig.getStringList("global.defaultHologramDisplay") : MineMe.getYAMLMineFile(this).getStringList("hologramsText");
         updateHolograms();
     }
 
     @Override
     public void showHolograms() {
-        setupHolograms();
+        updateHolograms();
+
     }
 
     @Override
     public void hideHolograms() {
         for (Hologram m : holograms) {
-            delete();
+            m.clearLines();
         }
     }
 
     @Override
     public void updateHolograms() {
+        MineMe.getInstance().debug("Updating holograms for " + name);
+        MineMe.getInstance().debug("Total lines: " + hologramsLines.size());
         for (Hologram h : holograms) {
             h.clearLines();
-            List<String> list = MineMe.getYAMLMineFile(this).getStringList("hologramsText");
-            for (int i = 0; i < list.size(); i++) {
-                h.appendTextLine(MessageManager.translateTagsAndColors(list.get(i), this));
+            for (int i = 0; i < hologramsLines.size(); i++) {
+                String text = hologramsLines.get(i);
+                h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this)
+                );
             }
         }
     }
