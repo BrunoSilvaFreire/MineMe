@@ -16,6 +16,7 @@
  */
 package me.ddevil.mineme.mines.impl;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +25,13 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 
 public abstract class BasicMine implements Mine {
 
+    protected final ArrayList<Block> brokenBlocks = new ArrayList();
     protected boolean broadcastOnReset;
     protected String broadcastMessage;
     protected double broadcastRadius;
@@ -188,5 +193,38 @@ public abstract class BasicMine implements Mine {
             comp.add("$1" + ma.name() + " $2= $1" + getComposition().get(ma));
         }
         return comp;
+    }
+
+    @Override
+    public boolean wasAlreadyBroken(Block b) {
+        return brokenBlocks.contains(b);
+    }
+
+    @Override
+    public double getPercentageMined() {
+        return Double.valueOf(
+                new DecimalFormat("###.#").format(
+                        (getVolume() * 100) / brokenBlocks.size()
+                ));
+    }
+
+    @Override
+    public int getMinedBlocks() {
+        return getVolume() - getRemainingBlocks();
+    }
+
+    @Override
+    public int getRemainingBlocks() {
+        return getVolume() - brokenBlocks.size();
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent e) {
+        Block b = e.getBlock();
+        if (contains(b)) {
+            if (!wasAlreadyBroken(b)) {
+                brokenBlocks.add(b);
+            }
+        }
     }
 }

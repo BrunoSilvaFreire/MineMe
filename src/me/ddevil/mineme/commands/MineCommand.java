@@ -32,6 +32,8 @@ import org.bukkit.entity.Player;
 
 public class MineCommand extends CustomCommand {
 
+    private final EditCommand editCommand;
+
     public class EditCommand extends SubCommand {
 
         public EditCommand(MineCommand minecmd) {
@@ -48,7 +50,15 @@ public class MineCommand extends CustomCommand {
         public boolean handleExecute(CommandSender sender, String[] args) {
             if (sender instanceof Player) {
                 Player p = (Player) sender;
+                if (args.length > 1) {
+                    String mineName = args[1];
+                    Mine mine = MineManager.getMine(mineName);
+                    if (mine != null) {
 
+                    } else {
+                    }
+                } else {
+                }
             } else {
                 sender.sendMessage("You can only use this command ingame");
             }
@@ -58,6 +68,8 @@ public class MineCommand extends CustomCommand {
 
     public MineCommand() {
         super("mineme", "mine.admin", Arrays.asList(new String[]{"mrl", "mm", "mine", "mines"}), "Command to manage MineMe mines");
+        editCommand = new EditCommand(this);
+        addSubCommand(editCommand);
         usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
             "$2Others cool aliases: $1mrl, mm, mine, mines",
             "$4 () = Obligatory $1/$4 [] = optional",
@@ -152,6 +164,9 @@ public class MineCommand extends CustomCommand {
                 } else if (func.equals("list")) {
                     //list
                     listMines(p);
+                } else if (func.equals("edit")) {
+                    //edit mine
+                    editCommand.handleExecute(p, args);
                 } else if (func.equals("help")) {
                     //lies
                     MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColor("$4The help is a lie! $1Use /mineme"));

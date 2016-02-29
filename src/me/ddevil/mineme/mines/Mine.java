@@ -16,18 +16,22 @@
  */
 package me.ddevil.mineme.mines;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 /**
  *
  * @author Selma
  */
-public interface Mine extends Iterable<Block> {
+public interface Mine extends Iterable<Block>, Listener {
+
+    public int getMinedBlocks();
 
     public void delete();
 
@@ -70,4 +74,14 @@ public interface Mine extends Iterable<Block> {
     public Location getLocation();
 
     public String getAlias();
+
+    //Statistics
+    public int getVolume();
+
+    public int getRemainingBlocks();
+
+    public double getPercentageMined();
+
+    public boolean wasAlreadyBroken(Block b);
+
 }

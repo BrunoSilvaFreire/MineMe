@@ -18,7 +18,6 @@ package me.ddevil.mineme;
 
 import java.util.ArrayList;
 import me.ddevil.core.chat.BasicMessageManager;
-import me.ddevil.core.chat.MessageManager;
 import me.ddevil.core.utils.StringUtils;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.ChatColor;
@@ -83,6 +82,7 @@ public class MineMeMessageManager extends BasicMessageManager {
 
     public static String translateTagsAndColors(String get, Mine m) {
         get = get.replaceAll("%mine%", m.getName());
+        get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
         get = get.replaceAll("%alias%", m.getAlias());
         get = get.replaceAll("%prefix%", pluginPrefix);
         get = get.replaceAll("%separator%", messageSeparator);

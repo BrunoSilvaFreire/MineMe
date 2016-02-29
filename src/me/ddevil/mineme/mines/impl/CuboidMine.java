@@ -42,8 +42,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.util.Vector;
 
 public class CuboidMine extends BasicMine implements HologramCompatible {
@@ -324,10 +322,15 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         return name;
     }
 
+    /**
+     *
+     * @param resetMinutesDelay
+     */
     public void setResetMinutesDelay(int resetMinutesDelay) {
         this.totalResetDelay = resetMinutesDelay;
     }
 
+    @Override
     public int getResetMinutesDelay() {
         return totalResetDelay;
     }
@@ -409,6 +412,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     //Holograms
     private final ArrayList<Hologram> holograms = new ArrayList();
+    private boolean hologramsReady = false;
 
     @Override
     public void setupHolograms() {
@@ -433,6 +437,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
         hologramsLines = MineMe.forceDefaultHolograms ? MineMe.pluginConfig.getStringList("global.defaultHologramDisplay") : MineMe.getYAMLMineFile(this).getStringList("hologramsText");
         updateHolograms();
+        hologramsReady = true;
     }
 
     @Override
@@ -464,7 +469,15 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     @Override
     public boolean isHologramsVisible() {
-        return true;
+        return hologramsReady;
+    }
+
+    //Statistics
+    private final ArrayList<Block> brokenBlocks = new ArrayList();
+
+    @Override
+    public int getVolume() {
+        return this.getSizeX() * this.getSizeY() * this.getSizeZ();
     }
 
     public class CuboidMineIterator implements Iterator<Block> {
