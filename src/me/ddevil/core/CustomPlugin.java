@@ -27,19 +27,20 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CustomPlugin extends JavaPlugin implements Listener {
-
+    
     public static CustomPlugin instance;
     protected static CommandMap commandMap;
     public static MessageManager messageManager;
     public static String pluginPrefix = "Plugin prefix was not setup";
     public static String messageSeparator = "Message separator was not setup";
-
+    
     @Override
     public void onEnable() {
         instance = this;
@@ -53,19 +54,19 @@ public class CustomPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().disablePlugin(this);
         }
     }
-
+    
     public static void registerCommand(Command cmd) {
         CustomPlugin.registerCommand(instance, cmd);
     }
-
+    
     public static void registerCommand(Plugin pl, Command cmd) {
         CustomPlugin.registerCommand(pl.getName(), cmd);
     }
-
+    
     private static void registerCommand(String pl, Command cmd) {
         commandMap.register(pl, cmd);
     }
-
+    
     public static boolean isPermissionRegistered(String permission) {
         for (Permission p : Bukkit.getPluginManager().getPermissions()) {
             if (p.getName().equalsIgnoreCase(permission)) {
@@ -74,23 +75,31 @@ public class CustomPlugin extends JavaPlugin implements Listener {
         }
         return false;
     }
-
+    
     public static void registerPermission(String permission) {
         if (!isPermissionRegistered(permission)) {
             Bukkit.getPluginManager().addPermission(new Permission(permission));
         }
     }
+    
+    public static void registerListener(Listener l) {
+        Bukkit.getPluginManager().registerEvents(l, instance);
+    }
 
+    public static void unregisterListener(Listener l) {
+        HandlerList.unregisterAll(l);
+    }
+    
     public CommandMap getCommandMap() {
         return commandMap;
     }
-
+    
     public FileConfiguration loadConfig() {
         FileConfiguration fc = getConfig();
         saveConfig();
         return fc;
     }
-
+    
     public FileConfiguration loadResource(File config, String resource) {
         if (!config.exists()) {
             //Load from plugin

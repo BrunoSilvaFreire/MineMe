@@ -85,7 +85,7 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
         get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
         get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
-        get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getMinedBlocks()));
+        get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
         get = get.replaceAll("%alias%", m.getAlias());
         get = get.replaceAll("%prefix%", pluginPrefix);
         get = get.replaceAll("%separator%", messageSeparator);

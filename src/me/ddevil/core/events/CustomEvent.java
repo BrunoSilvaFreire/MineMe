@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.core;
+package me.ddevil.core.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -22,8 +22,9 @@ import org.bukkit.event.HandlerList;
 
 public class CustomEvent extends Event {
 
-    public void call() {
+    public CustomEvent call() {
         Bukkit.getPluginManager().callEvent(CustomEvent.this);
+        return this;
     }
     private static final HandlerList handlers = new HandlerList();
 

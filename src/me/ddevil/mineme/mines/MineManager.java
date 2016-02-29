@@ -19,6 +19,7 @@ package me.ddevil.mineme.mines;
 import java.util.ArrayList;
 import me.ddevil.mineme.MineMe;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 /**
  *
@@ -39,8 +40,8 @@ public class MineManager {
 
     public static void registerMine(Mine m) {
         mines.add(m);
-        MineMe.getInstance().debug("Mine " + m.getName() + " registered to manager!");
-
+        MineMe.registerListener(m);
+        mineMe.debug("Mine " + m.getName() + " registered to manager!");
     }
 
     public static void unregisterMines() {

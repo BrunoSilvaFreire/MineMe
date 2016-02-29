@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.ddevil.core.events.CustomEvent;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
@@ -457,13 +459,19 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     public void updateHolograms() {
         MineMe.getInstance().debug("Updating holograms for " + name);
         MineMe.getInstance().debug("Total lines: " + hologramsLines.size());
-        for (Hologram h : holograms) {
-            h.clearLines();
-            for (int i = 0; i < hologramsLines.size(); i++) {
-                String text = hologramsLines.get(i);
-                h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this)
-                );
+        MineHologramUpdateEvent event = (MineHologramUpdateEvent) new MineHologramUpdateEvent(this).call();
+        if (!event.isCancelled()) {
+            for (Hologram h : holograms) {
+                h.clearLines();
+                for (int i = 0; i < hologramsLines.size(); i++) {
+                    String text = hologramsLines.get(i);
+                    h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this)
+                    );
+                }
             }
+            MineMe.getInstance().debug("Holograms updated");
+        } else {
+            MineMe.getInstance().debug("Hologram Update Event was cancelled");
         }
     }
 

@@ -104,7 +104,7 @@ public class PluginLoader extends CustomThread {
         if (MineMe.hologramsUsable) {
             mineMe.debug();
             mineMe.debug("Detected HolographicDisplays!");
-            MineMe.useHolograms = pluginConfig.getBoolean("global.useHolographicDisplays");
+            MineMe.useHolograms = pluginConfig.getBoolean("settings.useHolographicDisplays");
             MineMe.forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
             if (MineMe.useHolograms) {
                 mineMe.debug("Holograms enabled!");

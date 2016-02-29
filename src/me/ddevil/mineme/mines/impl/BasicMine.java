@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import me.ddevil.mineme.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Material;
@@ -202,18 +203,26 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public double getPercentageMined() {
-        return Double.valueOf(
-                new DecimalFormat("###.#").format(
-                        (getVolume() * 100) / brokenBlocks.size()
-                ));
+        if (brokenBlocks.isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(
+                    new DecimalFormat("###.#").format(
+                            (getVolume() * 100) / brokenBlocks.size()
+                    ));
+        }
     }
 
     @Override
     public double getPercentageRemaining() {
-        return Double.valueOf(
-                new DecimalFormat("###.#").format(
-                        (getVolume() * 100) / getRemainingBlocks()
-                ));
+        if (getRemainingBlocks() == 0) {
+            return 100;
+        } else {
+            return Double.valueOf(
+                    new DecimalFormat("###.#").format(
+                            (getVolume() * 100) / getRemainingBlocks()
+                    ));
+        }
     }
 
     @Override
@@ -232,6 +241,10 @@ public abstract class BasicMine implements Mine {
         if (contains(b)) {
             if (!wasAlreadyBroken(b)) {
                 brokenBlocks.add(b);
+                if (this instanceof HologramCompatible) {
+                    HologramCompatible hc = (HologramCompatible) this;
+                    hc.updateHolograms();
+                }
             }
         }
     }

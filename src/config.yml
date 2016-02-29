@@ -1,16 +1,16 @@
 #Very complex config v96.0
-
-#Everything below here will affect ~ALL~ the mines
-global:
-  
-  #Forces all the mines to use the default broadcast message in messages.yml
-  forceDefaultBroadcastMessage: true
-  
+ settings:
   #Uses HolographicDisplays to displays Hologram information about mines!
   #You can configurate holograms individualy on their respective files, or you can force
   #them to use the default hologram pattern, which is right below.
   #This will only work if you have Holographic Displays installed on your server!
   useHolographicDisplays: false
+  
+#Everything below here will affect ~ALL~ the mines
+ global:
+  
+  #Forces all the mines to use the default broadcast message in messages.yml
+  forceDefaultBroadcastMessage: true
   
   #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
   forceDefaultHologramOnAllMines: true
@@ -42,5 +42,5 @@ global:
   defaultHologramDisplay:
    - '%alias%'
    - '$1Mined: $2%minedblocks% $1blocks'
-   - '$2%remainingpercent% $1remaining'
+   - '$2%remainingblockspercent%$1% remaining'
    - '&eBanana'

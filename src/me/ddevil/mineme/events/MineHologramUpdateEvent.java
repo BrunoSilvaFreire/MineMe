@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Selma
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,30 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.mines;
+package me.ddevil.mineme.events;
 
-import me.ddevil.mineme.mines.impl.Cuboid;
-import me.ddevil.mineme.mines.impl.CuboidMine;
+import me.ddevil.core.events.CustomEvent;
+import me.ddevil.mineme.mines.Mine;
+import org.bukkit.event.Cancellable;
 
 /**
  *
  * @author Selma
  */
-public enum MineType {
+public class MineHologramUpdateEvent extends CustomEvent implements Cancellable {
 
-    CUBOID(CuboidMine.class),
-    MULTI_CUBOID(null),
-    CIRCULAR(null),
-    CUSTOM(null);
+    private final Mine mine;
+    private boolean cancelled;
 
-    private final Class<? extends Mine> mineClass;
-
-    private MineType(Class<? extends Mine> mineClass) {
-        this.mineClass = mineClass;
+    public MineHologramUpdateEvent(Mine mine) {
+        this.mine = mine;
     }
 
-    public Class<? extends Mine> getMineClass() {
-        return mineClass;
+    public Mine getMine() {
+        return mine;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
 }
