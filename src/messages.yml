@@ -23,12 +23,25 @@
  warningColor: "c"
  
 #Cool tags 360 no scope
-#
+# ----- Global tags (Always replaced) -----
 # %prefix% - Replaced by messagePrefix (The one right below)
 # %separator% - Replaced by messageSeparator
 #
-# %mine% - Replaced by the mine -> NAME <- (Usable only on Mine messages!)
-# %alias% - Replaced by the mine -> ALIAS <- (Usable only on Mine messages!)
+# ----- Mines tags (Will only be replaced on Mine messages) -----
+# %mine% - Replaced by the mine -> NAME <-
+# %alias% - Replaced by the mine -> ALIAS <-
+#
+# Just a little note about mined and remaining blocks:
+# - They only count when first broken
+# - If you place a block in a mine it will not count as a extra block
+# - If you break a block in a mine it and put another one in it's place,
+# it will count as a mined block, the placed block does NOT count
+# - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
+#
+# %minedblocks% - Replaced by the number of mined blocks
+# %minedblockspercent% - Replaced by the percentage of mined blocks
+# %remainingblocks% - Replaced by the number of remaining blocks
+# %remainingblockspercent% - Replaced by the percentage of remaining blocks
 #
 #Messages
  messages:
@@ -37,8 +50,10 @@
     messageSeparator: " &6&l>$3 "
     
     #Mine messages
-    #Message
+    
+    #This is displayed when you create a mine... What did you expect?
     mineCreate: "%prefix%%separator%$2Mine %mine% $2has been created!"
+    
     #if forceDefaultBroadcastMessage is enabled, this message will be used on all mines
     #on reset... ALL... MINES...
     mineReset: "%prefix%%separator%$2The mine %alias% $2has been reseted!"

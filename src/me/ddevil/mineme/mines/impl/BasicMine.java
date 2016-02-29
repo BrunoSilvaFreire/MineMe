@@ -209,6 +209,14 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
+    public double getPercentageRemaining() {
+        return Double.valueOf(
+                new DecimalFormat("###.#").format(
+                        (getVolume() * 100) / getRemainingBlocks()
+                ));
+    }
+
+    @Override
     public int getMinedBlocks() {
         return getVolume() - getRemainingBlocks();
     }

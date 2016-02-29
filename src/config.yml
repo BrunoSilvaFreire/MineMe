@@ -12,13 +12,35 @@ global:
   #This will only work if you have Holographic Displays installed on your server!
   useHolographicDisplays: false
   
-  #Forces mine to use the hologram config below
-  forceDefaultHologramOnAllMines: false
-  
+  #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
+  forceDefaultHologramOnAllMines: true
+
+
+  #Cool tags 360 no scope
+  # ----- Global tags (Always replaced) -----
+  # %prefix% - Replaced by messagePrefix (The one right below)
+  # %separator% - Replaced by messageSeparator
+  #
+  # ----- Mines tags (Will only be replaced on Mine messages) -----
+  # %mine% - Replaced by the mine -> NAME <-
+  # %alias% - Replaced by the mine -> ALIAS <-
+  #
+  # Just a little note about mined and remaining blocks:
+  # - They only count when first broken
+  # - If you place a block in a mine it will not count as a extra block
+  # - If you break a block in a mine it and put another one in it's place,
+  # it will count as a mined block, the placed block does NOT count
+  # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
+  #
+  # %minedblocks% - Replaced by the number of mined blocks
+  # %minedblockspercent% - Replaced by the percentage of mined blocks
+  # %remainingblocks% - Replaced by the number of remaining blocks
+  # %remainingblockspercent% - Replaced by the percentage of remaining blocks
+
   #This is the preset that will be setup to all the mines
   #if forceHologramOnAllMines is enabled
   defaultHologramDisplay:
    - '%alias%'
-   - '&eBanana'
-   - '&6Potato'
+   - '$1Mined: $2%minedblocks% $1blocks'
+   - '$2%remainingpercent% $1remaining'
    - '&eBanana'

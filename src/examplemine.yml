@@ -44,7 +44,8 @@
  - LAPIS_ORE=25
  - REDSTONE_ORE=25
  - COBBLESTONE=25
- 
+ #This will only be used in case HolographicDisplays is available and enabled
+ #in config.yml AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
  hologramsText:
   - '%alias%'
   - '&6Potato'

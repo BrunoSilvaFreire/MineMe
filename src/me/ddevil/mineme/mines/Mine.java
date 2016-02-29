@@ -31,8 +31,6 @@ import org.bukkit.event.Listener;
  */
 public interface Mine extends Iterable<Block>, Listener {
 
-    public int getMinedBlocks();
-
     public void delete();
 
     public void reset();
@@ -79,6 +77,10 @@ public interface Mine extends Iterable<Block>, Listener {
     public int getVolume();
 
     public int getRemainingBlocks();
+
+    public double getPercentageRemaining();
+
+    public int getMinedBlocks();
 
     public double getPercentageMined();
 
