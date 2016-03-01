@@ -19,18 +19,11 @@ package me.ddevil.mineme.thread;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Callable;
 import me.ddevil.core.thread.CustomThread;
 import me.ddevil.mineme.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
-import static me.ddevil.mineme.MineMe.WEP;
-import static me.ddevil.mineme.MineMe.forceDefaultHolograms;
-import static me.ddevil.mineme.MineMe.messagesConfig;
-import static me.ddevil.mineme.MineMe.minesFolder;
-import static me.ddevil.mineme.MineMe.pluginConfig;
-import static me.ddevil.mineme.MineMe.pluginFolder;
-import static me.ddevil.mineme.MineMe.setForceHologramsUse;
 import me.ddevil.mineme.events.MineLoadEvent;
+import me.ddevil.mineme.holograms.impl.HolographicDisplaysAdapter;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -43,161 +36,185 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 public class PluginLoader extends CustomThread {
 
-    private final MineMe mineMe = MineMe.getInstance();
+    private final MineMe plugin = MineMe.getInstance();
 
     @Override
     public void doRun() {
-        mineMe.debug("Loading config...");
+        plugin.debug("Loading config...");
         setupConfig();
-        mineMe.debug("Config loaded!");
-        mineMe.debug("Loading Message Manager...");
+        plugin.debug("Config loaded!");
+        plugin.debug("Loading Message Manager...");
         MineMe.messageManager = new MineMeMessageManager();
         MineMe.messageManager.setup();
-        mineMe.debug("Message Manager loaded!");
-        mineMe.debug("Looking for extra dependencies...");
+        plugin.debug("Message Manager loaded!");
+        plugin.debug("Looking for extra dependencies...");
         setupDependencies();
-        mineMe.debug("Loading Plugin...");
+        plugin.debug("Loading Plugin...");
         setupPlugin();
-        mineMe.debug("Plugin loaded!");
+        plugin.debug("Plugin loaded!");
     }
 
     private void setupConfig() {
-        pluginFolder = mineMe.getDataFolder();
-        if (!pluginFolder.exists()) {
-            mineMe.debug("Plugin folder not found! Making one...", 3);
-            pluginFolder.mkdir();
+        MineMe.pluginFolder = plugin.getDataFolder();
+        if (!MineMe.pluginFolder.exists()) {
+            plugin.debug("Plugin folder not found! Making one...", 3);
+            MineMe.pluginFolder.mkdir();
         }
 
-        File config = new File(mineMe.getDataFolder(), "config.yml");
+        File config = new File(plugin.getDataFolder(), "config.yml");
         if (!config.exists()) {
             //Load from plugin
-            mineMe.debug("Config file not found! Making one...", 3);
-            mineMe.saveResource("config.yml", false);
+            plugin.debug("Config file not found! Making one...", 3);
+            plugin.saveResource("config.yml", false);
         }
-        pluginConfig = YamlConfiguration.loadConfiguration(config);
-        mineMe.minimumDebugPriotity = pluginConfig.getInt("settings.minimumDebugLevel");
+        MineMe.pluginConfig = YamlConfiguration.loadConfiguration(config);
+        plugin.minimumDebugPriotity = MineMe.pluginConfig.getInt("settings.minimumDebugLevel");
 
-        minesFolder = new File(pluginFolder.getPath(), "mines");
-        if (!minesFolder.exists()) {
-            mineMe.debug("Mines folder not found! Making one...", 3);
-            minesFolder.mkdir();
+        MineMe.minesFolder = new File(MineMe.pluginFolder.getPath(), "mines");
+        if (!MineMe.minesFolder.exists()) {
+            plugin.debug("Mines folder not found! Making one...", 3);
+            MineMe.minesFolder.mkdir();
         }
-        File messages = new File(mineMe.getDataFolder(), "messages.yml");
+        File messages = new File(plugin.getDataFolder(), "messages.yml");
         if (!messages.exists()) {
             //Load from plugin
-            mineMe.debug("Messages file not found! Making one...", 3);
-            mineMe.saveResource("messages.yml", false);
+            plugin.debug("Messages file not found! Making one...", 3);
+            plugin.saveResource("messages.yml", false);
         }
-        messagesConfig = YamlConfiguration.loadConfiguration(messages);
-        MineMe.forceDefaultBroadcastMessage = messagesConfig.getBoolean("global.forceDefaultBroadcastMessage");
+        MineMe.defaultHologramText = MineMe.pluginConfig.getStringList("settings.holograms.defaultHologramText");
+        MineMe.messagesConfig = YamlConfiguration.loadConfiguration(messages);
+        MineMe.forceDefaultBroadcastMessage = MineMe.messagesConfig.getBoolean("global.forceDefaultBroadcastMessage");
     }
 
     public void setupDependencies() {
         //Try to get dependencies
         if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-            WEP = (WorldEditPlugin) mineMe.getServer().getPluginManager().getPlugin("WorldEdit");
+            MineMe.WEP = (WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit");
         }
-        if (WEP == null) {
-            mineMe.debug("WorldEdit is need for this plugin to work! :(", true);
-            mineMe.debug("Please download and install it!", true);
-            Bukkit.getPluginManager().disablePlugin(mineMe);
+        if (MineMe.WEP == null) {
+            plugin.debug("WorldEdit is need for this plugin to work! :(", true);
+            plugin.debug("Please download and install it!", true);
+            Bukkit.getPluginManager().disablePlugin(plugin);
             return;
         }
-        MineMe.hologramsUsable = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
-        if (MineMe.hologramsUsable) {
-            mineMe.debug();
-            mineMe.debug("Detected HolographicDisplays!", 3);
-            MineMe.useHolograms = pluginConfig.getBoolean("settings.useHolographicDisplays");
-            MineMe.forceDefaultHolograms = pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
-            if (MineMe.useHolograms) {
-                mineMe.debug("Holograms enabled!", 3);
-                setForceHologramsUse(forceDefaultHolograms);
-                if (forceDefaultHolograms) {
-                    mineMe.debug("Forcing allHolograms to use default preset.", 3);
+        //Holograms
+        MineMe.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
+        //Holographic Displays
+
+        MineMe.forceDefaultHolograms = MineMe.pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
+        MineMe.useHolographicDisplay = MineMe.pluginConfig.getBoolean("settings.holograms.useHolographicDisplaysAPI");
+        if (MineMe.useHolograms) {
+            //Check if HD is available
+            MineMe.holographicDisplaysUsable = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
+            if (MineMe.useHolographicDisplay) {
+                if (MineMe.holographicDisplaysUsable) {
+                    plugin.debug();
+                    plugin.debug("Detected HolographicDisplays!", 3);
+
+                    plugin.debug("Using Holographic Displays as the hologram adapter...", 3);
+                    MineMe.setForceHologramsUse(MineMe.forceDefaultHolograms);
+                    MineMe.hologramAdapter = new HolographicDisplaysAdapter();
+                    if (MineMe.forceDefaultHolograms) {
+                        plugin.debug("Forcing all holograms to use default preset.", 3);
+                    }
+                    plugin.debug();
+                } else {
+                    //Enabled in config, .jar is not in plugins
+                    plugin.debug("HolographicDisplays was enabled in the config, but is not installed in the server! Fixing...", true);
+                    try {
+                        MineMe.pluginConfig.set("settings.holograms.useHolographicDisplaysAPI", false);
+                        MineMe.pluginConfig.save(new File(plugin.getDataFolder(), "config.yml"));
+                        MineMe.useHolographicDisplay = false;
+                    } catch (IOException ex) {
+                        plugin.debug("There was a error fixing HolographicDisplays in the config!", true);
+                        plugin.printException(ex);
+                    }
                 }
-            } else {
-                mineMe.debug("Holograms are usable, but not enabled.", true);
-                mineMe.debug("If you wish to use them, enable useHolographicDisplays in config.yml", true);
             }
-            mineMe.debug();
         }
+
     }
 
     private void setupPlugin() {
         //Get mines folder
-        minesFolder = new File(mineMe.getDataFolder(), "mines");
-        if (!minesFolder.exists()) {
-            mineMe.debug("Mines folder not found! Making one...", 3);
-            minesFolder.mkdir();
+        MineMe.minesFolder = new File(plugin.getDataFolder(), "mines");
+        if (!MineMe.minesFolder.exists()) {
+            plugin.debug("Mines folder not found! Making one...", 3);
+            MineMe.minesFolder.mkdir();
         }
-        if (minesFolder.listFiles().length == 0) {
-            mineMe.debug("Mines folder is empty! Adding examplemine.yml", 3);
-            mineMe.saveResource("examplemine.yml", false);
-            File f = new File(mineMe.getDataFolder() + "/examplemine.yml");
+        if (MineMe.minesFolder.listFiles().length == 0) {
+            plugin.debug("Mines folder is empty! Adding examplemine.yml", 3);
+            plugin.saveResource("examplemine.yml", false);
+            File f = new File(plugin.getDataFolder() + "/examplemine.yml");
             try {
-                FileUtils.moveFileToDirectory(f, minesFolder, false);
-                mineMe.debug("examplemine.yml added!", 3);
+                FileUtils.moveFileToDirectory(f, MineMe.minesFolder, false);
+                plugin.debug("examplemine.yml added!", 3);
             } catch (IOException ex) {
                 f.delete();
-                mineMe.debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.", true);
+                plugin.debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.", true);
             }
         }
-        mineMe.debug();
+        if (MineMe.useHolograms && MineMe.hologramAdapter == null) {
+            plugin.debug("Holograms were enabled in the config, but we didn't find an hologram adapter! Fixing...", true);
+            plugin.setInConfig(MineMe.pluginConfig, "settings.holograms.enableHolograms", false);
+            MineMe.useHolograms = false;
+        }
+        plugin.debug();
         //load mines
-        mineMe.debug("Loading mines", true);
-        mineMe.debug();
-        File[] mineFiles = minesFolder.listFiles();
+        plugin.debug("Loading mines", true);
+        plugin.debug();
+        File[] mineFiles = MineMe.minesFolder.listFiles();
         int i = 0;
         for (File file : mineFiles) {
             String filename = file.getName();
-            mineMe.debug("Attempting to load " + filename + "...", 3);
+            plugin.debug("Attempting to load " + filename + "...", 3);
 
             String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
             if (!"yml".equals(extension)) {
-                mineMe.debug(filename + " isn't a .yml file! This shouldn't be here! Skipping.", true);
+                plugin.debug(filename + " isn't a .yml file! This shouldn't be here! Skipping.", true);
                 continue;
             }
             FileConfiguration mine = YamlConfiguration.loadConfiguration(file);
             //Get name
             String name = mine.getString("name");
             if (!mine.getBoolean("enabled")) {
-                mineMe.debug("Mine " + name + " is disabled, skipping.", 3);
+                plugin.debug("Mine " + name + " is disabled, skipping.", 3);
                 continue;
             }
             //Load mine
             try {
-                mineMe.debug("Loading...");
+                plugin.debug("Loading...");
                 MineConfig config = new MineConfig(mine);
                 //Instanciate
-                mineMe.debug("Instancializating mine " + name + " in world " + config.getWorld().getName(), 3);
+                plugin.debug("Instancializating mine " + name + " in world " + config.getWorld().getName(), 3);
                 Mine m = new CuboidMine(config);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(mineMe, new Runnable() {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
                     @Override
                     public void run() {
-                        if (MineMe.useHolograms) {
-                            if (m instanceof HologramCompatible) {
-                                mineMe.debug("Mine " + m.getName() + " is Holograms compatible! Creating holograms...", 3);
-                                HologramCompatible h = (HologramCompatible) m;
-                                h.setupHolograms();
+                        try {
+                            if (MineMe.useHolograms) {
+                                if (m instanceof HologramCompatible) {
+                                    plugin.debug("Mine " + m.getName() + " is Holograms compatible! Creating holograms...", 3);
+                                    HologramCompatible h = (HologramCompatible) m;
+                                    h.setupHolograms();
+                                }
                             }
+                        } finally {
+                            m.reset();
                         }
-                        m.reset();
                     }
                 }, 0l);
                 MineManager.registerMine(m);
                 new MineLoadEvent(m).call();
-                mineMe.debug("Loaded mine " + m.getName() + ".", true);
-                mineMe.debug();
+                plugin.debug("Loaded mine " + m.getName() + ".", true);
+                plugin.debug();
                 i++;
             } catch (Throwable t) {
-                mineMe.debug("Something went wrong while loading " + file.getName() + " :(", true);
-                mineMe.debug("--== Error ==--", true);
-                t.printStackTrace();
-                mineMe.debug("--== Error ==--", true);
-                mineMe.debug();
+                plugin.debug("Something went wrong while loading " + file.getName() + " :(", true);
+                plugin.printException(t);
             }
-            mineMe.debug("Loaded  " + i + " mines :D", true);
+            plugin.debug("Loaded  " + i + " mines :D", true);
         }
         long minute = 60 * 20L;
         //Check if timer is running
@@ -205,7 +222,7 @@ public class PluginLoader extends CustomThread {
             Bukkit.getScheduler().cancelTask(MineMe.resetId);
         }
         //Start timer
-        MineMe.resetId = Bukkit.getScheduler().scheduleSyncRepeatingTask(mineMe, new Runnable() {
+        MineMe.resetId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             @Override
             public void run() {
                 for (Mine mine : MineManager.getMines()) {

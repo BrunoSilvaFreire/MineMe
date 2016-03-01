@@ -20,9 +20,12 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
+import me.ddevil.mineme.holograms.HologramAdapter;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.thread.PluginLoader;
@@ -33,16 +36,25 @@ import org.bukkit.entity.Player;
 
 public class MineMe extends CustomPlugin {
 
+    //Configs
     public static FileConfiguration pluginConfig;
     public static FileConfiguration messagesConfig;
     public static File pluginFolder;
     public static File minesFolder;
+    //World Edit
     public static WorldEditPlugin WEP;
+    //MineMe
     public static Integer resetId;
     public static boolean useHolograms = false;
     public static boolean forceDefaultBroadcastMessage = true;
-    public static boolean hologramsUsable = false;
     public static boolean forceDefaultHolograms = false;
+    //Holograms
+    public static HologramAdapter hologramAdapter;
+    public static List<String> defaultHologramText;
+
+    //HolographicDisplays
+    public static boolean useHolographicDisplay;
+    public static boolean holographicDisplaysUsable = false;
 
     public static MineMe getInstance() {
         return (MineMe) instance;
@@ -86,7 +98,7 @@ public class MineMe extends CustomPlugin {
     }
 
     public static void setHologramsUsable(boolean hologramsUsable) {
-        MineMe.hologramsUsable = hologramsUsable;
+        MineMe.holographicDisplaysUsable = hologramsUsable;
     }
 
     public static void setForceHologramsUse(boolean forceHologramsUse) {

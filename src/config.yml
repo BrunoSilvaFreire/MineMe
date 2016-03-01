@@ -1,11 +1,5 @@
-#Very complex config v96.0
+#Very complex config v1.0
  settings:
-  #Uses HolographicDisplays to displays Hologram information about mines!
-  #You can configurate holograms individualy on their respective files, or you can force
-  #them to use the default hologram pattern, which is right below.
-  #This will only work if you have Holographic Displays installed on your server!
-  useHolographicDisplays: false
-  
   #The minimum priority level for messages to be logged into the console
   # 0 = All (by myseeeeeeelf, together weeeeeee)
   # 1 = Secondary mine updates (Hologram Updates) (Includes all level 2 msgs)
@@ -14,41 +8,56 @@
   # 4 = None
   # Errors will always be displayed, trust me, you'll need them.
   minimumDebugLevel: 0
+     
+     
+  #This section is about using holograms to display information on mines
+  #Currently supported hologram plugins are: ...Well... HolographicDisplays
+  #But if you have a suggestion for a hologram plugin, leave it on the spigot thread :D
+  holograms:
+   #If you want to enable holograms, set this to true, otherwise, false
+   #You can configurate mines holograms individualy on their respective mine file, or you can force
+   #them to use the default hologram pattern, which is right below.
+   #Remember: You need to choose a Hologram API to use for this to work!
+   enableHolograms: false
+   
+   #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
+   forceDefaultHologramOnAllMines: true
+   
+   #---Compatible Holograms API's---#
+   #Uses HolographicDisplays as the API to displays Hologram information about mines!
+   #This will only work if you have Holographic Displays installed on your server!
+   useHolographicDisplaysAPI: true
+   #---Compatible Holograms API's---#
+   
+   #This is the preset that will be setup to all the mines if forceHologramOnAllMines is enabled
+   #
+   #Cool tags 360 no scope
+   # ----- Global tags (Always replaced) -----
+   # %prefix% - Replaced by messagePrefix (The one right below)
+   # %separator% - Replaced by messageSeparator
+   #
+   # ----- Mines tags (Will only be replaced on Mine messages) -----
+   # %mine% - Replaced by the mine -> NAME <-
+   # %alias% - Replaced by the mine -> ALIAS <-
+   #
+   # Just a little note about mined and remaining blocks:
+   # - They only count when first broken
+   # - If you place a block in a mine it will not count as a "extra block"
+   # - If you break a block in a mine it and put another one in it's place, it will count as a mined block, the placed block does NOT count
+   # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
+   # - Explosion counts.
+   # - World Edit does not count (yet)
+   # %minedblocks% - Replaced by the number of mined blocks
+   # %minedblockspercent% - Replaced by the percentage of mined blocks
+   # %remainingblocks% - Replaced by the number of remaining blocks
+   # %remainingblockspercent% - Replaced by the percentage of remaining blocks
+   defaultHologramText:
+    - '%alias%'
+    - '$2Mined: $1%minedblocks% $2blocks'
+    - '$1%remainingblockspercent%$2% remaining'
+    - '$1Banana'
 #Everything below here will affect ~ALL~ the mines
  global:
   
   #Forces all the mines to use the default broadcast message in messages.yml
   forceDefaultBroadcastMessage: true
-  
-  #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
-  forceDefaultHologramOnAllMines: true
-
-
-  #Cool tags 360 no scope
-  # ----- Global tags (Always replaced) -----
-  # %prefix% - Replaced by messagePrefix (The one right below)
-  # %separator% - Replaced by messageSeparator
-  #
-  # ----- Mines tags (Will only be replaced on Mine messages) -----
-  # %mine% - Replaced by the mine -> NAME <-
-  # %alias% - Replaced by the mine -> ALIAS <-
-  #
-  # Just a little note about mined and remaining blocks:
-  # - They only count when first broken
-  # - If you place a block in a mine it will not count as a "extra block"
-  # - If you break a block in a mine it and put another one in it's place, it will count as a mined block, the placed block does NOT count
-  # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
-  # - Explosion counts.
-  # - World Edit does not count (yet)
-  # %minedblocks% - Replaced by the number of mined blocks
-  # %minedblockspercent% - Replaced by the percentage of mined blocks
-  # %remainingblocks% - Replaced by the number of remaining blocks
-  # %remainingblockspercent% - Replaced by the percentage of remaining blocks
-
-  #This is the preset that will be setup to all the mines
-  #if forceHologramOnAllMines is enabled
-  defaultHologramDisplay:
-   - '%alias%'
-   - '$2Mined: $1%minedblocks% $2blocks'
-   - '$1%remainingblockspercent%$2% remaining'
-   - '$1Banana'

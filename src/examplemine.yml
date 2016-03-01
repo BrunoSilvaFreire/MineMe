@@ -44,8 +44,13 @@
  - LAPIS_ORE=25
  - REDSTONE_ORE=25
  - COBBLESTONE=25
+ 
+ #If this mine will use the hologramsText below
+ #False will use the default text in config.yml
+ useCustomHologramText: false
+ 
  #This will only be used in case HolographicDisplays is available and enabled
- #in config.yml AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
+ #in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
  hologramsText:
    - '%alias%'
    - '$1Mined: $2%minedblocks% $1blocks'

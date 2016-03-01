@@ -55,7 +55,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         this.totalResetDelay = config.getResetDelay();
         this.name = config.getName();
-        this.alias = config.getAlias();
+        this.alias = MineMeMessageManager.translateColors(config.getAlias());
     }
 
     public BasicMine(String name, boolean broadcastOnReset, boolean nearbyBroadcast, String broadcastMessage, double broadcastRadius, int resetMinutesDelay) {
@@ -66,7 +66,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         this.broadcastMessage = broadcastMessage;
         this.name = name;
-        this.alias = name;
+        this.alias = MineMeMessageManager.translateColors(name);
     }
 
     public BasicMine(String name, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay) {
@@ -77,7 +77,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
         this.name = name;
-        this.alias = name;
+        this.alias = MineMeMessageManager.translateColors(name);
     }
 
     public BasicMine(String name, String alias, boolean broadcastOnReset, boolean nearbyBroadcast, String broadcastMessage, double broadcastRadius, int resetMinutesDelay) {
@@ -88,7 +88,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         this.broadcastMessage = broadcastMessage;
         this.name = name;
-        this.alias = alias;
+        this.alias = MineMeMessageManager.translateColors(alias);
     }
 
     public BasicMine(String name, String alias, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay) {
@@ -99,7 +99,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
         this.name = name;
-        this.alias = alias;
+        this.alias = MineMeMessageManager.translateColors(alias);
     }
 
     @Override

@@ -122,7 +122,6 @@ public class MineMeMessageManager extends BasicMessageManager {
     }
 
     public static String translateColors(String trans) {
-
         char[] b = trans.toCharArray();
         for (int i = 0; i < b.length - 1; i++) {
             if (b[i] == '$' && isValidNumber(b[i + 1])) {

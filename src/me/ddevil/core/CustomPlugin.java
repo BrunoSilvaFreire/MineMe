@@ -18,16 +18,17 @@ package me.ddevil.core;
 
 import me.ddevil.core.chat.MessageManager;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.ddevil.mineme.MineMe;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
@@ -73,14 +74,10 @@ public class CustomPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
         try {
-            if (Bukkit.getServer() instanceof CraftServer) {
-                Class craftServerClass = getOBCClass("CraftServer");
-
-                final Field f = craftServerClass.getDeclaredField("commandMap");
-                f.setAccessible(true);
-                commandMap = (CommandMap) f.get(Bukkit.getServer());
-
-            }
+            Class craftServerClass = getOBCClass("CraftServer");
+            final Field f = craftServerClass.getDeclaredField("commandMap");
+            f.setAccessible(true);
+            commandMap = (CommandMap) f.get(Bukkit.getServer());
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             Bukkit.getPluginManager().disablePlugin(this);
         }
@@ -167,5 +164,25 @@ public class CustomPlugin extends JavaPlugin implements Listener {
         } else {
             debug(msg);
         }
+    }
+
+    public void setInConfig(FileConfiguration configuration, String path, Object toSet) {
+        setInConfig(new File(getDataFolder(), configuration.getName()), configuration, path, toSet);
+    }
+
+    public void setInConfig(File f, FileConfiguration configuration, String path, Object toSet) {
+        try {
+            MineMe.pluginConfig.set(path, toSet);
+            MineMe.pluginConfig.save(f);
+        } catch (IOException ex) {
+            Logger.getLogger(CustomPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void printException(Throwable t) {
+        debug("--== Error ==--", true);
+        t.printStackTrace();
+        debug("--== Error ==--", true);
+        debug();
     }
 }

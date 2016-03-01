@@ -16,8 +16,6 @@
  */
 package me.ddevil.mineme.mines.impl;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import me.ddevil.mineme.MineMeMessageManager;
 
 import java.io.File;
@@ -26,14 +24,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import me.ddevil.core.events.CustomEvent;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.events.MineResetEvent;
+import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.HologramCompatible;
-import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
@@ -56,6 +51,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     protected Map<Material, Double> composition;
     protected File saveFile;
     private List<String> hologramsLines;
+    private FileConfiguration config;
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
         super(name, broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
@@ -72,6 +68,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
+        this.config = MineMe.getYAMLMineFile(this);
     }
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
@@ -89,6 +86,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
+        this.config = MineMe.getYAMLMineFile(this);
     }
 
     public CuboidMine(MineConfig config) {
@@ -103,6 +101,8 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 config.getConfig().getDouble("Y2"),
                 config.getConfig().getDouble("Z2")).toVector();
         composition = config.getComposition();
+        this.config = config.getConfig();
+
     }
 
     public void setComposition(Map<Material, Double> composition) {
@@ -285,7 +285,9 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 }
             }
             brokenBlocks.clear();
-            updateHolograms();
+            if (MineMe.useHolograms) {
+                updateHolograms();
+            }
         } else {
             MineMe.getInstance().debug("Reset event for mine " + name + " was cancelled", 2);
         }
@@ -409,7 +411,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     }
 
     //Holograms
-    private final ArrayList<Hologram> holograms = new ArrayList();
+    private final ArrayList<CompatibleHologram> holograms = new ArrayList();
     private boolean hologramsReady = false;
 
     @Override
@@ -419,22 +421,27 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         Location temp;
         temp = l.clone();
         temp.setY(getUpperY() + 3);
-        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(getSizeX() / 2 + 1, 0, 0);
-        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(((getSizeX() / 2) * -1) - 1, 0, 0);
-        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(0, 0, (getSizeZ() / 2) + 1);
-        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(0, 0, ((getSizeZ() / 2) * -1) - 1);
-        holograms.add(HologramsAPI.createHologram(MineMe.instance, temp));
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
         MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
-        hologramsLines = MineMe.forceDefaultHolograms ? MineMe.pluginConfig.getStringList("global.defaultHologramDisplay") : MineMe.getYAMLMineFile(this).getStringList("hologramsText");
+        hologramsLines = MineMe.forceDefaultHolograms
+                ? MineMe.defaultHologramText
+                : config.getBoolean("useCustomHologramText")
+                        ? config.getStringList("hologramsText")
+                        : MineMe.defaultHologramText;
         updateHolograms();
+
         hologramsReady = true;
     }
 
@@ -446,7 +453,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     @Override
     public void hideHolograms() {
-        for (Hologram m : holograms) {
+        for (CompatibleHologram m : holograms) {
             m.clearLines();
         }
     }
@@ -458,7 +465,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         MineMe.getInstance().debug("Total lines: " + hologramsLines.size(), 2);
         MineHologramUpdateEvent event = (MineHologramUpdateEvent) new MineHologramUpdateEvent(this).call();
         if (!event.isCancelled()) {
-            for (Hologram h : holograms) {
+            for (CompatibleHologram h : holograms) {
                 h.clearLines();
                 for (int i = 0; i < hologramsLines.size(); i++) {
                     String text = hologramsLines.get(i);
@@ -492,8 +499,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     }
 
     //Statistics
-    private final ArrayList<Block> brokenBlocks = new ArrayList();
-
     @Override
     public int getVolume() {
         return this.getSizeX() * this.getSizeY() * this.getSizeZ();
