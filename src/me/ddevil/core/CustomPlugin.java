@@ -20,13 +20,14 @@ import me.ddevil.core.chat.MessageManager;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.entity.Player;
+import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
@@ -40,14 +41,45 @@ public class CustomPlugin extends JavaPlugin implements Listener {
     public static MessageManager messageManager;
     public int minimumDebugPriotity = 0;
 
+    public static String getVersion() {
+        String name = Bukkit.getServer().getClass().getPackage().getName();
+        String version = name.substring(name.lastIndexOf('.') + 1) + ".";
+        return version;
+    }
+
+    public static Class<?> getNMSClass(String className) {
+        String fullName = "net.minecraft.server." + getVersion() + className;
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(fullName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return clazz;
+    }
+
+    public static Class<?> getOBCClass(String className) {
+        String fullName = "org.bukkit.craftbukkit." + getVersion() + className;
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(fullName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return clazz;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
         try {
             if (Bukkit.getServer() instanceof CraftServer) {
-                final Field f = CraftServer.class.getDeclaredField("commandMap");
+                Class craftServerClass = getOBCClass("CraftServer");
+
+                final Field f = craftServerClass.getDeclaredField("commandMap");
                 f.setAccessible(true);
                 commandMap = (CommandMap) f.get(Bukkit.getServer());
+
             }
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             Bukkit.getPluginManager().disablePlugin(this);
