@@ -20,6 +20,7 @@ import me.ddevil.mineme.mines.impl.Cuboid;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 
 /**
+ * The various mine's types you can set to mines :D
  *
  * @author Selma
  */
@@ -28,6 +29,7 @@ public enum MineType {
     CUBOID(CuboidMine.class),
     MULTI_CUBOID(null),
     CIRCULAR(null),
+    POLYGON(null),
     CUSTOM(null);
 
     private final Class<? extends Mine> mineClass;

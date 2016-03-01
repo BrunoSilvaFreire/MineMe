@@ -16,7 +16,6 @@
  */
 package me.ddevil.mineme.mines;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.Location;
@@ -31,20 +30,55 @@ import org.bukkit.event.Listener;
  */
 public interface Mine extends Iterable<Block>, Listener {
 
+    /**
+     * Deletes the mine
+     */
     public void delete();
 
+    /**
+     * Resets the mine
+     */
     public void reset();
 
+    /**
+     * Save the mine to it's config file
+     */
     public void save();
 
+    /**
+     * The the mine's <b>name</b>, not alias.
+     *
+     * @return The mine's name
+     */
     public String getName();
 
+    /**
+     *
+     * @return The materials used in the mine's composition
+     */
     public Material[] getMaterials();
 
+    /**
+     * Return if the mine is set to broadcast it's reset message.
+     *
+     * @return true if mine is set to send message on reset, false otherwise
+     */
     public boolean isBroadcastOnReset();
 
+    /**
+     * Set's if the mine should broadcast it's reset message.
+     *
+     * @param broadcastOnReset boolean to set
+     */
     public void setBroadcastOnReset(boolean broadcastOnReset);
 
+    /**
+     * Get the mine's type enum.
+     *
+     * @see MineType
+     *
+     * @return This mine's type
+     */
     public MineType getType();
 
     public boolean contains(int x, int y, int z);
@@ -78,11 +112,11 @@ public interface Mine extends Iterable<Block>, Listener {
 
     public int getRemainingBlocks();
 
-    public double getPercentageRemaining();
+    public float getPercentageRemaining();
 
     public int getMinedBlocks();
 
-    public double getPercentageMined();
+    public float getPercentageMined();
 
     public boolean wasAlreadyBroken(Block b);
 

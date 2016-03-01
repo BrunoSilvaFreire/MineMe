@@ -33,6 +33,7 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.events.MineResetEvent;
 import me.ddevil.mineme.mines.HologramCompatible;
+import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
@@ -271,8 +272,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 }
             }
             currentResetDelay = totalResetDelay;
-            new MineRepopulator().
-                    repopulate(this);
+            new MineRepopulator().repopulate(this);
             if (broadcastOnReset) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (broadcastNearby) {
@@ -284,6 +284,8 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                     }
                 }
             }
+            brokenBlocks.clear();
+            updateHolograms();
         } else {
             MineMe.getInstance().debug("Reset event for mine " + name + " was cancelled", 2);
         }
@@ -306,18 +308,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             blocks.add(thi);
         }
         return blocks;
-    }
-
-    @Override
-    public void save() {
-        File mineFile = MineMe.getMineFile(this);
-        YamlConfiguration file = YamlConfiguration.loadConfiguration(mineFile);
-        file.set("mine", this);
-        try {
-            file.save(mineFile);
-        } catch (IOException ex) {
-            Logger.getLogger(CuboidMine.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @Override
@@ -407,7 +397,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
      */
     @Override
     public boolean contains(Location l) {
-        if (!world.equals(l.getWorld().getName())) {
+        if (!world.equals(l.getWorld())) {
             return false;
         }
         return contains(l.getBlockX(), l.getBlockY(), l.getBlockZ());
@@ -463,6 +453,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     @Override
     public void updateHolograms() {
+
         MineMe.getInstance().debug("Updating holograms for " + name, 2);
         MineMe.getInstance().debug("Total lines: " + hologramsLines.size(), 2);
         MineHologramUpdateEvent event = (MineHologramUpdateEvent) new MineHologramUpdateEvent(this).call();
@@ -471,13 +462,27 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 h.clearLines();
                 for (int i = 0; i < hologramsLines.size(); i++) {
                     String text = hologramsLines.get(i);
-                    h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this)
-                    );
+                    h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this));
                 }
             }
             MineMe.getInstance().debug("Holograms updated", 2);
         } else {
             MineMe.getInstance().debug("Hologram Update Event for mine " + name + " was cancelled", 2);
+        }
+    }
+    private Integer lightHologramUpdateId;
+
+    @Override
+    public void softHologramUpdate() {
+        if (lightHologramUpdateId == null) {
+            lightHologramUpdateId = Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
+
+                @Override
+                public void run() {
+                    updateHolograms();
+                    lightHologramUpdateId = null;
+                }
+            }, 60l);
         }
     }
 

@@ -19,36 +19,34 @@ package me.ddevil.mineme.mines;
 import java.util.ArrayList;
 import me.ddevil.mineme.MineMe;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 /**
  *
  * @author Selma
  */
 public class MineManager {
-
+    
     private static final ArrayList<Mine> mines = new ArrayList();
-    private static MineMe mineMe;
-
-    public static void setup() {
-        mineMe = MineMe.getInstance();
-    }
-
+    private static final MineMe mineMe = MineMe.getInstance();
+    
     public static ArrayList<Mine> getMines() {
         return mines;
     }
-
+    
     public static void registerMine(Mine m) {
         mines.add(m);
         MineMe.registerListener(m);
         mineMe.debug("Mine " + m.getName() + " registered to manager!");
     }
-
+    
     public static void unregisterMines() {
         mines.clear();
+        for (Mine mine : mines) {
+            MineMe.unregisterListener(mine);
+        }
         MineMe.getInstance().debug("Unloaded all mines!");
     }
-
+    
     public static Mine getMine(String name) {
         for (Mine mine : mines) {
             if (mine.getName().equalsIgnoreCase(name)) {
@@ -57,11 +55,11 @@ public class MineManager {
         }
         return null;
     }
-
+    
     public static boolean isPlayerInAMine(Player p) {
         return getMineWith(p) != null;
     }
-
+    
     public static Mine getMineWith(Player p) {
         for (Mine m : mines) {
             if (m.contains(p)) {
@@ -70,7 +68,7 @@ public class MineManager {
         }
         return null;
     }
-
+    
     public static void sendInfo(Player p, Mine m) {
         MineMe.messageManager.sendMessage(p, m.getInfo());
     }

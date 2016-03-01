@@ -35,11 +35,11 @@
   #
   # Just a little note about mined and remaining blocks:
   # - They only count when first broken
-  # - If you place a block in a mine it will not count as a extra block
-  # - If you break a block in a mine it and put another one in it's place,
-  # it will count as a mined block, the placed block does NOT count
+  # - If you place a block in a mine it will not count as a "extra block"
+  # - If you break a block in a mine it and put another one in it's place, it will count as a mined block, the placed block does NOT count
   # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
-  #
+  # - Explosion counts.
+  # - World Edit does not count (yet)
   # %minedblocks% - Replaced by the number of mined blocks
   # %minedblockspercent% - Replaced by the percentage of mined blocks
   # %remainingblocks% - Replaced by the number of remaining blocks
@@ -49,6 +49,6 @@
   #if forceHologramOnAllMines is enabled
   defaultHologramDisplay:
    - '%alias%'
-   - '$1Mined: $2%minedblocks% $1blocks'
-   - '$2%remainingblockspercent%$1% remaining'
-   - '&eBanana'
+   - '$2Mined: $1%minedblocks% $2blocks'
+   - '$1%remainingblockspercent%$2% remaining'
+   - '$1Banana'

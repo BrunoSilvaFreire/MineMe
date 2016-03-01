@@ -29,6 +29,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
 public abstract class BasicMine implements Mine {
 
@@ -176,6 +178,11 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
+    public void save() {
+
+    }
+
+    @Override
     public List<String> getInfo() {
         String[] basic = new String[]{
             "$1Mine: $2" + getName(),
@@ -202,26 +209,22 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public double getPercentageMined() {
+    public float getPercentageMined() {
         if (brokenBlocks.isEmpty()) {
             return 0;
         } else {
-            return Double.valueOf(
-                    new DecimalFormat("###.#").format(
-                            (getVolume() * 100) / brokenBlocks.size()
-                    ));
+            double percentage = (brokenBlocks.size() * 100f) / getVolume();
+            return Math.round(percentage);
         }
     }
 
     @Override
-    public double getPercentageRemaining() {
+    public float getPercentageRemaining() {
         if (getRemainingBlocks() == 0) {
-            return 100;
+            return 0;
         } else {
-            return Double.valueOf(
-                    new DecimalFormat("###.#").format(
-                            (getVolume() * 100) / getRemainingBlocks()
-                    ));
+            double percentage = (getRemainingBlocks() * 100) / getVolume();
+            return Math.round(percentage);
         }
     }
 
@@ -248,4 +251,35 @@ public abstract class BasicMine implements Mine {
             }
         }
     }
+
+    @EventHandler
+    public void onBreak(BlockExplodeEvent e) {
+        Block b = e.getBlock();
+        if (contains(b)) {
+            if (!wasAlreadyBroken(b)) {
+                brokenBlocks.add(b);
+                if (this instanceof HologramCompatible) {
+                    HologramCompatible hc = (HologramCompatible) this;
+                    hc.updateHolograms();
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBreak(EntityExplodeEvent e) {
+        for (Block b : e.blockList()) {
+            if (contains(b)) {
+                if (!wasAlreadyBroken(b)) {
+                    brokenBlocks.add(b);
+                }
+            }
+        }
+        if (this instanceof HologramCompatible) {
+            MineMe.getInstance().debug("Updating hologram softly.");
+            HologramCompatible hc = (HologramCompatible) this;
+            hc.softHologramUpdate();
+        }
+    }
+
 }

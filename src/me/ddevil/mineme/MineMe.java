@@ -32,7 +32,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class MineMe extends CustomPlugin {
-    
+
     public static FileConfiguration pluginConfig;
     public static FileConfiguration messagesConfig;
     public static File pluginFolder;
@@ -43,90 +43,64 @@ public class MineMe extends CustomPlugin {
     public static boolean forceDefaultBroadcastMessage = true;
     public static boolean hologramsUsable = false;
     public static boolean forceDefaultHolograms = false;
-    
+
     public static MineMe getInstance() {
         return (MineMe) instance;
     }
-    public int minimumDebugPriotity = 0;
-    
+
     @Override
     public void onEnable() {
         super.onEnable();
         PluginLoader pLoader = new PluginLoader();
         pLoader.start();
         pLoader.addListener(new FinishListener() {
-            
+
             @Override
             public void onFinish() {
                 //Register commands
                 registerBaseCommands();
-                
+
                 debug("Plugin loaded!");
                 debug("It's all right, it's all favorable :D");
             }
         });
-        
+
     }
-    
+
     @Override
     public void onDisable() {
         unloadEverything();
     }
-    
-    public void debug(String[] msg) {
-        for (String m : msg) {
-            debug(m);
-        }
-    }
-    
-    public void debug(String msg) {
-        debug(msg, 0);
-    }
-    
-    public void debug(String msg, int priority) {
-        if (priority >= minimumDebugPriotity) {
-            getLogger().info(msg);
-        }
-    }
-    
-    public void debug(String msg, boolean force) {
-        if (force) {
-            getLogger().info(msg);
-            
-        } else {
-            debug(msg);
-        }
-    }
-    
+
     public void debug() {
         getLogger().info("");
     }
-    
+
     public static FileConfiguration getYAMLMineFile(Mine m) {
         return YamlConfiguration.loadConfiguration(getMineFile(m));
     }
-    
+
     public static File getMineFile(Mine m) {
         return new File(minesFolder.getPath(), m.getName() + ".yml");
-        
+
     }
-    
+
     public static void setHologramsUsable(boolean hologramsUsable) {
         MineMe.hologramsUsable = hologramsUsable;
     }
-    
+
     public static void setForceHologramsUse(boolean forceHologramsUse) {
         MineMe.forceDefaultHolograms = forceHologramsUse;
     }
-    
+
     public static boolean isForceHologramsUse() {
         return forceDefaultHolograms;
     }
-    
+
     private void registerBaseCommands() {
         registerCommand(new MineCommand());
     }
-    
+
     public void reload(Player p) {
         messageManager.sendMessage(p, "Reloading config...");
         debug("Stopping reseter task...");
@@ -136,7 +110,7 @@ public class MineMe extends CustomPlugin {
         PluginLoader l = new PluginLoader();
         l.start();
         l.addListener(new FinishListener() {
-            
+
             @Override
             public void onFinish() {
                 debug("Reload complete!");
@@ -144,7 +118,7 @@ public class MineMe extends CustomPlugin {
             }
         });
     }
-    
+
     private void unloadEverything() {
         if (useHolograms) {
             for (Hologram h : HologramsAPI.getHolograms(this)) {

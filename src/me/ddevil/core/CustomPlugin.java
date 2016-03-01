@@ -34,13 +34,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CustomPlugin extends JavaPlugin implements Listener {
-    
+
     public static CustomPlugin instance;
     protected static CommandMap commandMap;
     public static MessageManager messageManager;
-    public static String pluginPrefix = "Plugin prefix was not setup";
-    public static String messageSeparator = "Message separator was not setup";
-    
+    public int minimumDebugPriotity = 0;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -54,19 +53,19 @@ public class CustomPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().disablePlugin(this);
         }
     }
-    
+
     public static void registerCommand(Command cmd) {
         CustomPlugin.registerCommand(instance, cmd);
     }
-    
+
     public static void registerCommand(Plugin pl, Command cmd) {
         CustomPlugin.registerCommand(pl.getName(), cmd);
     }
-    
+
     private static void registerCommand(String pl, Command cmd) {
         commandMap.register(pl, cmd);
     }
-    
+
     public static boolean isPermissionRegistered(String permission) {
         for (Permission p : Bukkit.getPluginManager().getPermissions()) {
             if (p.getName().equalsIgnoreCase(permission)) {
@@ -75,36 +74,66 @@ public class CustomPlugin extends JavaPlugin implements Listener {
         }
         return false;
     }
-    
+
     public static void registerPermission(String permission) {
         if (!isPermissionRegistered(permission)) {
             Bukkit.getPluginManager().addPermission(new Permission(permission));
         }
     }
-    
+
     public static void registerListener(Listener l) {
         Bukkit.getPluginManager().registerEvents(l, instance);
+        instance.debug("Listener " + l.getClass().getSimpleName() + " registered.");
     }
 
     public static void unregisterListener(Listener l) {
         HandlerList.unregisterAll(l);
     }
-    
+
     public CommandMap getCommandMap() {
         return commandMap;
     }
-    
+
     public FileConfiguration loadConfig() {
         FileConfiguration fc = getConfig();
         saveConfig();
         return fc;
     }
-    
+
     public FileConfiguration loadResource(File config, String resource) {
         if (!config.exists()) {
             //Load from plugin
             saveResource("messages.yml", false);
         }
         return YamlConfiguration.loadConfiguration(config);
+    }
+
+    public void debug() {
+        debug("");
+    }
+
+    public void debug(String[] msg) {
+        for (String m : msg) {
+            debug(m);
+        }
+    }
+
+    public void debug(String msg) {
+        debug(msg, 0);
+    }
+
+    public void debug(String msg, int priority) {
+        if (priority >= minimumDebugPriotity) {
+            getLogger().info(msg);
+        }
+    }
+
+    public void debug(String msg, boolean force) {
+        if (force) {
+            getLogger().info(msg);
+
+        } else {
+            debug(msg);
+        }
     }
 }

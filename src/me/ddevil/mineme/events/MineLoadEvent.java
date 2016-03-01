@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Selma
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,19 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.mines;
+package me.ddevil.mineme.events;
 
-public interface HologramCompatible {
+import me.ddevil.core.events.CustomEvent;
+import me.ddevil.mineme.mines.Mine;
 
-    public abstract void setupHolograms();
+/**
+ *
+ * @author Selma
+ */
+public class MineLoadEvent extends CustomEvent {
 
-    public abstract void showHolograms();
+    private final Mine mine;
 
-    public abstract void hideHolograms();
+    public MineLoadEvent(Mine mine) {
+        this.mine = mine;
+    }
 
-    public abstract void updateHolograms();
+    public Mine getMine() {
+        return mine;
+    }
 
-    public abstract void softHologramUpdate();
-
-    public abstract boolean isHologramsVisible();
 }

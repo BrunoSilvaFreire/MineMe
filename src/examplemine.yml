@@ -47,7 +47,7 @@
  #This will only be used in case HolographicDisplays is available and enabled
  #in config.yml AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
  hologramsText:
-  - '%alias%'
-  - '&6Potato'
-  - '&eBanana'
-  - '&6Potato'
+   - '%alias%'
+   - '$1Mined: $2%minedblocks% $1blocks'
+   - '$2%remainingblockspercent%$1% remaining'
+   - '$3This is a custom hologram text! :D'

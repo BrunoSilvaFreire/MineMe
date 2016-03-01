@@ -30,6 +30,7 @@ import static me.ddevil.mineme.MineMe.minesFolder;
 import static me.ddevil.mineme.MineMe.pluginConfig;
 import static me.ddevil.mineme.MineMe.pluginFolder;
 import static me.ddevil.mineme.MineMe.setForceHologramsUse;
+import me.ddevil.mineme.events.MineLoadEvent;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -170,21 +171,22 @@ public class PluginLoader extends CustomThread {
                 //Instanciate
                 mineMe.debug("Instancializating mine " + name + " in world " + config.getWorld().getName(), 3);
                 Mine m = new CuboidMine(config);
-                Bukkit.getScheduler().callSyncMethod(mineMe, new Callable<Mine>() {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(mineMe, new Runnable() {
 
                     @Override
-                    public Mine call() throws Exception {
-                        m.reset();
+                    public void run() {
                         if (MineMe.useHolograms) {
                             if (m instanceof HologramCompatible) {
+                                mineMe.debug("Mine " + m.getName() + " is Holograms compatible! Creating holograms...", 3);
                                 HologramCompatible h = (HologramCompatible) m;
                                 h.setupHolograms();
                             }
                         }
-                        return m;
+                        m.reset();
                     }
-                });
+                }, 0l);
                 MineManager.registerMine(m);
+                new MineLoadEvent(m).call();
                 mineMe.debug("Loaded mine " + m.getName() + ".", true);
                 mineMe.debug();
                 i++;
