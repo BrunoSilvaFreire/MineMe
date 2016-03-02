@@ -16,7 +16,7 @@
  */
 package me.ddevil.mineme.mines;
 
-import me.ddevil.mineme.mines.impl.Cuboid;
+import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 
 /**
@@ -28,7 +28,7 @@ public enum MineType {
 
     CUBOID(CuboidMine.class),
     MULTI_CUBOID(null),
-    CIRCULAR(null),
+    CIRCULAR(CircularMine.class),
     POLYGON(null),
     CUSTOM(null);
 

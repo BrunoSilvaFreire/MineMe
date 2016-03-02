@@ -47,15 +47,13 @@ import org.bukkit.util.Vector;
 
 public class CuboidMine extends BasicMine implements HologramCompatible {
 
-    protected final World world;
     protected final Vector pos1;
     protected final Vector pos2;
     protected File saveFile;
     private List<String> hologramsLines;
-    private FileConfiguration config;
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
-        super(name, broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
+        super(name, l1.getWorld(), broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
@@ -65,7 +63,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
         l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
         l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
-        this.world = l1.getWorld();
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
@@ -73,7 +70,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     }
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
-        super(name, broadcastOnReset, nearbyBroadcast, resetMsg, broadcastRadius, delay);
+        super(name, l1.getWorld(), broadcastOnReset, nearbyBroadcast, resetMsg, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
@@ -83,7 +80,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
         l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
         l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
-        this.world = l1.getWorld();
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
@@ -92,7 +88,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     public CuboidMine(MineConfig config) {
         super(config);
-        this.world = config.getWorld();
         this.pos1 = new Location(world,
                 config.getConfig().getDouble("X1"),
                 config.getConfig().getDouble("Y1"),
@@ -104,11 +99,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         composition = config.getComposition();
         this.config = config.getConfig();
 
-    }
-
-    @Override
-    public void setComposition(Map<Material, Double> composition) {
-        this.composition = composition;
     }
 
     public Vector getPos2() {
@@ -175,15 +165,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     }
 
     /**
-     * Get the Mine's world.
-     *
-     * @return The World object representing this Mine's world
-     */
-    public World getWorld() {
-        return world;
-    }
-
-    /**
      * Get the the centre of the Mine.
      *
      * @return Location at the centre of the Mine
@@ -192,7 +173,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         int x1 = this.getUpperX() + 1;
         int y1 = this.getUpperY() + 1;
         int z1 = this.getUpperZ() + 1;
-        return new Location(this.getWorld(), this.getLowerX() + (x1 - this.getLowerX()) / 2.0, this.getLowerY() + (y1 - this.getLowerY()) / 2.0, this.getLowerZ() + (z1 - this.getLowerZ()) / 2.0);
+        return new Location(this.getWorld(), this.getLowerX() + (x1 - this.getLowerX()) / 2.0, this.getMinimumY() + (y1 - this.getMinimumY()) / 2.0, this.getMaximumY() + (z1 - this.getMaximumY()) / 2.0);
     }
 
     /**
@@ -209,7 +190,8 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
      *
      * @return the minimum Y co-ordinate
      */
-    public int getLowerY() {
+    @Override
+    public int getMinimumY() {
         return this.pos1.getBlockY();
     }
 
@@ -218,7 +200,8 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
      *
      * @return the minimum Z co-ordinate
      */
-    public int getLowerZ() {
+    @Override
+    public int getMaximumY() {
         return this.pos1.getBlockZ();
     }
 
@@ -307,15 +290,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     }
 
     @Override
-    public synchronized List<Block> getBlocks() {
-        ArrayList<Block> blocks = new ArrayList<>();
-        for (Block thi : this) {
-            blocks.add(thi);
-        }
-        return blocks;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
@@ -372,7 +346,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
      * @return true if the given point is within this Cuboid, false otherwise
      */
     @Override
-    public boolean contains(int x, int y, int z) {
+    public boolean contains(double x, double y, double z) {
         return x >= this.pos1.getBlockX() && x <= this.pos2.getBlockX()
                 && y >= this.pos1.getBlockY() && y <= this.pos2.getBlockY()
                 && z >= this.pos1.getBlockZ() && z <= this.pos2.getBlockZ();
@@ -505,6 +479,16 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         return this.getSizeX() * this.getSizeY() * this.getSizeZ();
     }
 
+    @Override
+    public Vector getMaximumPoint() {
+        return pos2;
+    }
+
+    @Override
+    public Vector getMinimumPoint() {
+        return pos1;
+    }
+
     public class CuboidMineIterator implements Iterator<Block> {
 
         private final World w;
@@ -578,26 +562,13 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     @Override
     public void save() {
-        FileConfiguration file = MineMe.getYAMLMineFile(this);
-        file.set("name", name);
-        file.set("alias", alias);
-        file.set("world", world.getName());
-        file.set("type", getType().name());
-        file.set("resetDelay", totalResetDelay);
-        file.set("broadcastOnReset", broadcastOnReset);
-        file.set("broadcastToNearbyOnly", broadcastNearby);
-        file.set("broadcastRadius", broadcastRadius);
+        FileConfiguration file = getBasicSavedConfig();
         file.set("X1", pos1.getBlockX());
         file.set("Y1", pos1.getBlockY());
         file.set("Z1", pos1.getBlockZ());
         file.set("X2", pos2.getBlockX());
         file.set("Y2", pos2.getBlockY());
         file.set("Z2", pos2.getBlockZ());
-        ArrayList<String> comp = new ArrayList();
-        for (Material m : composition.keySet()) {
-            comp.add(m + "=" + composition.get(m));
-        }
-        file.set("composition", comp);
         try {
             file.save(MineMe.getMineFile(this));
         } catch (IOException ex) {

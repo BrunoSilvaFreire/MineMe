@@ -24,7 +24,7 @@ public class MineRepopulator {
 
     public void repopulate(Mine m) {
         RepopulateMap map = new RepopulateMap(m);
-        for (Block b : m.getBlocks()) {
+        for (Block b : m) {
             b.setType(map.getRandomBlock());
         }
     }

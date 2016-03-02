@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.util.Vector;
 
 /**
  *
@@ -89,7 +91,7 @@ public interface Mine extends Iterable<Block>, Listener {
      */
     public MineType getType();
 
-    public boolean contains(int x, int y, int z);
+    public boolean contains(double x, double y, double z);
 
     public boolean contains(Block b);
 
@@ -102,8 +104,6 @@ public interface Mine extends Iterable<Block>, Listener {
     public boolean broadcastToNearbyOnly();
 
     public double broadcastRadius();
-
-    public List<Block> getBlocks();
 
     public List<String> getInfo();
 
@@ -140,4 +140,33 @@ public interface Mine extends Iterable<Block>, Listener {
 
     public boolean wasAlreadyBroken(Block b);
 
+    public World getWorld();
+
+    /**
+     * Gets the minimum Y value
+     *
+     * @return the Y value
+     */
+    public int getMinimumY();
+
+    /**
+     * Gets the maximum Y value
+     *
+     * @return the Y value
+     */
+    public int getMaximumY();
+
+    /**
+     * Gets the minimum Y value
+     *
+     * @return the Y value
+     */
+    public Vector getMaximumPoint();
+
+    /**
+     * Gets the maximum Y value
+     *
+     * @return the Y value
+     */
+    public Vector getMinimumPoint();
 }

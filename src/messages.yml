@@ -55,7 +55,7 @@
     #Chat messages
     messagePrefix: "$1&lMine$2&lMe"
     messageSeparator: " &6&l>$3 "
-    header: MessageColor.ERROR + "$4&m----&r %prefix% $4&m----"
+    header: "$4&m----&r %prefix% $4&m----"
 
   #Mine messages
     
