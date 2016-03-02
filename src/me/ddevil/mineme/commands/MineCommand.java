@@ -146,6 +146,7 @@ public class MineCommand extends CustomCommand {
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "info (name) " + MessageColor.NEUTRAL + "Displays infos about the specified mine",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name)" + MessageColor.NEUTRAL + "Displays infos about the specified mine",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "list " + MessageColor.NEUTRAL + "List all the loaded mines.",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reset (name|all) " + MessageColor.NEUTRAL + "Reset the mine. (If you put all as the name, will reset all the mines)",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reload " + MessageColor.NEUTRAL + "Reloads the config. :)",
             MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)",
@@ -209,7 +210,39 @@ public class MineCommand extends CustomCommand {
                         });
                     }
                 } else if (func.equalsIgnoreCase("delete")) {
-                    //delete
+                    if (args.length > 1) {
+                        String name = args[1];
+                        Mine m = MineManager.getMine(name);
+                        if (m != null) {
+                            m.delete();
+                            MineMe.messageManager.sendMessage(p, "Mine " + MessageColor.PRIMARY + m.getName() + MessageColor.NEUTRAL + " was deleted! :D");
+                        } else {
+                            MineMe.messageManager.sendMessage(p, "Could not find mine " + name + ".");
+                            listMines(p);
+                        }
+                    } else {
+                        MineMe.messageManager.sendMessage(p, new String[]{
+                            MineMeMessageManager.invalidArguments,
+                            "You need to specify a name!"
+                        });
+                    }
+                } else if (func.equalsIgnoreCase("reset")) {
+                    if (args.length > 1) {
+                        String name = args[1];
+                        Mine m = MineManager.getMine(name);
+                        if (m != null) {
+                            m.reset();
+                            MineMe.messageManager.sendMessage(p, "Mine " + MessageColor.PRIMARY + m.getName() + MessageColor.NEUTRAL + " was reseted! :D");
+                        } else {
+                            MineMe.messageManager.sendMessage(p, "Could not find mine " + name + ".");
+                            listMines(p);
+                        }
+                    } else {
+                        MineMe.messageManager.sendMessage(p, new String[]{
+                            MineMeMessageManager.invalidArguments,
+                            "You need to specify a name!"
+                        });
+                    }
                 } else if (func.equalsIgnoreCase("info")) {
                     if (args.length > 1) {
                         String name = args[1];
