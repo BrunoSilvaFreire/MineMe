@@ -47,6 +47,10 @@
    # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
    # - Explosion counts.
    # - World Edit does not count (yet)
+   # %composition:(Material name here)% - Replaced the percentage of the material in the mine's composition, returns 0 if the mine doesn't contains the material
+   # example: %composition:STONE% Get the Stone percentage in the mine's composition
+   #
+   # %volume% - Replaced by the mine's volume
    # %minedblocks% - Replaced by the number of mined blocks
    # %minedblockspercent% - Replaced by the percentage of mined blocks
    # %remainingblocks% - Replaced by the number of remaining blocks
@@ -55,7 +59,9 @@
     - '%alias%'
     - '$2Mined: $1%minedblocks% $2blocks'
     - '$1%remainingblockspercent%$2% remaining'
-    - '$1Banana'
+    - '$2Stone percentage:$1 %composition:STONE%'
+    - '$2Emerald percentage$1 %composition:EMERALD_ORE%'
+    - '$2Gold percentage$1 %composition:GOLD_ORE%'
 #Everything below here will affect ~ALL~ the mines
  global:
   

@@ -22,6 +22,7 @@ import me.ddevil.core.utils.StringUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class MineMeMessageManager extends BasicMessageManager {
@@ -88,9 +89,33 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
         get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
         get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
+        get = get.replaceAll("%volume%", m.getVolume() + "");
         get = get.replaceAll("%alias%", m.getAlias());
         get = get.replaceAll("%prefix%", pluginPrefix);
         get = get.replaceAll("%separator%", messageSeparator);
+        boolean translateComposition = get.contains("%composition:");
+        while (translateComposition) {
+            int inicio = get.indexOf("%composition") + 13;
+            Integer fim = null;
+            for (int i = inicio - 12; i < get.length(); i++) {
+                char c = get.charAt(i);
+                if (c == '%') {
+                    fim = i;
+                }
+            }
+            if (fim == null) {
+                break;
+            }
+            String mname = get.substring(inicio, fim);
+            try {
+                Material material = Material.valueOf(mname);
+                get = get.replaceAll("%composition:" + material.name() + "%", String.valueOf(m.getPercentage(material)));
+                translateComposition = get.contains("%composition:");
+            } catch (Exception e) {
+                break;
+            }
+
+        }
         return translateColors(get);
     }
 

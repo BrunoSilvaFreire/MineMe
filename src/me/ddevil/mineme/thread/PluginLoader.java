@@ -226,7 +226,7 @@ public class PluginLoader extends CustomThread {
             @Override
             public void run() {
                 for (Mine mine : MineManager.getMines()) {
-                    mine.tictoc();
+                    mine.minuteCountdown();
                 }
             }
         }, minute, minute);

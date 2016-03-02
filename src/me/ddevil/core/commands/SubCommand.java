@@ -17,7 +17,9 @@
 package me.ddevil.core.commands;
 
 import java.util.List;
+import me.ddevil.core.CustomPlugin;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -69,7 +71,7 @@ public abstract class SubCommand {
     }
 
     public void sendUsage(Player p) {
-        MineMe.messageManager.sendMessage(p, usageMessages);
+        CustomPlugin.messageManager.sendMessage(p, usageMessages);
     }
 
     public void setAliases(List<String> aliases) {

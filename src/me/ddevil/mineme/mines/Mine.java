@@ -109,7 +109,11 @@ public interface Mine extends Iterable<Block>, Listener {
 
     public Map<Material, Double> getComposition();
 
-    public void tictoc();
+    public double getPercentage(Material m);
+
+    public void minuteCountdown();
+
+    public void setBlockAsBroken(Block block);
 
     public Location getLocation();
 

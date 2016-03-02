@@ -40,11 +40,11 @@ public class MineCommand extends CustomCommand {
         public EditCommand(MineCommand minecmd) {
             super("edit", minecmd, Arrays.asList(new String[]{}));
             usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
+                MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----",
                 MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) add (material) (number from 0 to 100) " + MessageColor.NEUTRAL + "Add's this material to the mines composition.",
-                MessageColor.SECONDARY + "Example: " + MessageColor.SECONDARY + "/mineme edit examplemine add IRON_ORE 30 " + MessageColor.NEUTRAL + "Sets 30% iron ore.",
-                MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) remove (material) " + MessageColor.NEUTRAL + "Removes this material to the mines composition."
-            });
+                MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) remove (material) " + MessageColor.NEUTRAL + "Removes this material to the mines composition.",
+                MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----"});
         }
 
         @Override
@@ -124,6 +124,13 @@ public class MineCommand extends CustomCommand {
             }
             return true;
         }
+
+        @Override
+        public void sendUsage(Player p) {
+            for (String msg : usageMessages) {
+                p.sendMessage(MineMeMessageManager.translateColors(msg));
+            }
+        }
     }
 
     public MineCommand() {
@@ -131,18 +138,19 @@ public class MineCommand extends CustomCommand {
         editCommand = new EditCommand(this);
         addSubCommand(editCommand);
         usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
+            MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----",
             MessageColor.SECONDARY + "Others cool aliases: " + MessageColor.PRIMARY + "mrl, mm, mine, mines",
             MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] " + MessageColor.NEUTRAL + "Creates a new mine full of stone :D",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "delete (name) " + MessageColor.NEUTRAL + "Deletes the specified mine",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "info (name) " + MessageColor.NEUTRAL + "Displays infos about the specified mine",
-            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) ()" + MessageColor.NEUTRAL + "Displays infos about the specified mine",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name)" + MessageColor.NEUTRAL + "Displays infos about the specified mine",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "list " + MessageColor.NEUTRAL + "List all the loaded mines.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reload " + MessageColor.NEUTRAL + "Reloads the config. :)",
-            MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)"
-
-        });
+            MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)",
+            MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----"}
+        );
     }
 
     @Override
@@ -275,6 +283,13 @@ public class MineCommand extends CustomCommand {
             MineMeMessageManager.invalidArguments,
             msg
         });
+    }
+
+    @Override
+    public void sendUsage(Player p) {
+        for (String msg : usageMessages) {
+            p.sendMessage(MineMeMessageManager.translateColors(msg));
+        }
     }
 
 }

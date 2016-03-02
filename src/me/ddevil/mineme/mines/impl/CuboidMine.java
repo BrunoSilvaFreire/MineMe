@@ -46,14 +46,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class CuboidMine extends BasicMine implements HologramCompatible {
-    
+
     protected final World world;
     protected final Vector pos1;
     protected final Vector pos2;
     protected File saveFile;
     private List<String> hologramsLines;
     private FileConfiguration config;
-    
+
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
         super(name, broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
@@ -71,7 +71,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         this.composition = composition;
         this.config = MineMe.getYAMLMineFile(this);
     }
-    
+
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
         super(name, broadcastOnReset, nearbyBroadcast, resetMsg, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
@@ -89,7 +89,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         this.composition = composition;
         this.config = MineMe.getYAMLMineFile(this);
     }
-    
+
     public CuboidMine(MineConfig config) {
         super(config);
         this.world = config.getWorld();
@@ -103,26 +103,26 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 config.getConfig().getDouble("Z2")).toVector();
         composition = config.getComposition();
         this.config = config.getConfig();
-        
+
     }
-    
+
     @Override
     public void setComposition(Map<Material, Double> composition) {
         this.composition = composition;
     }
-    
+
     public Vector getPos2() {
         return pos2;
     }
-    
+
     public Vector getPos1() {
         return pos1;
     }
-    
+
     public File getSaveFile() {
         return saveFile;
     }
-    
+
     public void setSaveFile(File saveFile) {
         this.saveFile = saveFile;
     }
@@ -248,18 +248,18 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     public int getUpperZ() {
         return this.pos2.getBlockZ();
     }
-    
+
     @Override
     public Iterator<Block> iterator() {
         return new CuboidMineIterator(this.getWorld(), this.pos1.getBlockX(), this.pos1.getBlockY(), this.pos1.getBlockZ(), this.pos2.getBlockX(), this.pos2.getBlockY(), this.pos2.getBlockZ());
     }
-    
+
     @Override
     public void delete() {
         saveFile.delete();
         deleted = true;
     }
-    
+
     @Override
     public void reset() {
         if (isDeleted()) {
@@ -297,12 +297,12 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             MineMe.getInstance().debug("Reset event for mine " + name + " was cancelled", 2);
         }
     }
-    
+
     @Override
     public Location getLocation() {
         return getCenter();
     }
-    
+
     @Override
     public synchronized List<Block> getBlocks() {
         ArrayList<Block> blocks = new ArrayList<>();
@@ -311,7 +311,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         }
         return blocks;
     }
-    
+
     @Override
     public String getName() {
         return name;
@@ -324,12 +324,12 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     public void setResetMinutesDelay(int resetMinutesDelay) {
         this.totalResetDelay = resetMinutesDelay;
     }
-    
+
     @Override
     public int getResetMinutesDelay() {
         return totalResetDelay;
     }
-    
+
     public FileConfiguration toConfig() {
         try {
             File f = new File(MineMe.minesFolder.getCanonicalPath() + "/" + name + ".yml");
@@ -352,9 +352,9 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         } catch (IOException ex) {
             return null;
         }
-        
+
     }
-    
+
     @Override
     public MineType getType() {
         return MineType.CUBOID;
@@ -399,7 +399,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         }
         return contains(l.getBlockX(), l.getBlockY(), l.getBlockZ());
     }
-    
+
     @Override
     public boolean contains(Player p) {
         return contains(p.getLocation());
@@ -408,7 +408,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     //Holograms
     private final ArrayList<CompatibleHologram> holograms = new ArrayList();
     private boolean hologramsReady = false;
-    
+
     @Override
     public void setupHolograms() {
         MineMe.getInstance().debug("Creating holograms for " + name + "...");
@@ -436,23 +436,23 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                         ? config.getStringList("hologramsText")
                         : MineMe.defaultHologramText;
         updateHolograms();
-        
+
         hologramsReady = true;
     }
-    
+
     @Override
     public void showHolograms() {
         updateHolograms();
-        
+
     }
-    
+
     @Override
     public void hideHolograms() {
         for (CompatibleHologram m : holograms) {
             m.clearLines();
         }
     }
-    
+
     @Override
     public void updateHolograms() {
         if (isDeleted()) {
@@ -475,12 +475,13 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         }
     }
     private Integer lightHologramUpdateId;
-    
+
     @Override
     public void softHologramUpdate() {
         if (lightHologramUpdateId == null) {
+            MineMe.getInstance().debug("Updating hologram softly.");
             lightHologramUpdateId = Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
-                
+
                 @Override
                 public void run() {
                     updateHolograms();
@@ -489,7 +490,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             }, 60l);
         }
     }
-    
+
     @Override
     public boolean isHologramsVisible() {
         return hologramsReady;
@@ -500,14 +501,14 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     public int getVolume() {
         return this.getSizeX() * this.getSizeY() * this.getSizeZ();
     }
-    
+
     public class CuboidMineIterator implements Iterator<Block> {
-        
+
         private final World w;
         private final int baseX, baseY, baseZ;
         private int x, y, z;
         private final int sizeX, sizeY, sizeZ;
-        
+
         public CuboidMineIterator(World w, int x1, int y1, int z1, int x2, int y2, int z2) {
             this.w = w;
             this.baseX = x1;
@@ -518,12 +519,12 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             this.sizeZ = Math.abs(z2 - z1) + 1;
             this.x = this.y = this.z = 0;
         }
-        
+
         @Override
         public boolean hasNext() {
             return this.x < this.sizeX && this.y < this.sizeY && this.z < this.sizeZ;
         }
-        
+
         @Override
         public Block next() {
             Block b = this.w.getBlockAt(this.baseX + this.x, this.baseY + this.y, this.baseZ + this.z);
@@ -536,16 +537,16 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             }
             return b;
         }
-        
+
         @Override
         public void remove() {
         }
     }
-    
+
     public enum CuboidDirection {
-        
+
         North, East, South, West, Up, Down, Horizontal, Vertical, Both, Unknown;
-        
+
         public CuboidDirection opposite() {
             switch (this) {
                 case North:
@@ -571,7 +572,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             }
         }
     }
-    
+
     @Override
     public void save() {
         FileConfiguration file = MineMe.getYAMLMineFile(this);

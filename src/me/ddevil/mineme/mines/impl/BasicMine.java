@@ -16,7 +16,6 @@
  */
 package me.ddevil.mineme.mines.impl;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -186,7 +185,7 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public void tictoc() {
+    public void minuteCountdown() {
         currentResetDelay--;
         if (currentResetDelay <= 0) {
             reset();
@@ -226,6 +225,15 @@ public abstract class BasicMine implements Mine {
         } else {
             double percentage = (brokenBlocks.size() * 100f) / getVolume();
             return Math.round(percentage);
+        }
+    }
+
+    @Override
+    public double getPercentage(Material m) {
+        if (composition.containsKey(m)) {
+            return composition.get(m);
+        } else {
+            return 0;
         }
     }
 
@@ -287,7 +295,15 @@ public abstract class BasicMine implements Mine {
             }
         }
         if (this instanceof HologramCompatible) {
-            MineMe.getInstance().debug("Updating hologram softly.");
+            HologramCompatible hc = (HologramCompatible) this;
+            hc.softHologramUpdate();
+        }
+    }
+
+    @Override
+    public void setBlockAsBroken(Block block) {
+        brokenBlocks.add(block);
+        if (this instanceof HologramCompatible) {
             HologramCompatible hc = (HologramCompatible) this;
             hc.softHologramUpdate();
         }

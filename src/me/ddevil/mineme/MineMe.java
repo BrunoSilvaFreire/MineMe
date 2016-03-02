@@ -18,9 +18,9 @@ package me.ddevil.mineme;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.thread.FinishListener;
@@ -71,8 +71,7 @@ public class MineMe extends CustomPlugin {
             public void onFinish() {
                 //Register commands
                 registerBaseCommands();
-
-                debug("Plugin loaded!");
+                WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
                 debug("It's all right, it's all favorable :D");
             }
         });

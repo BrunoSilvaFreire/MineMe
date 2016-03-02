@@ -16,8 +16,19 @@
  */
 package me.ddevil.mineme.mines;
 
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.logging.AbstractLoggingExtent;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import me.ddevil.mineme.MineMe;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 /**
@@ -25,20 +36,20 @@ import org.bukkit.entity.Player;
  * @author Selma
  */
 public class MineManager {
-    
+
     private static final ArrayList<Mine> mines = new ArrayList();
     private static final MineMe mineMe = MineMe.getInstance();
-    
+
     public static ArrayList<Mine> getMines() {
         return mines;
     }
-    
+
     public static void registerMine(Mine m) {
         mines.add(m);
         MineMe.registerListener(m);
         mineMe.debug("Mine " + m.getName() + " registered to manager!");
     }
-    
+
     public static void unregisterMines() {
         mines.clear();
         for (Mine mine : mines) {
@@ -46,7 +57,7 @@ public class MineManager {
         }
         MineMe.getInstance().debug("Unloaded all mines!");
     }
-    
+
     public static Mine getMine(String name) {
         for (Mine mine : mines) {
             if (mine.getName().equalsIgnoreCase(name)) {
@@ -55,11 +66,11 @@ public class MineManager {
         }
         return null;
     }
-    
+
     public static boolean isPlayerInAMine(Player p) {
         return getMineWith(p) != null;
     }
-    
+
     public static Mine getMineWith(Player p) {
         for (Mine m : mines) {
             if (m.contains(p)) {
@@ -68,8 +79,57 @@ public class MineManager {
         }
         return null;
     }
-    
+
     public static void sendInfo(Player p, Mine m) {
         MineMe.messageManager.sendMessage(p, m.getInfo());
+    }
+
+    private static void notifyBlockChange(Block b) {
+        for (Mine mine : mines) {
+            if (mine.contains(b)) {
+                if (!mine.wasAlreadyBroken(b)) {
+                    mine.setBlockAsBroken(b);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @author Selma
+     */
+    public static class WorldEditManager {
+
+        public class WorldEditLogger extends AbstractLoggingExtent {
+
+            private final Actor actor;
+            private final World world;
+
+            public Actor getActor() {
+                return actor;
+            }
+
+            public WorldEditLogger(World world, Actor actor, Extent extent) {
+                super(extent);
+                this.actor = actor;
+                this.world = world;
+            }
+
+            @Override
+            protected void onBlockChange(Vector position, BaseBlock newBlock) {
+                BaseBlock oldBlock = getBlock(position);
+                Block block = new Location(Bukkit.getWorld(world.getName()), position.getBlockX(), position.getBlockY(), position.getBlockZ()).getBlock();
+                notifyBlockChange(block);
+            }
+        }
+
+        @Subscribe
+        public void wrapForLogging(EditSessionEvent event) {
+            Actor actor = event.getActor();
+            World world = event.getWorld();
+            if (actor != null && actor.isPlayer()) {
+                event.setExtent(new WorldEditLogger(world, actor, event.getExtent()));
+            }
+        }
     }
 }
