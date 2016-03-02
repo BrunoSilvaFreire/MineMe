@@ -20,7 +20,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.IOException;
 import me.ddevil.core.thread.CustomThread;
-import me.ddevil.mineme.MineMeMessageManager;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineLoadEvent;
 import me.ddevil.mineme.holograms.impl.HolographicDisplaysAdapter;

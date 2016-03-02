@@ -17,9 +17,7 @@
 package me.ddevil.core.commands;
 
 import java.util.List;
-import me.ddevil.core.CustomPlugin;
 import me.ddevil.mineme.MineMe;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

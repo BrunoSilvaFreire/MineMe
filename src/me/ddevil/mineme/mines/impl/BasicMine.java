@@ -20,7 +20,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import me.ddevil.mineme.MineMeMessageManager;
+import java.util.Map;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
@@ -34,16 +35,24 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 
 public abstract class BasicMine implements Mine {
 
-    protected final ArrayList<Block> brokenBlocks = new ArrayList();
+    //General
+    protected final String name;
+    protected final String alias;
+
+    //Messages
     protected boolean broadcastOnReset;
     protected String broadcastMessage;
     protected double broadcastRadius;
     protected boolean broadcastNearby;
-    protected final String name;
-    protected final String alias;
 
+    //Blocks
+    protected Map<Material, Double> composition;
+    protected final ArrayList<Block> brokenBlocks = new ArrayList();
+
+    //Clock
     protected int currentResetDelay;
     protected int totalResetDelay;
+    protected boolean deleted = false;
 
     public BasicMine(MineConfig config) {
         this.broadcastMessage = MineMe.forceDefaultBroadcastMessage
@@ -113,6 +122,7 @@ public abstract class BasicMine implements Mine {
 
     public void setResetMinutesDelay(int resetMinutesDelay) {
         this.totalResetDelay = resetMinutesDelay;
+        save();
     }
 
     @Override
@@ -138,22 +148,28 @@ public abstract class BasicMine implements Mine {
     @Override
     public void setBroadcastOnReset(boolean broadcastOnReset) {
         this.broadcastOnReset = broadcastOnReset;
+        save();
+
     }
 
     public void setResetDelay(int resetDelay) {
         this.currentResetDelay = resetDelay;
+        save();
     }
 
     public void setNearbyBroadcast(boolean nearbyBroadcast) {
         this.broadcastNearby = nearbyBroadcast;
+        save();
     }
 
     public void setBroadcastRadius(double broadcastRadius) {
         this.broadcastRadius = broadcastRadius;
+        save();
     }
 
     public void setBroadcastMessage(String broadcastMessage) {
         this.broadcastMessage = broadcastMessage;
+        save();
     }
 
     public double getBroadcastRadius() {
@@ -175,11 +191,6 @@ public abstract class BasicMine implements Mine {
         if (currentResetDelay <= 0) {
             reset();
         }
-    }
-
-    @Override
-    public void save() {
-
     }
 
     @Override
@@ -282,4 +293,37 @@ public abstract class BasicMine implements Mine {
         }
     }
 
+    @Override
+    public boolean containsMaterial(Material material) {
+        return composition.containsKey(material);
+    }
+
+    @Override
+    public void removeMaterial(Material material) {
+        if (containsMaterial(material)) {
+            composition.remove(material);
+        }
+        save();
+    }
+
+    @Override
+    public void setMaterial(Material material, double percentage) {
+        composition.put(material, percentage);
+        save();
+    }
+
+    @Override
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    @Override
+    public Map<Material, Double> getComposition() {
+        return composition;
+    }
+
+    @Override
+    public Material[] getMaterials() {
+        return composition.keySet().toArray(new Material[composition.keySet().size()]);
+    }
 }

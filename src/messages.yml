@@ -46,7 +46,7 @@
 #Messages
  messages:
     #Chat messages
-    messagePrefix: "&e&lMine&a&lMe"
+    messagePrefix: "$1&lMine$2&lMe"
     messageSeparator: " &6&l>$3 "
     
     #Mine messages

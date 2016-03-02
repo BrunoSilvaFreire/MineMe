@@ -20,8 +20,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import me.ddevil.core.commands.CustomCommand;
 import me.ddevil.core.commands.SubCommand;
-import me.ddevil.mineme.MineMeMessageManager;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.messages.MessageColor;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.impl.CuboidMine;
@@ -39,11 +40,11 @@ public class MineCommand extends CustomCommand {
         public EditCommand(MineCommand minecmd) {
             super("edit", minecmd, Arrays.asList(new String[]{}));
             usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
-                "$4 () = Obligatory $1/$4 [] = optional",
-                "$1/mineme $2edit (name) add (material) (number from 0 to 1) $3s",
-                "$2Example: $1/mineme edit examplemine add COBBLESTONE 0.3 $4Sets 30% cobble.",
-                "$1/mineme $2edit (name) ()$3Displays infos about the specified mine",
-                "$1/mineme $2edit (name) ()$3Displays infos about the specified mine",});
+                MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
+                MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) add (material) (number from 0 to 100) " + MessageColor.NEUTRAL + "Add's this material to the mines composition.",
+                MessageColor.SECONDARY + "Example: " + MessageColor.SECONDARY + "/mineme edit examplemine add IRON_ORE 30 " + MessageColor.NEUTRAL + "Sets 30% iron ore.",
+                MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) remove (material) " + MessageColor.NEUTRAL + "Removes this material to the mines composition."
+            });
         }
 
         @Override
@@ -54,10 +55,69 @@ public class MineCommand extends CustomCommand {
                     String mineName = args[1];
                     Mine mine = MineManager.getMine(mineName);
                     if (mine != null) {
-
+                        if (args.length > 2) {
+                            String toDo = args[2];
+                            if (toDo.equalsIgnoreCase("add")) {
+                                //Add block to mine
+                                if (args.length > 3) {
+                                    String mname = args[3].toUpperCase();
+                                    try {
+                                        Material material = Material.valueOf(mname);
+                                        if (material.isBlock()) {
+                                            if (args.length > 4) {
+                                                String stringpercent = args[4].replace("%", "");
+                                                try {
+                                                    double percent = Double.valueOf(stringpercent);
+                                                    mine.setMaterial(material, percent);
+                                                    mine.reset();
+                                                    MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + material.name() + MessageColor.SECONDARY + " was set to " + MessageColor.PRIMARY + percent + MessageColor.SECONDARY + " in mine " + MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + " !");
+                                                } catch (NumberFormatException e) {
+                                                    sendInvalidArguments(p, MessageColor.ERROR + stringpercent + MessageColor.NEUTRAL + " isn't a number!");
+                                                }
+                                            } else {
+                                                sendInvalidArguments(p, MessageColor.NEUTRAL + "Please give us a number!");
+                                            }
+                                        } else {
+                                            sendInvalidArguments(p, MessageColor.ERROR + material.name() + MessageColor.NEUTRAL + " isn't a placeable block!");
+                                        }
+                                    } catch (Exception e) {
+                                        sendInvalidArguments(p, MessageColor.ERROR + mname + MessageColor.NEUTRAL + " isn't a Material!");
+                                    }
+                                } else {
+                                    sendInvalidArguments(p, MessageColor.NEUTRAL + "Please give us a material!");
+                                }
+                            } else if (toDo.equalsIgnoreCase("remove") || toDo.equalsIgnoreCase("delete")) {
+                                //Removes block from composition
+                                if (args.length > 3) {
+                                    String mname = args[3].toUpperCase();
+                                    try {
+                                        Material material = Material.valueOf(mname);
+                                        if (mine.containsMaterial(material)) {
+                                            mine.removeMaterial(material);
+                                            mine.reset();
+                                            MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + material.name() + MessageColor.SECONDARY + " was removed from " + MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + " !");
+                                        } else {
+                                            sendInvalidArguments(p, MessageColor.NEUTRAL + "Mine " + MessageColor.ERROR + mine.getName() + MessageColor.NEUTRAL + " doesn't contain any " + MessageColor.ERROR + material.name() + MessageColor.NEUTRAL + "!");
+                                        }
+                                    } catch (Exception e) {
+                                        sendInvalidArguments(p, MessageColor.ERROR + mname + MessageColor.NEUTRAL + " isn't a Material!");
+                                    }
+                                } else {
+                                    sendInvalidArguments(p, MessageColor.NEUTRAL + "Please give us a material!");
+                                }
+                            } else {
+                                sendUsage(p);
+                            }
+                        } else {
+                            sendUsage(p);
+                        }
                     } else {
+                        sendInvalidArguments(p,
+                                "The mine " + mineName + " doesn't exists!"
+                        );
                     }
                 } else {
+                    sendUsage(p);
                 }
             } else {
                 sender.sendMessage("You can only use this command ingame");
@@ -71,16 +131,16 @@ public class MineCommand extends CustomCommand {
         editCommand = new EditCommand(this);
         addSubCommand(editCommand);
         usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
-            "$2Others cool aliases: $1mrl, mm, mine, mines",
-            "$4 () = Obligatory $1/$4 [] = optional",
-            "$1/mineme $2create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] $3Creates a new mine full of stone :D",
-            "$1/mineme $2delete (name) $3Deletes the specified mine",
-            "$1/mineme $2info (name) $3Displays infos about the specified mine",
-            "$1/mineme $2edit (name) ()$3Displays infos about the specified mine",
-            "$1/mineme $2list $3List all the loaded mines.",
-            "$1/mineme $2help $3Shows this.",
-            "$1/mineme $2reload $3Reloads the config. :)",
-            "$4NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)"
+            MessageColor.SECONDARY + "Others cool aliases: " + MessageColor.PRIMARY + "mrl, mm, mine, mines",
+            MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] " + MessageColor.NEUTRAL + "Creates a new mine full of stone :D",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "delete (name) " + MessageColor.NEUTRAL + "Deletes the specified mine",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "info (name) " + MessageColor.NEUTRAL + "Displays infos about the specified mine",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) ()" + MessageColor.NEUTRAL + "Displays infos about the specified mine",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "list " + MessageColor.NEUTRAL + "List all the loaded mines.",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reload " + MessageColor.NEUTRAL + "Reloads the config. :)",
+            MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)"
 
         });
     }
@@ -91,7 +151,7 @@ public class MineCommand extends CustomCommand {
             Player p = (Player) sender;
             if (args.length > 0) {
                 String func = args[0];
-                if (func.equals("create")) {
+                if (func.equalsIgnoreCase("create")) {
                     //create
                     if (args.length > 1) {
                         String mineName = args[1];
@@ -140,9 +200,9 @@ public class MineCommand extends CustomCommand {
                             "You need to specify a name!"
                         });
                     }
-                } else if (func.equals("delete")) {
+                } else if (func.equalsIgnoreCase("delete")) {
                     //delete
-                } else if (func.equals("info")) {
+                } else if (func.equalsIgnoreCase("info")) {
                     if (args.length > 1) {
                         String name = args[1];
                         Mine m = MineManager.getMine(name);
@@ -158,18 +218,18 @@ public class MineCommand extends CustomCommand {
                             "You need to specify a name!"
                         });
                     }
-                } else if (func.equals("reload")) {
+                } else if (func.equalsIgnoreCase("reload")) {
                     //reload
                     MineMe.getInstance().reload(p);
-                } else if (func.equals("list")) {
+                } else if (func.equalsIgnoreCase("list")) {
                     //list
                     listMines(p);
-                } else if (func.equals("edit")) {
+                } else if (func.equalsIgnoreCase("edit")) {
                     //edit mine
                     editCommand.handleExecute(p, args);
-                } else if (func.equals("help")) {
+                } else if (func.equalsIgnoreCase("help")) {
                     //lies
-                    MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColor("$4The help is a lie! $1Use /mineme"));
+                    MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColor(MessageColor.ERROR + "The help is a lie! " + MessageColor.PRIMARY + "Use /mineme"));
                 } else {
                     //none
                     sendUsage(p);
@@ -203,10 +263,18 @@ public class MineCommand extends CustomCommand {
         for (Mine m : MineManager.getMines()) {
             s = s.concat(MineMeMessageManager.translateTagsAndColors(m.getName(), m));
             if (MineManager.getMines().indexOf(m) != MineManager.getMines().size() - 1) {
-                s = s.concat("§f, $1");
+                s = s.concat(MessageColor.SECONDARY + ", " + MessageColor.PRIMARY);
             }
         }
-        MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColor("%prefix% $1Available mines: " + s));
+        MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColor(MessageColor.SECONDARY + "Available mines: " + MessageColor.PRIMARY + "" + s));
+    }
+
+    @Override
+    public void sendInvalidArguments(Player p, String msg) {
+        MineMe.messageManager.sendMessage(p, new String[]{
+            MineMeMessageManager.invalidArguments,
+            msg
+        });
     }
 
 }

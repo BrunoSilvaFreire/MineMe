@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme;
+package me.ddevil.mineme.messages;
 
 import java.util.ArrayList;
 import me.ddevil.core.chat.BasicMessageManager;
 import me.ddevil.core.utils.StringUtils;
+import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class MineMeMessageManager extends BasicMessageManager {
 
@@ -160,6 +162,11 @@ public class MineMeMessageManager extends BasicMessageManager {
             afinal.add(translateTagsAndColors(s, m));
         }
         return afinal.toArray(new String[afinal.size()]);
+    }
+
+    @Override
+    public void sendMessage(Player p, String string) {
+        p.sendMessage(translateColors(pluginPrefix + messageSeparator + string));
     }
 
 }

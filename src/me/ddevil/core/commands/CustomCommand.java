@@ -96,5 +96,7 @@ public abstract class CustomCommand extends Command {
         CustomPlugin.messageManager.sendMessage(p, usageMessages);
     }
 
+    public abstract void sendInvalidArguments(Player p, String msg);
+
     public abstract boolean handleExecute(CommandSender sender, String[] args);
 }

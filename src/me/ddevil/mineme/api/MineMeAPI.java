@@ -17,7 +17,7 @@
 package me.ddevil.mineme.api;
 
 import me.ddevil.mineme.MineMe;
-import me.ddevil.mineme.MineMeMessageManager;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import org.bukkit.entity.Player;

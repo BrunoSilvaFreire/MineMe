@@ -40,10 +40,9 @@
  #{Material}:[Data(Optional)]={Percentage}
  #STONE=25
  #WOOL:9=25
- - STONE=25
- - LAPIS_ORE=25
- - REDSTONE_ORE=25
- - COBBLESTONE=25
+ - STONE=35
+ - EMERALD_ORE=60
+ - DIAMOND_ORE=5
  
  #If this mine will use the hologramsText below
  #False will use the default text in config.yml

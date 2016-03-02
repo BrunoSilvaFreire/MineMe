@@ -59,6 +59,14 @@ public interface Mine extends Iterable<Block>, Listener {
     public Material[] getMaterials();
 
     /**
+     * Checks if this mine is deleted (Garbage Collector hasn't finalized this
+     * yet)
+     *
+     * @return true if this mine is deleted.
+     */
+    public boolean isDeleted();
+
+    /**
      * Return if the mine is set to broadcast it's reset message.
      *
      * @return true if mine is set to send message on reset, false otherwise
@@ -106,6 +114,14 @@ public interface Mine extends Iterable<Block>, Listener {
     public Location getLocation();
 
     public String getAlias();
+
+    public boolean containsMaterial(Material material);
+
+    public void setComposition(Map<Material, Double> composition);
+
+    public void setMaterial(Material material, double percentage);
+
+    public void removeMaterial(Material material);
 
     //Statistics
     public int getVolume();

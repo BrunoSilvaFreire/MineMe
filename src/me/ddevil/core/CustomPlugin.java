@@ -20,7 +20,6 @@ import me.ddevil.core.chat.MessageManager;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.mineme.MineMe;

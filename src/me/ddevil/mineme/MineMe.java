@@ -84,10 +84,6 @@ public class MineMe extends CustomPlugin {
         unloadEverything();
     }
 
-    public void debug() {
-        getLogger().info("");
-    }
-
     public static FileConfiguration getYAMLMineFile(Mine m) {
         return YamlConfiguration.loadConfiguration(getMineFile(m));
     }
