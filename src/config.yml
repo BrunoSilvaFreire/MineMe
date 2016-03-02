@@ -65,10 +65,11 @@
     - '&7Stone $2percentage:$1 %composition:STONE%'
     - '&2Emerald $2percentage$1 %composition:EMERALD_ORE%'
     - '&6Gold $2percentage$1 %composition:GOLD_ORE%'
+    - '$2Time until next reset: $1%resettime%'
     - '&e&lBanana for scale!'
     - '%header%'
 #Everything below here will affect ~ALL~ the mines
  global:
-  
+  convertFromMineResetLite: false
   #Forces all the mines to use the default broadcast message in messages.yml
   forceDefaultBroadcastMessage: true
