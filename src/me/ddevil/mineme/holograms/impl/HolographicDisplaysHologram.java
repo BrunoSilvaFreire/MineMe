@@ -45,4 +45,9 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
         hologram.appendTextLine(translateTagsAndColors);
     }
 
+    @Override
+    public void delete() {
+        hologram.delete();
+    }
+
 }

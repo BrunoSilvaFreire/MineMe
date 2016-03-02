@@ -28,6 +28,7 @@ public abstract class BasicMessageManager implements MessageManager {
     //Global Messages
     public static String pluginPrefix;
     public static String messageSeparator;
+    public static String header;
 
     @Override
     public void sendMessage(Player p, String string) {

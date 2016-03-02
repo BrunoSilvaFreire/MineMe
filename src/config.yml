@@ -5,7 +5,7 @@
   # 1 = Secondary mine updates (Hologram Updates) (Includes all level 2 msgs)
   # 2 = Priority mine updates (Resets, Saves, Loads) (Includes all level 3 msgs) (Loading mines from config messages are always shown btw)
   # 3 = Loading/Unloading (Loads, Unloads, Reloads, Configs, etc)
-  # 4 = None
+  # 4 = None (Not actually none, displays only primordial messages)
   # Errors will always be displayed, trust me, you'll need them.
   minimumDebugLevel: 0
      
@@ -35,6 +35,7 @@
    # ----- Global tags (Always replaced) -----
    # %prefix% - Replaced by messagePrefix (The one right below)
    # %separator% - Replaced by messageSeparator
+   # %header% - Replaced by pluginHeader
    #
    # ----- Mines tags (Will only be replaced on Mine messages) -----
    # %mine% - Replaced by the mine -> NAME <-
@@ -46,7 +47,7 @@
    # - If you break a block in a mine it and put another one in it's place, it will count as a mined block, the placed block does NOT count
    # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
    # - Explosion counts.
-   # - World Edit does not count (yet)
+   # - World Edit counts.
    # %composition:(Material name here)% - Replaced the percentage of the material in the mine's composition, returns 0 if the mine doesn't contains the material
    # example: %composition:STONE% Get the Stone percentage in the mine's composition
    #
@@ -56,12 +57,15 @@
    # %remainingblocks% - Replaced by the number of remaining blocks
    # %remainingblockspercent% - Replaced by the percentage of remaining blocks
    defaultHologramText:
+    - '%header%'
     - '%alias%'
-    - '$2Mined: $1%minedblocks% $2blocks'
+    - '$2Mined: $1%minedblocks%$4/$1%volume% $2blocks'
     - '$1%remainingblockspercent%$2% remaining'
-    - '$2Stone percentage:$1 %composition:STONE%'
-    - '$2Emerald percentage$1 %composition:EMERALD_ORE%'
-    - '$2Gold percentage$1 %composition:GOLD_ORE%'
+    - '&7&lStone $2percentage:$1 %composition:STONE%'
+    - '&2&lEmerald $2percentage$1 %composition:EMERALD_ORE%'
+    - '&6&lGold $2percentage$1 %composition:GOLD_ORE%'
+    - '&e&lBanana for scale!'
+    - '%header%'
 #Everything below here will affect ~ALL~ the mines
  global:
   

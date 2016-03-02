@@ -69,6 +69,7 @@ public class MineMeMessageManager extends BasicMessageManager {
             //Global Messages
             messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
             pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
+            header = translateTagsAndColor(MineMe.messagesConfig.getString("messages.header"));
 
             //Error Messages
             noPermission = translateColors(MineMe.messagesConfig.getString("messages.noPermission"));
@@ -92,6 +93,7 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%volume%", m.getVolume() + "");
         get = get.replaceAll("%alias%", m.getAlias());
         get = get.replaceAll("%prefix%", pluginPrefix);
+        get = get.replaceAll("%header%", header);
         get = get.replaceAll("%separator%", messageSeparator);
         boolean translateComposition = get.contains("%composition:");
         while (translateComposition) {
@@ -120,8 +122,15 @@ public class MineMeMessageManager extends BasicMessageManager {
     }
 
     public static String translateTagsAndColor(String get) {
-        get = get.replaceAll("%prefix%", pluginPrefix);
-        get = get.replaceAll("%separator%", messageSeparator);
+        if (pluginPrefix != null) {
+            get = get.replaceAll("%prefix%", pluginPrefix);
+        }
+        if (messageSeparator != null) {
+            get = get.replaceAll("%separator%", messageSeparator);
+        }
+        if (header != null) {
+            get = get.replaceAll("%header%", header);
+        }
         return translateColors(get);
     }
 
@@ -162,7 +171,7 @@ public class MineMeMessageManager extends BasicMessageManager {
                 }
             }
         }
-        return StringUtils.optimizeColors(ChatColor.translateAlternateColorCodes(colorChar, new String(b)));
+        return ChatColor.translateAlternateColorCodes(colorChar, new String(b));
     }
 
     public static String[] translateColors(String[] trans) {

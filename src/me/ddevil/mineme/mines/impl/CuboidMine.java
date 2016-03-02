@@ -258,6 +258,9 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     public void delete() {
         saveFile.delete();
         deleted = true;
+        for (CompatibleHologram hologram : holograms) {
+            hologram.delete();
+        }
     }
 
     @Override
@@ -415,7 +418,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         Location l = getCenter();
         Location temp;
         temp = l.clone();
-        temp.setY(getUpperY() + 3);
+        temp.setY(getUpperY() + 4);
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(getSizeX() / 2 + 1, 0, 0);

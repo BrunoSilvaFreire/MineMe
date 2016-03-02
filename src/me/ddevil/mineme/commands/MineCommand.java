@@ -40,11 +40,11 @@ public class MineCommand extends CustomCommand {
         public EditCommand(MineCommand minecmd) {
             super("edit", minecmd, Arrays.asList(new String[]{}));
             usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
-                MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----",
+                "%header",
                 MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) add (material) (number from 0 to 100) " + MessageColor.NEUTRAL + "Add's this material to the mines composition.",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) remove (material) " + MessageColor.NEUTRAL + "Removes this material to the mines composition.",
-                MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----"});
+                "%header"});
         }
 
         @Override
@@ -138,7 +138,7 @@ public class MineCommand extends CustomCommand {
         editCommand = new EditCommand(this);
         addSubCommand(editCommand);
         usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
-            MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----",
+            "%header",
             MessageColor.SECONDARY + "Others cool aliases: " + MessageColor.PRIMARY + "mrl, mm, mine, mines",
             MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] " + MessageColor.NEUTRAL + "Creates a new mine full of stone :D",
@@ -150,7 +150,7 @@ public class MineCommand extends CustomCommand {
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reload " + MessageColor.NEUTRAL + "Reloads the config. :)",
             MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)",
-            MessageColor.ERROR + "&m----&r %prefix% " + MessageColor.ERROR + "&m----"}
+            "%header"}
         );
     }
 
@@ -233,6 +233,12 @@ public class MineCommand extends CustomCommand {
                         if (m != null) {
                             m.reset();
                             MineMe.messageManager.sendMessage(p, "Mine " + MessageColor.PRIMARY + m.getName() + MessageColor.NEUTRAL + " was reseted! :D");
+                        } else if (name.equalsIgnoreCase("all")) {
+                            for (Mine mb : MineManager.getMines()) {
+                                mb.reset();
+                            }
+                            MineMe.messageManager.sendMessage(p, "Reseted all mines!");
+
                         } else {
                             MineMe.messageManager.sendMessage(p, "Could not find mine " + name + ".");
                             listMines(p);
