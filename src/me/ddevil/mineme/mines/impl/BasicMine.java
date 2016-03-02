@@ -16,6 +16,7 @@
  */
 package me.ddevil.mineme.mines.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.json.simple.JSONObject;
 
 public abstract class BasicMine implements Mine {
 
@@ -41,6 +43,7 @@ public abstract class BasicMine implements Mine {
     protected final String name;
     protected final String alias;
     protected FileConfiguration config;
+    protected File saveFile = MineMe.getMineFile(this);
 
     //Messages
     protected boolean broadcastOnReset;
@@ -89,7 +92,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastRadius = broadcastRadius;
         this.totalResetDelay = resetMinutesDelay;
         this.currentResetDelay = totalResetDelay;
-        broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
+        broadcastMessage = MineMe.messagesConfig.getString("messages.mineReset");
         this.name = name;
         this.alias = MineMeMessageManager.translateColors(name);
         this.world = world;
@@ -113,7 +116,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastRadius = broadcastRadius;
         this.totalResetDelay = resetMinutesDelay;
         this.currentResetDelay = totalResetDelay;
-        broadcastMessage = MineMe.messagesConfig.getString("messages.resetMessage");
+        broadcastMessage = MineMe.messagesConfig.getString("messages.mineReset");
         this.name = name;
         this.alias = MineMeMessageManager.translateColors(alias);
         this.world = world;
@@ -317,6 +320,17 @@ public abstract class BasicMine implements Mine {
             hc.softHologramUpdate();
         }
     }
+    protected boolean enabled = false;
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 
     @Override
     public boolean containsMaterial(Material material) {
@@ -369,20 +383,30 @@ public abstract class BasicMine implements Mine {
     protected final World world;
 
     public FileConfiguration getBasicSavedConfig() {
-        FileConfiguration config = MineMe.getYAMLMineFile(this);
-        config.set("name", name);
-        config.set("alias", alias);
-        config.set("world", world.getName());
-        config.set("type", getType().name());
-        config.set("resetDelay", totalResetDelay);
-        config.set("broadcastOnReset", broadcastOnReset);
-        config.set("broadcastToNearbyOnly", broadcastNearby);
-        config.set("broadcastRadius", broadcastRadius);
+        FileConfiguration c = MineMe.getYAMLMineFile(this);
+        c.set("enabled", enabled);
+        c.set("name", name);
+        c.set("alias", alias);
+        c.set("world", world.getName());
+        c.set("type", getType().name());
+        c.set("resetDelay", totalResetDelay);
+        c.set("broadcastOnReset", broadcastOnReset);
+        c.set("broadcastToNearbyOnly", broadcastNearby);
+        c.set("broadcastRadius", broadcastRadius);
         ArrayList<String> comp = new ArrayList();
         for (Material m : composition.keySet()) {
             comp.add(m + "=" + composition.get(m));
         }
-        config.set("composition", comp);
-        return config;
+        c.set("composition", comp);
+        return c;
     }
+
+    @Override
+    public String toString() {
+        JSONObject obj = new JSONObject();
+        obj.put("name", name);
+        obj.put("location", getLocation().toString());
+        return obj.toJSONString();
+    }
+
 }

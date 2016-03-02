@@ -85,7 +85,12 @@ public class MineMeMessageManager extends BasicMessageManager {
     }
 
     public static String translateTagsAndColors(String get, Mine m) {
-        get = get.replaceAll("%mine%", m.getName());
+        get
+                = get.replaceAll("%mine%",
+                        m
+                        .getName()
+                );
+
         get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
         get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
         get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));

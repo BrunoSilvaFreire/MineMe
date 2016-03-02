@@ -127,19 +127,6 @@ public interface Mine extends Iterable<Block>, Listener {
 
     public void removeMaterial(Material material);
 
-    //Statistics
-    public int getVolume();
-
-    public int getRemainingBlocks();
-
-    public float getPercentageRemaining();
-
-    public int getMinedBlocks();
-
-    public float getPercentageMined();
-
-    public boolean wasAlreadyBroken(Block b);
-
     public World getWorld();
 
     /**
@@ -169,4 +156,22 @@ public interface Mine extends Iterable<Block>, Listener {
      * @return the Y value
      */
     public Vector getMinimumPoint();
+
+    public boolean isEnabled();
+
+    public void setEnabled(boolean enabled);
+    //Statistics
+
+    public int getVolume();
+
+    public int getRemainingBlocks();
+
+    public float getPercentageRemaining();
+
+    public int getMinedBlocks();
+
+    public float getPercentageMined();
+
+    public boolean wasAlreadyBroken(Block b);
+
 }

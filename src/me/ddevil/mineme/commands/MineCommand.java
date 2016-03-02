@@ -23,9 +23,11 @@ import me.ddevil.core.commands.SubCommand;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.messages.MessageColor;
+import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.impl.CuboidMine;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -138,6 +140,7 @@ public class MineCommand extends CustomCommand {
         editCommand = new EditCommand(this);
         addSubCommand(editCommand);
         usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
+            "&r",
             "%header",
             MessageColor.SECONDARY + "Others cool aliases: " + MessageColor.PRIMARY + "mrl, mm, mine, mines",
             MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
@@ -164,6 +167,10 @@ public class MineCommand extends CustomCommand {
                     //create
                     if (args.length > 1) {
                         String mineName = args[1];
+                        if (!MineManager.isNameAvailable(mineName)) {
+                            sendInvalidArguments(p, "There is already a mine named " + MessageColor.PRIMARY + mineName + MessageColor.NEUTRAL + "! Please select another one.");
+                            return true;
+                        }
                         Location loc1 = MineMe.WEP.getSelection(p).getMaximumPoint();
                         Location loc2 = MineMe.WEP.getSelection(p).getMinimumPoint();
                         if (loc1 == null) {
@@ -297,12 +304,35 @@ public class MineCommand extends CustomCommand {
             MineMe.messageManager.sendMessage(p, MineMeMessageManager.noPermission);
             return;
         }
+        Bukkit.broadcastMessage("§apos1: " + loc1.toString());
+        Bukkit.broadcastMessage("§apos2: " + loc2.toString());
+        Location fl1 = loc1.clone();
+        Location fl2 = loc2.clone();
+        fl1.setX(Math.min(loc1.getBlockX(), loc2.getBlockX()));
+        fl1.setY(Math.min(loc1.getBlockY(), loc2.getBlockY()));
+        fl1.setZ(Math.min(loc1.getBlockZ(), loc2.getBlockZ()));
+        fl2.setX(Math.max(loc1.getBlockX(), loc2.getBlockX()));
+        fl2.setY(Math.max(loc1.getBlockY(), loc2.getBlockY()));
+        fl2.setZ(Math.max(loc1.getBlockZ(), loc2.getBlockZ()));
+        Bukkit.broadcastMessage("§cpos1: " + loc1.toString());
+        Bukkit.broadcastMessage("§cpos2: " + loc2.toString());
         HashMap<Material, Double> map = new HashMap<>();
         map.put(Material.STONE, 100d);
-        Mine m = new CuboidMine(name, loc1, loc2, map, delay, broadcastMessage, nearby, radius);
-        m.reset();
+        Mine m = new CuboidMine(name, fl1, fl2, map, delay, broadcastMessage, nearby, radius);
         MineManager.registerMine(m);
         MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColors(MineMeMessageManager.mineCreateMessage, m));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
+
+            @Override
+            public void run() {
+                m.save();
+                if (m instanceof HologramCompatible) {
+                    HologramCompatible h = (HologramCompatible) m;
+                    h.setupHolograms();
+                }
+                m.reset();
+            }
+        }, 20l);
     }
 
     private void listMines(Player p) {

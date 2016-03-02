@@ -31,6 +31,7 @@ import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.events.MineResetEvent;
 import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.HologramCompatible;
+import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
@@ -49,7 +50,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     protected final Vector pos1;
     protected final Vector pos2;
-    protected File saveFile;
     private List<String> hologramsLines;
 
     public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
@@ -57,12 +57,18 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
-        l1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
-        l1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
-        l1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
-        l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
-        l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
-        l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
+        Bukkit.broadcastMessage("§apos1: " + l1.toString());
+        Bukkit.broadcastMessage("§apos2: " + l2.toString());
+        Location fl1 = l1.clone();
+        Location fl2 = l2.clone();
+        fl1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
+        fl1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
+        fl1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
+        fl2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
+        fl2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
+        fl2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
+        Bukkit.broadcastMessage("§cpos1: " + l1.toString());
+        Bukkit.broadcastMessage("§cpos2: " + l2.toString());
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
@@ -239,7 +245,9 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
 
     @Override
     public void delete() {
-        saveFile.delete();
+        setEnabled(false);
+        save();
+        MineManager.unregisterMine(this);
         deleted = true;
         for (CompatibleHologram hologram : holograms) {
             hologram.delete();
@@ -268,7 +276,10 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (broadcastNearby) {
                         if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
-                            p.sendMessage(MineMeMessageManager.translateTagsAndColors(broadcastMessage, this));
+                            p.sendMessage(
+                                    MineMeMessageManager.translateTagsAndColors(
+                                            broadcastMessage,
+                                            this));
                         }
                     } else {
                         p.sendMessage(MineMeMessageManager.translateTagsAndColors(broadcastMessage, this));

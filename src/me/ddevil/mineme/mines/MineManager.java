@@ -44,6 +44,15 @@ public class MineManager {
         return mines;
     }
 
+    public static boolean isNameAvailable(String name) {
+        for (Mine mine : mines) {
+            if (mine.getName().equalsIgnoreCase(name)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static void registerMine(Mine m) {
         mines.add(m);
         MineMe.registerListener(m);
@@ -55,6 +64,12 @@ public class MineManager {
         for (Mine mine : mines) {
             MineMe.unregisterListener(mine);
         }
+        MineMe.getInstance().debug("Unloaded all mines!");
+    }
+
+    public static void unregisterMine(Mine mine) {
+        mines.remove(mine);
+        MineMe.unregisterListener(mine);
         MineMe.getInstance().debug("Unloaded all mines!");
     }
 

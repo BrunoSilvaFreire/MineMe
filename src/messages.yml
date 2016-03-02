@@ -60,7 +60,7 @@
   #Mine messages
     
   #This is displayed when you create a mine... What did you expect?
-    mineCreate: "%prefix%%separator%$2Mine %mine% $2has been created!"
+    mineCreate: "$2Mine %mine% $2has been created!"
     
   #if forceDefaultBroadcastMessage is enabled, this message will be used on all mines
   #on reset... ALL... MINES...

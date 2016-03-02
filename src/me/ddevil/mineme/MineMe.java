@@ -69,10 +69,17 @@ public class MineMe extends CustomPlugin {
 
             @Override
             public void onFinish() {
-                //Register commands
-                registerBaseCommands();
-                WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
-                debug("It's all right, it's all favorable :D");
+                //Register commands and World Edit
+                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
+
+                    @Override
+                    public void run() {
+                        WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
+                        registerBaseCommands();
+                        debug("It's all right, it's all favorable :D");
+                    }
+                }, 0l);
+
             }
         });
 
