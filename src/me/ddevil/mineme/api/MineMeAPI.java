@@ -51,6 +51,10 @@ public class MineMeAPI {
         return MineManager.getMineWith(player);
     }
 
+    public static boolean isPlayerInAMine(Player player) {
+        return MineManager.isPlayerInAMine(player);
+    }
+
     /**
      * Translates the tags and colors in this String :D
      * <b>Note this will only work with static tags! (Tags that don't require
