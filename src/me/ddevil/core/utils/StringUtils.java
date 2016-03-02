@@ -16,7 +16,6 @@
  */
 package me.ddevil.core.utils;
 
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 
 public class StringUtils {
@@ -38,22 +37,22 @@ public class StringUtils {
     }
 
     public static String optimizeColors(String msg) {
-        ChatColor ultimaCor = null;
+        ChatColor lastColor = null;
         for (int i = 0; i < msg.length(); i++) {
             char c = msg.charAt(i);
             if (c == '§') {
                 ChatColor cor = ChatColor.getByChar(msg.charAt(i + 1));
                 if (cor != null) {
                     if (cor.isColor()) {
-                        if (ultimaCor == null) {
-                            ultimaCor = cor;
+                        if (lastColor == null) {
+                            lastColor = cor;
                             continue;
                         }
-                        if (cor == ultimaCor) {
+                        if (cor == lastColor) {
                             msg = new StringBuffer(msg).replace(i, i + 2, "").toString();
                             i -= 2;
                         } else {
-                            ultimaCor = cor;
+                            lastColor = cor;
                         }
                     }
                 }
