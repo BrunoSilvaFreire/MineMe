@@ -1,5 +1,5 @@
  #This will prevent the mine from being loaded
- enabled: true
+ enabled: false
 
  #The mine name, this name won't be displayed at all, this is mostly for
  #technical reasons(Like finding itself in things like /mineme info).

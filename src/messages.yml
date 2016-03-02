@@ -46,6 +46,7 @@
  # example: %composition:STONE% Get the Stone percentage in the mine's composition
  #
  # %volume% - Replaced by the mine's volume
+ # %resettime% - The time remaining till next reset
  # %minedblocks% - Replaced by the number of mined blocks
  # %minedblockspercent% - Replaced by the percentage of mined blocks
  # %remainingblocks% - Replaced by the number of remaining blocks

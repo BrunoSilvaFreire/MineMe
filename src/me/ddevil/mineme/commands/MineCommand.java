@@ -42,11 +42,12 @@ public class MineCommand extends CustomCommand {
         public EditCommand(MineCommand minecmd) {
             super("edit", minecmd, Arrays.asList(new String[]{}));
             usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
-                "%header",
+                "&r",
+                "%header%",
                 MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) add (material) (number from 0 to 100) " + MessageColor.NEUTRAL + "Add's this material to the mines composition.",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) remove (material) " + MessageColor.NEUTRAL + "Removes this material to the mines composition.",
-                "%header"});
+                "%header%"});
         }
 
         @Override
@@ -141,7 +142,7 @@ public class MineCommand extends CustomCommand {
         addSubCommand(editCommand);
         usageMessages = MineMeMessageManager.translateTagsAndColors(new String[]{
             "&r",
-            "%header",
+            "%header%",
             MessageColor.SECONDARY + "Others cool aliases: " + MessageColor.PRIMARY + "mrl, mm, mine, mines",
             MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] " + MessageColor.NEUTRAL + "Creates a new mine full of stone :D",
@@ -153,7 +154,7 @@ public class MineCommand extends CustomCommand {
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reload " + MessageColor.NEUTRAL + "Reloads the config. :)",
             MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)",
-            "%header"}
+            "%header%"}
         );
     }
 
@@ -304,8 +305,6 @@ public class MineCommand extends CustomCommand {
             MineMe.messageManager.sendMessage(p, MineMeMessageManager.noPermission);
             return;
         }
-        Bukkit.broadcastMessage("§apos1: " + loc1.toString());
-        Bukkit.broadcastMessage("§apos2: " + loc2.toString());
         Location fl1 = loc1.clone();
         Location fl2 = loc2.clone();
         fl1.setX(Math.min(loc1.getBlockX(), loc2.getBlockX()));
@@ -314,8 +313,6 @@ public class MineCommand extends CustomCommand {
         fl2.setX(Math.max(loc1.getBlockX(), loc2.getBlockX()));
         fl2.setY(Math.max(loc1.getBlockY(), loc2.getBlockY()));
         fl2.setZ(Math.max(loc1.getBlockZ(), loc2.getBlockZ()));
-        Bukkit.broadcastMessage("§cpos1: " + loc1.toString());
-        Bukkit.broadcastMessage("§cpos2: " + loc2.toString());
         HashMap<Material, Double> map = new HashMap<>();
         map.put(Material.STONE, 100d);
         Mine m = new CuboidMine(name, fl1, fl2, map, delay, broadcastMessage, nearby, radius);

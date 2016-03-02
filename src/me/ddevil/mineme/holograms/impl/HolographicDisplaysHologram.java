@@ -50,4 +50,22 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
         hologram.delete();
     }
 
+    @Override
+    public void setLine(int line, String text) {
+        if (line < hologram.size()) {
+            hologram.removeLine(line);
+        }
+        hologram.insertTextLine(line, text);
+    }
+
+    @Override
+    public int size() {
+        return hologram.size();
+    }
+
+    @Override
+    public void removeLine(int line) {
+        hologram.removeLine(line);
+    }
+
 }

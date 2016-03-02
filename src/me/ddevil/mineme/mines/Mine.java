@@ -111,7 +111,7 @@ public interface Mine extends Iterable<Block>, Listener {
 
     public double getPercentage(Material m);
 
-    public void minuteCountdown();
+    public void secondCountdown();
 
     public void setBlockAsBroken(Block block);
 
@@ -156,6 +156,8 @@ public interface Mine extends Iterable<Block>, Listener {
      * @return the Y value
      */
     public Vector getMinimumPoint();
+
+    public int getTimeToNextReset();
 
     public boolean isEnabled();
 

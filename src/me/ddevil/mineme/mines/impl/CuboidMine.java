@@ -57,8 +57,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
-        Bukkit.broadcastMessage("§apos1: " + l1.toString());
-        Bukkit.broadcastMessage("§apos2: " + l2.toString());
         Location fl1 = l1.clone();
         Location fl2 = l2.clone();
         fl1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
@@ -67,8 +65,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         fl2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
         fl2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
         fl2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
-        Bukkit.broadcastMessage("§cpos1: " + l1.toString());
-        Bukkit.broadcastMessage("§cpos2: " + l2.toString());
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
@@ -80,12 +76,14 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
         }
-        l1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
-        l1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
-        l1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
-        l2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
-        l2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
-        l2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
+        Location fl1 = l1.clone();
+        Location fl2 = l2.clone();
+        fl1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
+        fl1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
+        fl1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
+        fl2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
+        fl2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
+        fl2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
         this.pos1 = l1.toVector();
         this.pos2 = l2.toVector();
         this.composition = composition;
@@ -444,6 +442,9 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     @Override
     public void updateHolograms() {
         if (isDeleted()) {
+            return;
+        }
+        if (holograms.isEmpty()) {
             return;
         }
         MineMe.getInstance().debug("Updating holograms for " + name, 2);

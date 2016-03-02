@@ -7,7 +7,7 @@
   # 3 = Loading/Unloading (Loads, Unloads, Reloads, Configs, etc)
   # 4 = None (Not actually none, displays only primordial messages)
   # Errors will always be displayed, trust me, you'll need them.
-  minimumDebugLevel: 0
+  minimumDebugLevel: 3
      
      
   #This section is about using holograms to display information on mines
@@ -52,6 +52,7 @@
    # example: %composition:STONE% Get the Stone percentage in the mine's composition
    #
    # %volume% - Replaced by the mine's volume
+   # %resettime% - The time remaining till next reset
    # %minedblocks% - Replaced by the number of mined blocks
    # %minedblockspercent% - Replaced by the percentage of mined blocks
    # %remainingblocks% - Replaced by the number of remaining blocks
@@ -61,9 +62,9 @@
     - '%alias%'
     - '$2Mined: $1%minedblocks%$4/$1%volume% $2blocks'
     - '$1%remainingblockspercent%$2% remaining'
-    - '&7&lStone $2percentage:$1 %composition:STONE%'
-    - '&2&lEmerald $2percentage$1 %composition:EMERALD_ORE%'
-    - '&6&lGold $2percentage$1 %composition:GOLD_ORE%'
+    - '&7Stone $2percentage:$1 %composition:STONE%'
+    - '&2Emerald $2percentage$1 %composition:EMERALD_ORE%'
+    - '&6Gold $2percentage$1 %composition:GOLD_ORE%'
     - '&e&lBanana for scale!'
     - '%header%'
 #Everything below here will affect ~ALL~ the mines

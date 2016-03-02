@@ -216,20 +216,25 @@ public class PluginLoader extends CustomThread {
             }
             plugin.debug("Loaded  " + i + " mines :D", true);
         }
-        long minute = 60 * 20L;
         //Check if timer is running
         if (MineMe.resetId != null) {
             Bukkit.getScheduler().cancelTask(MineMe.resetId);
         }
         //Start timer
         MineMe.resetId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
             @Override
             public void run() {
                 for (Mine mine : MineManager.getMines()) {
-                    mine.minuteCountdown();
+                    mine.secondCountdown();
+                    if (mine instanceof HologramCompatible) {
+                        HologramCompatible compatible = (HologramCompatible) mine;
+                        compatible.updateHolograms();
+                    }
                 }
+
             }
-        }, minute, minute);
+        }, 20l, 20l);
     }
 
 }

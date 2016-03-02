@@ -68,7 +68,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastRadius = config.getBroadcastRadius();
         this.broadcastNearby = config.isNearbyBroadcast();
         this.currentResetDelay = totalResetDelay;
-        this.totalResetDelay = config.getResetDelay();
+        this.totalResetDelay = config.getResetDelay() * 60;
         this.name = config.getName();
         this.alias = MineMeMessageManager.translateColors(config.getAlias());
         this.world = config.getWorld();
@@ -78,7 +78,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastOnReset = broadcastOnReset;
         this.broadcastNearby = nearbyBroadcast;
         this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay;
+        this.totalResetDelay = resetMinutesDelay * 60;
         this.currentResetDelay = totalResetDelay;
         this.broadcastMessage = broadcastMessage;
         this.name = name;
@@ -90,7 +90,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastOnReset = broadcastOnReset;
         this.broadcastNearby = nearbyBroadcast;
         this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay;
+        this.totalResetDelay = resetMinutesDelay * 60;
         this.currentResetDelay = totalResetDelay;
         broadcastMessage = MineMe.messagesConfig.getString("messages.mineReset");
         this.name = name;
@@ -102,7 +102,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastOnReset = broadcastOnReset;
         this.broadcastNearby = nearbyBroadcast;
         this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay;
+        this.totalResetDelay = resetMinutesDelay * 60;
         this.currentResetDelay = totalResetDelay;
         this.broadcastMessage = broadcastMessage;
         this.name = name;
@@ -114,7 +114,7 @@ public abstract class BasicMine implements Mine {
         this.broadcastOnReset = broadcastOnReset;
         this.broadcastNearby = nearbyBroadcast;
         this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay;
+        this.totalResetDelay = resetMinutesDelay * 60;
         this.currentResetDelay = totalResetDelay;
         broadcastMessage = MineMe.messagesConfig.getString("messages.mineReset");
         this.name = name;
@@ -128,7 +128,7 @@ public abstract class BasicMine implements Mine {
     }
 
     public int getResetMinutesDelay() {
-        return totalResetDelay;
+        return totalResetDelay / 60;
     }
 
     public void setResetMinutesDelay(int resetMinutesDelay) {
@@ -197,7 +197,7 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public void minuteCountdown() {
+    public void secondCountdown() {
         currentResetDelay--;
         if (currentResetDelay <= 0) {
             reset();
@@ -275,10 +275,6 @@ public abstract class BasicMine implements Mine {
         if (contains(b)) {
             if (!wasAlreadyBroken(b)) {
                 brokenBlocks.add(b);
-                if (this instanceof HologramCompatible) {
-                    HologramCompatible hc = (HologramCompatible) this;
-                    hc.updateHolograms();
-                }
             }
         }
     }
@@ -389,7 +385,7 @@ public abstract class BasicMine implements Mine {
         c.set("alias", alias);
         c.set("world", world.getName());
         c.set("type", getType().name());
-        c.set("resetDelay", totalResetDelay);
+        c.set("resetDelay", getResetMinutesDelay());
         c.set("broadcastOnReset", broadcastOnReset);
         c.set("broadcastToNearbyOnly", broadcastNearby);
         c.set("broadcastRadius", broadcastRadius);
@@ -407,6 +403,11 @@ public abstract class BasicMine implements Mine {
         obj.put("name", name);
         obj.put("location", getLocation().toString());
         return obj.toJSONString();
+    }
+
+    @Override
+    public int getTimeToNextReset() {
+        return currentResetDelay;
     }
 
 }

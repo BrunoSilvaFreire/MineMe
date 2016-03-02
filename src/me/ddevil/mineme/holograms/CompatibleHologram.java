@@ -26,6 +26,12 @@ public interface CompatibleHologram {
 
     public void appendTextLine(String translateTagsAndColors);
 
+    public void setLine(int line, String text);
+
     public void delete();
+
+    public void removeLine(int line);
+
+    public int size();
 
 }
