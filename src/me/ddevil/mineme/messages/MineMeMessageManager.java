@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import me.ddevil.core.chat.BasicMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
+import me.ddevil.mineme.storage.StorageManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -89,6 +90,8 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
         get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
         get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
+        get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
+        get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
         get = get.replaceAll("%volume%", m.getVolume() + "");
         get = get.replaceAll("%resettime%", secondsToString(m.getTimeToNextReset()));
         get = get.replaceAll("%alias%", m.getAlias());

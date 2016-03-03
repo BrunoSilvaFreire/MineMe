@@ -35,6 +35,7 @@ import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
+import me.ddevil.mineme.storage.StorageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,6 +46,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.json.simple.parser.ParseException;
 
 public class CuboidMine extends BasicMine implements HologramCompatible {
 
@@ -283,6 +285,11 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                         p.sendMessage(MineMeMessageManager.translateTagsAndColors(broadcastMessage, this));
                     }
                 }
+            }
+            try {
+                StorageManager.addReset(this);
+            } catch (IOException | ParseException ex) {
+                MineMe.instance.printException("There was an error trying to update the total broken blocks in " + name + "'s storage file!", ex);
             }
             brokenBlocks.clear();
             if (MineMe.useHolograms) {

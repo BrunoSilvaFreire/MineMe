@@ -31,6 +31,7 @@ import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.conversion.MRLConverter;
 import me.ddevil.mineme.holograms.HologramAdapter;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.thread.PluginLoader;
@@ -46,6 +47,8 @@ public class MineMe extends CustomPlugin {
     public static FileConfiguration messagesConfig;
     public static File pluginFolder;
     public static File minesFolder;
+    //Storage
+    public static File storageFolder;
     //World Edit
     public static WorldEditPlugin WEP;
     //MineMe
@@ -65,7 +68,7 @@ public class MineMe extends CustomPlugin {
     public static boolean useHolographicDisplay;
     public static boolean holographicDisplaysUsable = false;
     //MVdW
-    public static boolean useMVdWPlaceholderAPI;
+    public static boolean useMVdWPlaceholderAPI = false;
     //MineResetLite
     public static boolean convertMineResetLite;
 
@@ -89,35 +92,42 @@ public class MineMe extends CustomPlugin {
                         @Override
                         public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                             Player p = e.getPlayer();
-                            return MineManager.isPlayerInAMine(p) ? "" : MineManager.getMineWith(p).getAlias();
+                            return !MineManager.isPlayerInAMine(p) ? "" : MineManager.getMineWith(p).getAlias();
                         }
                     });
                     PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineremaining", new PlaceholderReplacer() {
                         @Override
                         public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                             Player p = e.getPlayer();
-                            return MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getRemainingBlocks());
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getRemainingBlocks());
+                        }
+                    });
+                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineresettime", new PlaceholderReplacer() {
+                        @Override
+                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                            Player p = e.getPlayer();
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineMeMessageManager.secondsToString(MineManager.getMineWith(p).getTimeToNextReset()));
                         }
                     });
                     PlaceholderAPI.registerPlaceholder(MineMe.this, "minememinemined", new PlaceholderReplacer() {
                         @Override
                         public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                             Player p = e.getPlayer();
-                            return MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getMinedBlocks());
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getMinedBlocks());
                         }
                     });
                     PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineremainingpercent", new PlaceholderReplacer() {
                         @Override
                         public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                             Player p = e.getPlayer();
-                            return MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getPercentageRemaining());
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getPercentageRemaining());
                         }
                     });
                     PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineminedpercent", new PlaceholderReplacer() {
                         @Override
                         public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                             Player p = e.getPlayer();
-                            return MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getPercentageMined());
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getPercentageMined());
                         }
                     });
                     for (Mine m : MineManager.getMines()) {
@@ -138,6 +148,12 @@ public class MineMe extends CustomPlugin {
                             @Override
                             public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                                 return String.valueOf(m.getPercentageRemaining());
+                            }
+                        });
+                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":resettime", new PlaceholderReplacer() {
+                            @Override
+                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                                return MineMeMessageManager.secondsToString(m.getTimeToNextReset());
                             }
                         });
                         PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":minedpercent", new PlaceholderReplacer() {

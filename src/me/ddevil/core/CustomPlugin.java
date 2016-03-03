@@ -159,7 +159,6 @@ public class CustomPlugin extends JavaPlugin implements Listener {
     public void debug(String msg, boolean force) {
         if (force) {
             getLogger().info(msg);
-
         } else {
             debug(msg);
         }
@@ -178,7 +177,8 @@ public class CustomPlugin extends JavaPlugin implements Listener {
         }
     }
 
-    public void printException(Throwable t) {
+    public void printException(String msg, Throwable t) {
+        debug(msg, true);
         debug("--== Error ==--", true);
         t.printStackTrace();
         debug("--== Error ==--", true);

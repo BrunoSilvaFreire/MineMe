@@ -18,6 +18,7 @@ package me.ddevil.mineme.thread;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import me.ddevil.core.thread.CustomThread;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -60,7 +61,6 @@ public class PluginLoader extends CustomThread {
             plugin.debug("Plugin folder not found! Making one...", 3);
             MineMe.pluginFolder.mkdir();
         }
-
         File config = new File(plugin.getDataFolder(), "config.yml");
         if (!config.exists()) {
             //Load from plugin
@@ -69,11 +69,27 @@ public class PluginLoader extends CustomThread {
         }
         MineMe.pluginConfig = YamlConfiguration.loadConfiguration(config);
         plugin.minimumDebugPriotity = MineMe.pluginConfig.getInt("settings.minimumDebugLevel");
-
+        MineMe.storageFolder = new File(MineMe.pluginFolder.getPath(), "storage");
+        if (!MineMe.storageFolder.exists()) {
+            plugin.debug("Storage folder not found! Making one...", 3);
+            MineMe.storageFolder.mkdir();
+            //Make readme
+            File readme = new File(MineMe.storageFolder, "README.txt");
+            try (FileWriter fileWriter = new FileWriter(readme)) {
+                fileWriter.write(
+                        "Whatever you do DON'T EDIT ANY FILE IN HERE!" + System.getProperty("line.separator")
+                        + "These are encrypted files, and if you change anything here the plugin won't be able to load the info it needs!" + System.getProperty("line.separator")
+                        + "k thx lov u bai <3");
+                fileWriter.close();
+            } catch (Exception e) {
+                plugin.printException("There was an error creating the README file!", e);
+            }
+        }
         MineMe.minesFolder = new File(MineMe.pluginFolder.getPath(), "mines");
         if (!MineMe.minesFolder.exists()) {
             plugin.debug("Mines folder not found! Making one...", 3);
             MineMe.minesFolder.mkdir();
+
         }
         File messages = new File(plugin.getDataFolder(), "messages.yml");
         if (!messages.exists()) {
@@ -97,6 +113,8 @@ public class PluginLoader extends CustomThread {
             Bukkit.getPluginManager().disablePlugin(plugin);
             return;
         }
+        MineMe.useMVdWPlaceholderAPI = Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI");
+
         //Holograms
         MineMe.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
         //Holographic Displays
@@ -126,8 +144,7 @@ public class PluginLoader extends CustomThread {
                         MineMe.pluginConfig.save(new File(plugin.getDataFolder(), "config.yml"));
                         MineMe.useHolographicDisplay = false;
                     } catch (IOException ex) {
-                        plugin.debug("There was a error fixing HolographicDisplays in the config!", true);
-                        plugin.printException(ex);
+                        MineMe.instance.printException("There was a error fixing HolographicDisplays in the config!", ex);
                     }
                 }
             }
@@ -211,8 +228,8 @@ public class PluginLoader extends CustomThread {
                 plugin.debug();
                 i++;
             } catch (Throwable t) {
-                plugin.debug("Something went wrong while loading " + file.getName() + " :(", true);
-                plugin.printException(t);
+
+                plugin.printException("Something went wrong while loading " + file.getName() + " :(", t);
             }
             plugin.debug("Loaded  " + i + " mines :D", true);
         }

@@ -299,29 +299,31 @@ public interface Mine extends Iterable<Block>, Listener {
     public int getVolume();
 
     /**
-     * Get the total number of blocks that haven't been broken yet
+     * Get the total number of blocks that haven't been broken yet since the
+     * last reset
      *
      * @return The total remaining blocks
      */
     public int getRemainingBlocks();
 
     /**
-     * Get the total number of blocks that haven't been broken yet as a
-     * percentage
+     * Get the total number of blocks that haven't been broken yet since the
+     * last reset as a percentage
      *
      * @return The total remaining blocks as a percentage
      */
     public float getPercentageRemaining();
 
     /**
-     * Get the total number of blocks that have been broken
+     * Get the total number of blocks that have been broken since the last reset
      *
      * @return The total broken blocks
      */
     public int getMinedBlocks();
 
     /**
-     * Get the total number of blocks that have been broken yet as a percentage
+     * Get the total number of blocks that have been broken yet since the last
+     * reset as a percentage
      *
      * @return The total broken blocks as a percentage
      */
