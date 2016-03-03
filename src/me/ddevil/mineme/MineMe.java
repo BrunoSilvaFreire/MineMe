@@ -34,6 +34,7 @@ import me.ddevil.mineme.holograms.HologramAdapter;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.storage.StorageManager;
 import me.ddevil.mineme.thread.PluginLoader;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -116,6 +117,20 @@ public class MineMe extends CustomPlugin {
                             return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getMinedBlocks());
                         }
                     });
+                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememinetotalminedblocks", new PlaceholderReplacer() {
+                        @Override
+                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                            Player p = e.getPlayer();
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(StorageManager.getTotalBrokenBlocks(MineManager.getMineWith(p)));
+                        }
+                    });
+                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememinetotalresets", new PlaceholderReplacer() {
+                        @Override
+                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                            Player p = e.getPlayer();
+                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(StorageManager.getTotalResets(MineManager.getMineWith(p)));
+                        }
+                    });
                     PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineremainingpercent", new PlaceholderReplacer() {
                         @Override
                         public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
@@ -142,6 +157,18 @@ public class MineMe extends CustomPlugin {
                             @Override
                             public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                                 return String.valueOf(m.getMinedBlocks());
+                            }
+                        });
+                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":totalminedblocks", new PlaceholderReplacer() {
+                            @Override
+                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                                return String.valueOf(StorageManager.getTotalBrokenBlocks(m));
+                            }
+                        });
+                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":totalresets", new PlaceholderReplacer() {
+                            @Override
+                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                                return String.valueOf(StorageManager.getTotalResets(m));
                             }
                         });
                         PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":remainingpercent", new PlaceholderReplacer() {

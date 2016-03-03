@@ -31,32 +31,7 @@
    
    #This is the preset that will be setup to all the mines if forceHologramOnAllMines is enabled
    #
-   #Cool tags 360 no scope
-   # ----- Global tags (Always replaced) -----
-   # %prefix% - Replaced by messagePrefix (The one right below)
-   # %separator% - Replaced by messageSeparator
-   # %header% - Replaced by pluginHeader
-   #
-   # ----- Mines tags (Will only be replaced on Mine messages) -----
-   # %mine% - Replaced by the mine -> NAME <-
-   # %alias% - Replaced by the mine -> ALIAS <-
-   #
-   # Just a little note about mined and remaining blocks:
-   # - They only count when first broken
-   # - If you place a block in a mine it will not count as a "extra block"
-   # - If you break a block in a mine it and put another one in it's place, it will count as a mined block, the placed block does NOT count
-   # - If you break a block in a mine it and put another one and break it again, it will NOT count, you can't ~farm mined blocks~
-   # - Explosion counts.
-   # - World Edit counts.
-   # %composition:(Material name here)% - Replaced the percentage of the material in the mine's composition, returns 0 if the mine doesn't contains the material
-   # example: %composition:STONE% Get the Stone percentage in the mine's composition
-   #
-   # %volume% - Replaced by the mine's volume
-   # %resettime% - The time remaining till next reset
-   # %minedblocks% - Replaced by the number of mined blocks
-   # %minedblockspercent% - Replaced by the percentage of mined blocks
-   # %remainingblocks% - Replaced by the number of remaining blocks
-   # %remainingblockspercent% - Replaced by the percentage of remaining blocks
+   # Check tags @ https://www.spigotmc.org/resources/mineme.19380/
    defaultHologramText:
     - '%header%'
     - '%alias%'
@@ -66,7 +41,7 @@
     - '&2Emerald $2percentage$1 %composition:EMERALD_ORE%'
     - '&6Gold $2percentage$1 %composition:GOLD_ORE%'
     - '$2Time until next reset: $1%resettime%'
-    - '&e&lBanana for scale!'
+    - '$2Lifetime mined blocks: $1%totalminedblocks%'
     - '%header%'
 #Everything below here will affect ~ALL~ the mines
  global:

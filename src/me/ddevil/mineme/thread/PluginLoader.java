@@ -100,6 +100,7 @@ public class PluginLoader extends CustomThread {
         MineMe.defaultHologramText = MineMe.pluginConfig.getStringList("settings.holograms.defaultHologramText");
         MineMe.messagesConfig = YamlConfiguration.loadConfiguration(messages);
         MineMe.forceDefaultBroadcastMessage = MineMe.messagesConfig.getBoolean("global.forceDefaultBroadcastMessage");
+        MineMe.convertMineResetLite = MineMe.pluginConfig.getBoolean("global.convertFromMineResetLite");
     }
 
     public void setupDependencies() {

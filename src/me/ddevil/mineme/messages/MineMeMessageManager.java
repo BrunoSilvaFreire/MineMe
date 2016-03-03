@@ -85,16 +85,19 @@ public class MineMeMessageManager extends BasicMessageManager {
     }
 
     public static String translateTagsAndColors(String get, Mine m) {
+        //Mine
         get = get.replaceAll("%mine%", m.getName());
         get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
         get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
         get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
         get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
-        get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
-        get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
         get = get.replaceAll("%volume%", m.getVolume() + "");
         get = get.replaceAll("%resettime%", secondsToString(m.getTimeToNextReset()));
         get = get.replaceAll("%alias%", m.getAlias());
+        //LifeTime stats
+        get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
+        get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
+        //Plugin
         get = get.replaceAll("%prefix%", pluginPrefix);
         get = get.replaceAll("%header%", header);
         get = get.replaceAll("%separator%", messageSeparator);

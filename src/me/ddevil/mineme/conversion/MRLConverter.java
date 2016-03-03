@@ -30,6 +30,8 @@ import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.mines.impl.CuboidMine;
+import org.apache.commons.io.FileUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -41,24 +43,38 @@ public class MRLConverter {
 
     public static List<Mine> convert() {
         ArrayList<Mine> mines = new ArrayList<>();
+        int i = 0;
         for (com.koletar.jj.mineresetlite.Mine m : MineResetLite.instance.mines) {
             MineMe.instance.debug("Converting mine " + m.getName() + "...", true);
             CuboidMine cm = new CuboidMine(new MineConfig(createBasicConfig(m)));
             MineManager.registerMine(cm);
             mines.add(cm);
             MineMe.instance.debug("Converted!", true);
+            i++;
         }
+        MineMe.instance.debug(i + " mines converted!", true);
+        MineMe.instance.debug("Disabling MineResetLite to avoid incompatibilities!", true);
+        MineMe.instance.debug("Remeber to remove MineResetLite from the plugins folder to prevent incompatibilities!", true);
+        Bukkit.getPluginManager().disablePlugin(MineResetLite.instance);
+        MineMe.instance.debug("MineResetLite disabled!", true);
         MineMe.convertMineResetLite = false;
         MineMe.pluginConfig.set("global.convertFromMineResetLite", false);
-        MineMe.instance.saveConfig();
+        try {
+            MineMe.pluginConfig.save(new File(MineMe.instance.getDataFolder(), "config.yml"));
+        } catch (IOException ex) {
+            Logger.getLogger(MRLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return mines;
     }
 
     public static FileConfiguration createBasicConfig(com.koletar.jj.mineresetlite.Mine mine) {
         MineMe.getInstance().saveResource("examplemine.yml", true);
         File template = new File(MineMe.pluginFolder, "examplemine.yml");
+        File name = new File(MineMe.pluginFolder, mine.getName() + ".yml");
+        template.renameTo(name);
+        template = name;
         try {
-            Files.move(template.toPath(), new File(MineMe.minesFolder, mine.getName() + ".yml").toPath(), (CopyOption) null);
+            FileUtils.moveFileToDirectory(template, MineMe.minesFolder, false);
         } catch (IOException ex) {
             Logger.getLogger(MRLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -66,9 +82,9 @@ public class MRLConverter {
         c.set("enabled", true);
         c.set("name", mine.getName());
         c.set("alias", mine.getName());
-        c.set("world", "");
+        c.set("world", mine.getWorld().getName());
         c.set("type", "CUBOID");
-        c.set("resetDelay", mine.getResetDelay());
+        c.set("resetDelay", mine.getResetDelay() * 60);
         c.set("broadcastOnReset", true);
         c.set("broadcastToNearbyOnly", false);
         c.set("broadcastRadius", 50.0);
@@ -81,6 +97,11 @@ public class MRLConverter {
         c.set("X2", mine.getMaxX());
         c.set("Y2", mine.getMaxY());
         c.set("Z2", mine.getMaxZ());
+        try {
+            c.save(new File(MineMe.minesFolder, mine.getName() + ".yml"));
+        } catch (IOException ex) {
+            Logger.getLogger(MRLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return c;
     }
 }
