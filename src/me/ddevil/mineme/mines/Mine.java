@@ -186,6 +186,12 @@ public interface Mine extends Iterable<Block>, Listener {
     public void setBlockAsBroken(Block block);
 
     /**
+     *
+     * @return
+     */
+    public boolean isCompletelyBroken();
+
+    /**
      * Get's the mine's center.
      *
      * @return The mine's center
@@ -337,4 +343,10 @@ public interface Mine extends Iterable<Block>, Listener {
      */
     public boolean wasAlreadyBroken(Block block);
 
+    /**
+     * Get's the Block/Second break speed
+     *
+     * @return The average number of blocks broken in the last second
+     */
+    public int averageBreakSpeed();
 }

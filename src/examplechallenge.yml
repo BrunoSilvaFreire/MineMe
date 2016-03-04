@@ -1,0 +1,16 @@
+name: "minerampage"
+alias: "&cMine &fRampage"
+#Available types are:
+# -------------------------
+# BREAK_ALL = Break
+# limitvalue = The time limit in minutes before the challenge is failed
+# -------------------------
+#
+#
+type: 'BREAK_ALL'
+limitvalue: 2
+#Will be shown in challenge holograms
+description:
+    - '&cBreak every block in the mine under'
+    -
+    -

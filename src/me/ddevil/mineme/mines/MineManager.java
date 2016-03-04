@@ -132,7 +132,6 @@ public class MineManager {
 
             @Override
             protected void onBlockChange(Vector position, BaseBlock newBlock) {
-                BaseBlock oldBlock = getBlock(position);
                 Block block = new Location(Bukkit.getWorld(world.getName()), position.getBlockX(), position.getBlockY(), position.getBlockZ()).getBlock();
                 notifyBlockChange(block);
             }

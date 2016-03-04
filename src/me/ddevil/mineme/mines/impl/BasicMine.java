@@ -26,7 +26,6 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.configs.MineConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -54,6 +53,7 @@ public abstract class BasicMine implements Mine {
     //Blocks
     protected Map<Material, Double> composition;
     protected final ArrayList<Block> brokenBlocks = new ArrayList();
+    protected final ArrayList<Block> lastSecond = new ArrayList();
 
     //Clock
     protected int currentResetDelay;
@@ -199,9 +199,15 @@ public abstract class BasicMine implements Mine {
     @Override
     public void secondCountdown() {
         currentResetDelay--;
+        lastSecond.clear();
         if (currentResetDelay <= 0) {
             reset();
         }
+    }
+
+    @Override
+    public int averageBreakSpeed() {
+        return lastSecond.size();
     }
 
     @Override
@@ -275,6 +281,7 @@ public abstract class BasicMine implements Mine {
         if (contains(b)) {
             if (!wasAlreadyBroken(b)) {
                 brokenBlocks.add(b);
+                lastSecond.add(b);
             }
         }
     }
@@ -285,6 +292,7 @@ public abstract class BasicMine implements Mine {
         if (contains(b)) {
             if (!wasAlreadyBroken(b)) {
                 brokenBlocks.add(b);
+                lastSecond.add(b);
                 if (this instanceof HologramCompatible) {
                     HologramCompatible hc = (HologramCompatible) this;
                     hc.updateHolograms();
@@ -299,6 +307,7 @@ public abstract class BasicMine implements Mine {
             if (contains(b)) {
                 if (!wasAlreadyBroken(b)) {
                     brokenBlocks.add(b);
+                    lastSecond.add(b);
                 }
             }
         }
@@ -311,6 +320,7 @@ public abstract class BasicMine implements Mine {
     @Override
     public void setBlockAsBroken(Block block) {
         brokenBlocks.add(block);
+        lastSecond.add(block);
         if (this instanceof HologramCompatible) {
             HologramCompatible hc = (HologramCompatible) this;
             hc.softHologramUpdate();
@@ -408,6 +418,11 @@ public abstract class BasicMine implements Mine {
     @Override
     public int getTimeToNextReset() {
         return currentResetDelay;
+    }
+
+    @Override
+    public boolean isCompletelyBroken() {
+        return getRemainingBlocks() <= 0;
     }
 
 }
