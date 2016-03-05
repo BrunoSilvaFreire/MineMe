@@ -8,9 +8,10 @@ alias: "&cMine &fRampage"
 #
 #
 type: 'BREAK_ALL'
-limitvalue: 2
+limitValue: 2
+#The time in minutes after the challenge has stopped
+resetDelay: 10
 #Will be shown in challenge holograms
 description:
     - '&cBreak every block in the mine under'
-    -
-    -
+    - '&c2 minutes to win!'

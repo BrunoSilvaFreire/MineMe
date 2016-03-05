@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.challenge.Challenge;
+import me.ddevil.mineme.challenge.ChallengeEndListener;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.configs.MineConfig;
@@ -423,6 +425,32 @@ public abstract class BasicMine implements Mine {
     @Override
     public boolean isCompletelyBroken() {
         return getRemainingBlocks() <= 0;
+    }
+    //Challenges
+    protected Challenge currentChallenge;
+    protected ArrayList<Challenge> challengeQueue = new ArrayList();
+
+    @Override
+    public void addChallengeToQueue(Challenge challenge) {
+        challengeQueue.add(challenge);
+    }
+
+    @Override
+    public void forceSetCurrentChallenge(Challenge challenge) {
+        if (currentChallenge != null) {
+            currentChallenge.complete(ChallengeEndListener.ChallengeResult.FAILED);
+        }
+        currentChallenge = challenge;
+    }
+
+    @Override
+    public Challenge getCurrentChallenge() {
+        return currentChallenge;
+    }
+
+    @Override
+    public boolean isRunningAChallenge() {
+        return currentChallenge != null;
     }
 
 }

@@ -18,6 +18,7 @@ package me.ddevil.mineme.mines;
 
 import java.util.List;
 import java.util.Map;
+import me.ddevil.mineme.challenge.Challenge;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -349,4 +350,12 @@ public interface Mine extends Iterable<Block>, Listener {
      * @return The average number of blocks broken in the last second
      */
     public int averageBreakSpeed();
+
+    public boolean isRunningAChallenge();
+
+    public Challenge getCurrentChallenge();
+
+    public void forceSetCurrentChallenge(Challenge challenge);
+
+    public void addChallengeToQueue(Challenge challenge);
 }

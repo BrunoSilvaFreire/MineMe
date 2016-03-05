@@ -55,3 +55,5 @@
    - '$1Mined: $2%minedblocks% $1blocks'
    - '$2%remainingblockspercent%$1% remaining'
    - '$3This is a custom hologram text! :D'
+ challenges:
+     - minerampage:1

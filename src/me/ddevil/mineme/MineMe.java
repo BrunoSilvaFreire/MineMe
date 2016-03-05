@@ -36,6 +36,7 @@ import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.storage.StorageManager;
 import me.ddevil.mineme.thread.PluginLoader;
+import me.ddevil.mineme.utils.MVdWPlaceholderManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -85,119 +86,15 @@ public class MineMe extends CustomPlugin {
                 //Register commands and World Edit
                 WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
                 registerBaseCommands();
-                debug("It's all right, it's all favorable :D");
                 if (useMVdWPlaceholderAPI) {
-                    debug("Registering MVdW placeholders...", true);
-                    //Players placeholders
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememine", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : MineManager.getMineWith(p).getAlias();
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineremaining", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getRemainingBlocks());
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineresettime", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineMeMessageManager.secondsToString(MineManager.getMineWith(p).getTimeToNextReset()));
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememinemined", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getMinedBlocks());
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememinetotalminedblocks", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(StorageManager.getTotalBrokenBlocks(MineManager.getMineWith(p)));
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememinetotalresets", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(StorageManager.getTotalResets(MineManager.getMineWith(p)));
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineremainingpercent", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getPercentageRemaining());
-                        }
-                    });
-                    PlaceholderAPI.registerPlaceholder(MineMe.this, "minememineminedpercent", new PlaceholderReplacer() {
-                        @Override
-                        public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                            Player p = e.getPlayer();
-                            return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineManager.getMineWith(p).getPercentageMined());
-                        }
-                    });
-                    for (Mine m : MineManager.getMines()) {
-                        //Register mines placeholders
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":remaining", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return String.valueOf(m.getRemainingBlocks());
-                            }
-                        });
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":mined", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return String.valueOf(m.getMinedBlocks());
-                            }
-                        });
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":totalminedblocks", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return String.valueOf(StorageManager.getTotalBrokenBlocks(m));
-                            }
-                        });
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":totalresets", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return String.valueOf(StorageManager.getTotalResets(m));
-                            }
-                        });
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":remainingpercent", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return String.valueOf(m.getPercentageRemaining());
-                            }
-                        });
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":resettime", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return MineMeMessageManager.secondsToString(m.getTimeToNextReset());
-                            }
-                        });
-                        PlaceholderAPI.registerPlaceholder(MineMe.this, "mineme:" + m.getName() + ":minedpercent", new PlaceholderReplacer() {
-                            @Override
-                            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                                return String.valueOf(m.getPercentageMined());
-                            }
-                        });
-                    }
-                    debug("Placeholders registered!", true);
+                    MVdWPlaceholderManager.setupPlaceholders();
                 }
                 if (convertMineResetLite) {
                     MineMe.instance.debug("Converting MineResetLite...", true);
                     MRLConverter.convert();
                     MineMe.instance.debug("Converted MineResetLite!", true);
-
                 }
+                debug("It's all right, it's all favorable :D");
             }
         });
 

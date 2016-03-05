@@ -115,7 +115,8 @@ public class PluginLoader extends CustomThread {
             return;
         }
         MineMe.useMVdWPlaceholderAPI = Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI");
-
+        System.out.println("Is available = " + Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI"));
+        System.out.println("Is available = " + MineMe.useMVdWPlaceholderAPI);
         //Holograms
         MineMe.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
         //Holographic Displays
@@ -218,6 +219,12 @@ public class PluginLoader extends CustomThread {
                                     h.setupHolograms();
                                 }
                             }
+                            if (config.getConfig().getStringList("challenges") != null) {
+                                if (!config.getConfig().getStringList("challenges").isEmpty()) {
+
+                                }
+                            }
+
                         } finally {
                             m.reset();
                         }

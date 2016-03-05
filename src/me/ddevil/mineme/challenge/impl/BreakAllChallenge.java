@@ -14,9 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.challenge;
+package me.ddevil.mineme.challenge.impl;
 
+import me.ddevil.core.events.CustomEvent;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.challenge.BasicChallenge;
+import me.ddevil.mineme.challenge.ChallengeEndListener;
+import me.ddevil.mineme.events.ChallengeStartEvent;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.Bukkit;
 
@@ -29,6 +33,7 @@ public class BreakAllChallenge extends BasicChallenge {
     protected final Mine mine;
     protected final int timeLimit;
     protected int currentTime;
+    protected int repeatID;
 
     public BreakAllChallenge(Mine mine, int timeLimit) {
         this.mine = mine;
@@ -38,23 +43,29 @@ public class BreakAllChallenge extends BasicChallenge {
 
     @Override
     public void start() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(MineMe.instance, new Runnable() {
+        if (mine.isRunningAChallenge()) {
 
-            @Override
-            public void run() {
-                currentTime--;
-                checkCompletion();
-            }
-        }, 20l, 20l);
+        }
+        ChallengeStartEvent event = (ChallengeStartEvent) new ChallengeStartEvent(mine, this).call();
+        if (!event.isCancelled()) {
+            repeatID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MineMe.instance, new Runnable() {
+
+                @Override
+                public void run() {
+                    currentTime--;
+                    checkCompletion();
+                }
+            }, 20l, 20l);
+        }
     }
 
     @Override
     public void checkCompletion() {
         if (mine.isCompletelyBroken()) {
+            Bukkit.getScheduler().cancelTask(repeatID);
             complete(ChallengeEndListener.ChallengeResult.COMPLETED);
         } else if (currentTime == 0) {
             complete(ChallengeEndListener.ChallengeResult.FAILED);
-
         }
     }
 
