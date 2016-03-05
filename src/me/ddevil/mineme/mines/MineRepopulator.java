@@ -21,29 +21,32 @@ import me.ddevil.mineme.utils.RandomCollection;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 
 public class MineRepopulator {
 
     public void repopulate(Mine m) {
         RepopulateMap map = new RepopulateMap(m);
         for (Block b : m) {
-            b.setType(map.getRandomBlock());
+            ItemStack bb = map.getRandomBlock();
+            b.setType(bb.getType());
+            b.setData(bb.getData().getData());
         }
     }
 
     private static class RepopulateMap {
 
-        private final RandomCollection<Material> randomCollection;
+        private final RandomCollection<ItemStack> randomCollection;
 
         private RepopulateMap(Mine m) {
             randomCollection = new RandomCollection<>();
-            for (Material m1 : m.getComposition().keySet()) {
+            for (ItemStack m1 : m.getComposition().keySet()) {
                 randomCollection.add(m.getComposition().get(m1), m1);
             }
 
         }
 
-        private Material getRandomBlock() {
+        private ItemStack getRandomBlock() {
             return randomCollection.next();
         }
     }

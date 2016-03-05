@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -46,7 +47,7 @@ public class MineConfig {
 
     //Tecnical info
     private final int resetDelay;
-    private final HashMap<Material, Double> composition;
+    private final HashMap<ItemStack, Double> composition;
     private final boolean useCustomBroadcast;
 
     public MineConfig(FileConfiguration mine) {
@@ -62,11 +63,27 @@ public class MineConfig {
         broadcastMessage = mine.getString("customBroadcast");
         broadcastRadius = mine.getDouble("broadcastRadius");
         resetDelay = mine.getInt("resetDelay");
-        HashMap<Material, Double> comp = new HashMap();
+        HashMap<ItemStack, Double> comp = new HashMap();
         for (String s : mine.getStringList("composition")) {
             String[] split = s.split("=");
+
+            String[] materialanddata = split[0].split(":");
+            Material mat = Material.valueOf(materialanddata[0]);
+            Byte b = null;
+            if (materialanddata.length > 1) {
+                try {
+                    b = Byte.valueOf(materialanddata[1]);
+                } catch (NumberFormatException exception) {
+                    MineMe.getInstance().debug(split[1] + " in " + s + "isn't a number! Setting byte to 0");
+                    b = 0;
+                }
+            } else {
+                b = 0;
+            }
+            ItemStack f = new ItemStack(mat, 1, (short) 0, b);
             try {
-                comp.put(Material.valueOf(split[0]), Double.valueOf(split[1]));
+                comp.put(f, Double.valueOf(split[1])
+                );
             } catch (NumberFormatException e) {
                 MineMe.getInstance().debug(split[1] + " in " + s + "isn't a number!");
             }
@@ -79,7 +96,7 @@ public class MineConfig {
         return useCustomBroadcast;
     }
 
-    public HashMap<Material, Double> getComposition() {
+    public HashMap<ItemStack, Double> getComposition() {
         return composition;
     }
 

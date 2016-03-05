@@ -17,26 +17,27 @@
 package me.ddevil.mineme.mines.impl;
 
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.internal.LocalWorldAdapter;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.events.MineResetEvent;
+import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.messages.MineMeMessageManager;
+import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.storage.StorageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -47,7 +48,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author Selma
  */
-public class CircularMine extends BasicMine {
+public class CircularMine extends BasicMine implements HologramCompatible {
 
     //General
     private final Vector center;
@@ -58,20 +59,28 @@ public class CircularMine extends BasicMine {
 
     public CircularMine(MineConfig config) {
         super(config);
-        this.center = new Vector(config.getConfig().getDouble("X"), config.getConfig().getDouble("Y"), config.getConfig().getDouble("Z"));
+        Vector fakecenter = new Vector(config.getConfig().getDouble("X"), config.getConfig().getDouble("Y"), config.getConfig().getDouble("Z"));
         this.radius = config.getConfig().getDouble("radius");
-        this.minY = (int) center.getY();
-        this.maxY = (int) (config.getConfig().getInt("height") + center.getY());
+        this.minY = (int) fakecenter.getY();
+        this.maxY = (int) (config.getConfig().getInt("height") + fakecenter.getY());
         this.composition = config.getComposition();
+        this.config = config.getConfig();
         area = new CylinderRegion(
                 new BukkitWorld(world),
                 new com.sk89q.worldedit.Vector(
-                        center.getX(),
-                        center.getY(),
-                        center.getZ()),
+                        fakecenter.getX(),
+                        fakecenter.getY(),
+                        fakecenter.getZ()),
                 new Vector2D(radius, radius),
                 minY,
                 maxY);
+        this.center = new Vector(
+                area.getCenter().getX(),
+                area.getCenter().getY(),
+                area.getCenter().getZ()
+        );
+        center.setX(center.getX() + 0.5);
+        center.setZ(center.getZ() + 0.5);
     }
 
     @Override
@@ -86,9 +95,6 @@ public class CircularMine extends BasicMine {
         if (isDeleted()) {
             return;
         }
-        System.out.println(area.getArea());
-        System.out.println(area.getWorld().getName());
-        System.out.println(area.getCenter().toString());
         MineResetEvent event = (MineResetEvent) new MineResetEvent(this).call();
         if (!event.isCancelled()) {
             MineMe.getInstance().debug("Reseting mine " + name, 2);
@@ -174,7 +180,7 @@ public class CircularMine extends BasicMine {
 
     @Override
     public int getVolume() {
-        return getArea() * getHeight();
+        return area.getArea();
     }
 
     @Override
@@ -207,27 +213,122 @@ public class CircularMine extends BasicMine {
     public int getMaximumY() {
         return maxY;
     }
+    //Holograms
+    private final ArrayList<CompatibleHologram> holograms = new ArrayList();
+    private boolean hologramsReady = false;
+    private List<String> hologramsLines;
+
+    @Override
+    public void setupHolograms() {
+        MineMe.getInstance().debug("Creating holograms for " + name + "...");
+        Location l = getCenter().toLocation(world);
+        Location temp;
+        temp = l.clone();
+        temp.setY(getMaximumY() + 4);
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
+        temp = l.clone();
+        temp.add(area.getRadius().getX() + 1, 0, 0);
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
+        temp = l.clone();
+        temp.add((area.getRadius().getX() * -1) - 1, 0, 0);
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
+        temp = l.clone();
+        temp.add(0, 0, area.getRadius().getZ() + 1);
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
+        temp = l.clone();
+        temp.add(0, 0, (area.getRadius().getZ() * -1) - 1);
+        holograms.add(MineMe.hologramAdapter.createHologram(temp));
+        MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
+        if (MineMe.forceDefaultHolograms) {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
+            hologramsLines = MineMe.defaultHologramText;
+        } else if (config.getBoolean("useCustomHologramText")) {
+            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
+            hologramsLines = config.getStringList("hologramsText");
+        } else {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
+            hologramsLines = MineMe.defaultHologramText;
+        }
+        updateHolograms();
+
+        hologramsReady = true;
+    }
+
+    @Override
+    public void showHolograms() {
+        updateHolograms();
+    }
+
+    @Override
+    public void hideHolograms() {
+        for (CompatibleHologram m : holograms) {
+            m.clearLines();
+        }
+    }
+
+    @Override
+    public void updateHolograms() {
+        if (isDeleted()) {
+            return;
+        }
+        if (holograms.isEmpty()) {
+            return;
+        }
+        MineMe.getInstance().debug("Updating holograms for " + name, 2);
+        MineMe.getInstance().debug("Total lines: " + hologramsLines.size(), 2);
+        MineHologramUpdateEvent event = (MineHologramUpdateEvent) new MineHologramUpdateEvent(this).call();
+        if (!event.isCancelled()) {
+            for (CompatibleHologram h : holograms) {
+                h.clearLines();
+                for (int i = 0; i < hologramsLines.size(); i++) {
+                    String text = hologramsLines.get(i);
+                    h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this));
+                }
+            }
+            MineMe.getInstance().debug("Holograms updated", 2);
+        } else {
+            MineMe.getInstance().debug("Hologram Update Event for mine " + name + " was cancelled", 2);
+        }
+    }
+    private Integer lightHologramUpdateId = null;
+
+    @Override
+    public void softHologramUpdate() {
+        if (lightHologramUpdateId == null) {
+            MineMe.getInstance().debug("Updating hologram softly.");
+            lightHologramUpdateId = Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
+
+                @Override
+                public void run() {
+                    updateHolograms();
+                    lightHologramUpdateId = null;
+                }
+            }, 60l);
+        }
+    }
+
+    @Override
+    public boolean isHologramsVisible() {
+        return hologramsReady;
+    }
 
     public class CircularIterator implements Iterator<Block> {
 
+        private final Iterator<BlockVector> bviterator;
+
         public CircularIterator() {
-            for (BlockVector bv : area) {
-                blocks.add(new Location(world, bv.getX(), bv.getX(), bv.getX()).getBlock());
-            }
+            bviterator = area.iterator();
         }
-        private final ArrayList<Block> blocks = new ArrayList<>();
-        private int current = 0;
 
         @Override
         public boolean hasNext() {
-            return current != blocks.size() - 1;
+            return bviterator.hasNext();
         }
 
         @Override
         public Block next() {
-            Block get = blocks.get(current);
-            current++;
-            return get;
+            BlockVector next = bviterator.next();
+            return new Location(world, next.getX(), next.getY(), next.getZ()).getBlock();
         }
     }
 }

@@ -16,10 +16,6 @@
  */
 package me.ddevil.mineme;
 
-import be.maximvdw.placeholderapi.PlaceholderAPI;
-import be.maximvdw.placeholderapi.PlaceholderReplaceEvent;
-import be.maximvdw.placeholderapi.PlaceholderReplacer;
-import be.maximvdw.placeholderapi.internal.MVdWPlaceholderReplacer;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.sk89q.worldedit.WorldEdit;
@@ -31,10 +27,8 @@ import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.conversion.MRLConverter;
 import me.ddevil.mineme.holograms.HologramAdapter;
-import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
-import me.ddevil.mineme.storage.StorageManager;
 import me.ddevil.mineme.thread.PluginLoader;
 import me.ddevil.mineme.utils.MVdWPlaceholderManager;
 import org.bukkit.Bukkit;

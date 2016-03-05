@@ -115,6 +115,15 @@ public class MineManager {
         }
     }
 
+    public static boolean isPartOfMine(Block b) {
+        for (Mine mine : mines) {
+            if (mine.contains(b)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      *
      * @author Selma

@@ -45,6 +45,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.json.simple.parser.ParseException;
 
@@ -54,7 +55,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     protected final Vector pos2;
     private List<String> hologramsLines;
 
-    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
+    public CuboidMine(String name, Location l1, Location l2, Map<ItemStack, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
         super(name, l1.getWorld(), broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
@@ -71,9 +72,10 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         this.pos2 = l2.toVector();
         this.composition = composition;
         this.config = MineMe.getYAMLMineFile(this);
+        this.enabled = true;
     }
 
-    public CuboidMine(String name, Location l1, Location l2, Map<Material, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
+    public CuboidMine(String name, Location l1, Location l2, Map<ItemStack, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
         super(name, l1.getWorld(), broadcastOnReset, nearbyBroadcast, resetMsg, broadcastRadius, delay);
         if (!l1.getWorld().equals(l2.getWorld())) {
             throw new IllegalArgumentException("Locations must be on the same world");
@@ -90,6 +92,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         this.pos2 = l2.toVector();
         this.composition = composition;
         this.config = MineMe.getYAMLMineFile(this);
+        this.enabled = true;
     }
 
     public CuboidMine(MineConfig config) {
@@ -336,8 +339,8 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
             config.set("name", name);
             config.set("world", world);
             ArrayList<String> al = new ArrayList<>();
-            for (Material m : getMaterials()) {
-                al.add(m + "=" + composition.get(m));
+            for (ItemStack m : getMaterials()) {
+                al.add(m.getType() + ":" + m.getData().getData() + "=" + composition.get(m));
             }
             config.set("composition", al);
             config.set("resetDelay", totalResetDelay);
@@ -423,11 +426,16 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         temp.add(0, 0, ((getSizeZ() / 2) * -1) - 1);
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
-        hologramsLines = MineMe.forceDefaultHolograms
-                ? MineMe.defaultHologramText
-                : config.getBoolean("useCustomHologramText")
-                        ? config.getStringList("hologramsText")
-                        : MineMe.defaultHologramText;
+        if (MineMe.forceDefaultHolograms) {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
+            hologramsLines = MineMe.defaultHologramText;
+        } else if (config.getBoolean("useCustomHologramText")) {
+            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
+            hologramsLines = config.getStringList("hologramsText");
+        } else {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
+            hologramsLines = MineMe.defaultHologramText;
+        }
         updateHolograms();
 
         hologramsReady = true;

@@ -21,7 +21,7 @@
    enableHolograms: false
    
    #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
-   forceDefaultHologramOnAllMines: true
+   forceDefaultHologramOnAllMines: false
    
    #---Compatible Holograms API's---#
    #Uses HolographicDisplays as the API to displays Hologram information about mines!

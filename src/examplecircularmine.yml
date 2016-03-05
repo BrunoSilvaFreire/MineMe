@@ -1,0 +1,29 @@
+enabled: false
+name: 'circularmine'
+alias: '&cSpiral'
+world: world
+type: CIRCULAR
+resetDelay: 1
+broadcastOnReset: true
+broadcastToNearbyOnly: false
+broadcastRadius: 50.0
+composition:
+ #{Material}:[Data(Optional)]={Percentage}
+ #STONE=25
+ #WOOL:9=25
+ - STONE=35
+ - DIAMOND_ORE=60
+ - DIAMOND_BLOCK=5
+radius: 10
+height: 30
+X: 30.0
+Y: 64.0
+Z: 30.0
+useCustomHologramText: false
+#This will only be used in case HolographicDisplays is available and enabled
+#in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
+hologramsText:
+ - '%alias%'
+ - '$1Mined: $2%minedblocks% $1blocks'
+ - '$2%remainingblockspercent%$1% remaining'
+ - '$3This is a custom hologram text! :D'

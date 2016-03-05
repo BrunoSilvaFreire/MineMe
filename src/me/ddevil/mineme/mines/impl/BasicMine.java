@@ -36,6 +36,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONObject;
 
 public abstract class BasicMine implements Mine {
@@ -53,7 +54,7 @@ public abstract class BasicMine implements Mine {
     protected boolean broadcastNearby;
 
     //Blocks
-    protected Map<Material, Double> composition;
+    protected Map<ItemStack, Double> composition;
     protected final ArrayList<Block> brokenBlocks = new ArrayList();
     protected final ArrayList<Block> lastSecond = new ArrayList();
 
@@ -215,7 +216,8 @@ public abstract class BasicMine implements Mine {
     @Override
     public List<String> getInfo() {
         String[] basic = new String[]{
-            "$1Mine: $2" + getName(),
+            "$1Name: $2" + getName(),
+            "$1Alias: $2" + getAlias(),
             "$1Type: $2" + getType(),
             "$1World: $2" + getLocation().getWorld().getName(),
             "$1Location: $2" + getLocation().getBlockX() + ", " + getLocation().getBlockY() + ", " + getLocation().getBlockZ() + ", ",
@@ -227,9 +229,8 @@ public abstract class BasicMine implements Mine {
         ArrayList<String> comp = new ArrayList();
 
         comp.addAll(Arrays.asList(basic));
-        for (Material ma
-                : getMaterials()) {
-            comp.add("$1" + ma.name() + " $2= $1" + getComposition().get(ma));
+        for (ItemStack m : getMaterials()) {
+            comp.add("$1" + m.getType() + "$4:$1" + m.getData().getData() + " $2= $1" + composition.get(m));
         }
         return comp;
     }
@@ -251,11 +252,13 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public double getPercentage(Material m) {
-        if (composition.containsKey(m)) {
-            return composition.get(m);
-        } else {
-            return 0;
+        for (ItemStack i : getMaterials()) {
+            if (i.getType() == m) {
+                return composition.get(i);
+            }
         }
+        return 0;
+
     }
 
     @Override
@@ -343,20 +346,28 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public boolean containsMaterial(Material material) {
-        return composition.containsKey(material);
+        for (ItemStack i : getMaterials()) {
+            if (i.getType() == material) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void removeMaterial(Material material) {
-        if (containsMaterial(material)) {
-            composition.remove(material);
+        for (ItemStack i : getMaterials()) {
+            if (i.getType() == material) {
+                composition.remove(i);
+                break;
+            }
         }
         save();
     }
 
     @Override
     public void setMaterial(Material material, double percentage) {
-        composition.put(material, percentage);
+        composition.put(new ItemStack(material), percentage);
         save();
     }
 
@@ -366,12 +377,12 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public Map<Material, Double> getComposition() {
+    public Map<ItemStack, Double> getComposition() {
         return composition;
     }
 
     @Override
-    public void setComposition(Map<Material, Double> composition) {
+    public void setComposition(Map<ItemStack, Double> composition) {
         this.composition = composition;
     }
 
@@ -386,8 +397,8 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public Material[] getMaterials() {
-        return composition.keySet().toArray(new Material[composition.keySet().size()]);
+    public ItemStack[] getMaterials() {
+        return composition.keySet().toArray(new ItemStack[composition.keySet().size()]);
     }
     protected final World world;
 
@@ -403,8 +414,9 @@ public abstract class BasicMine implements Mine {
         c.set("broadcastToNearbyOnly", broadcastNearby);
         c.set("broadcastRadius", broadcastRadius);
         ArrayList<String> comp = new ArrayList();
-        for (Material m : composition.keySet()) {
-            comp.add(m + "=" + composition.get(m));
+        for (ItemStack m : composition.keySet()) {
+            String s = m.getType().name() + ":" + m.getData().getData();
+            comp.add(s + "=" + composition.get(m));
         }
         c.set("composition", comp);
         return c;

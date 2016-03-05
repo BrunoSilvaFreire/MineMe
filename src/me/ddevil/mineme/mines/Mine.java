@@ -25,6 +25,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 /**
@@ -59,7 +60,7 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @return The materials used in the mine's composition
      */
-    public Material[] getMaterials();
+    public ItemStack[] getMaterials();
 
     /**
      * Checks if this mine is deleted (Garbage Collector hasn't finalized this
@@ -161,7 +162,7 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @return The mine's composition
      */
-    public Map<Material, Double> getComposition();
+    public Map<ItemStack, Double> getComposition();
 
     /**
      * Get's the material's percentage in the mines composition
@@ -219,7 +220,7 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @param composition The composition map to set to the mine
      */
-    public void setComposition(Map<Material, Double> composition);
+    public void setComposition(Map<ItemStack, Double> composition);
 
     /**
      * Set's the material percentage in the mine's composition, override the

@@ -16,6 +16,7 @@
  */
 package me.ddevil.mineme.commands;
 
+import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.Arrays;
 import java.util.HashMap;
 import me.ddevil.core.commands.CustomCommand;
@@ -30,8 +31,10 @@ import me.ddevil.mineme.mines.impl.CuboidMine;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class MineCommand extends CustomCommand {
 
@@ -172,8 +175,13 @@ public class MineCommand extends CustomCommand {
                             sendInvalidArguments(p, "There is already a mine named " + MessageColor.PRIMARY + mineName + MessageColor.NEUTRAL + "! Please select another one.");
                             return true;
                         }
-                        Location loc1 = MineMe.WEP.getSelection(p).getMaximumPoint();
-                        Location loc2 = MineMe.WEP.getSelection(p).getMinimumPoint();
+                        Selection sel = MineMe.WEP.getSelection(p);
+                        if (sel == null) {
+                            MineMe.messageManager.sendMessage(p, "You don't have a selection in WorldEdit! Type //wand and select 2 points");
+                            return true;
+                        }
+                        Location loc1 = sel.getMaximumPoint();
+                        Location loc2 = sel.getMinimumPoint();
                         if (loc1 == null) {
                             MineMe.messageManager.sendMessage(p, "You don't have a position 1 selected in WorldEdit!");
                             return true;
@@ -313,9 +321,15 @@ public class MineCommand extends CustomCommand {
         fl2.setX(Math.max(loc1.getBlockX(), loc2.getBlockX()));
         fl2.setY(Math.max(loc1.getBlockY(), loc2.getBlockY()));
         fl2.setZ(Math.max(loc1.getBlockZ(), loc2.getBlockZ()));
-        HashMap<Material, Double> map = new HashMap<>();
-        map.put(Material.STONE, 100d);
+        HashMap<ItemStack, Double> map = new HashMap<>();
+        map.put(new ItemStack(Material.STONE), 100d);
         Mine m = new CuboidMine(name, fl1, fl2, map, delay, broadcastMessage, nearby, radius);
+        for (Block m1 : m) {
+            if (MineManager.isPartOfMine(m1)) {
+                MineMe.messageManager.sendMessage(p, "It seems that there is already a mine here! Please try somewhere else :D");
+                return;
+            }
+        }
         MineManager.registerMine(m);
         MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColors(MineMeMessageManager.mineCreateMessage, m));
         Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {

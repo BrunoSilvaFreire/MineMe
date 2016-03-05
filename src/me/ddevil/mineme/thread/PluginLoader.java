@@ -164,15 +164,19 @@ public class PluginLoader extends CustomThread {
             MineMe.minesFolder.mkdir();
         }
         if (MineMe.minesFolder.listFiles().length == 0) {
-            plugin.debug("Mines folder is empty! Adding examplemine.yml", 3);
+            plugin.debug("Mines folder is empty! Adding examplemines...", 3);
             plugin.saveResource("examplemine.yml", false);
-            File f = new File(plugin.getDataFolder() + "/examplemine.yml");
+            plugin.saveResource("examplecircularmine.yml", false);
+            File examplecircularmine = new File(plugin.getDataFolder() + "/examplecircularmine.yml");
+            File examplecuboidmine = new File(plugin.getDataFolder() + "/examplemine.yml");
             try {
-                FileUtils.moveFileToDirectory(f, MineMe.minesFolder, false);
+                FileUtils.moveFileToDirectory(examplecuboidmine, MineMe.minesFolder, false);
                 plugin.debug("examplemine.yml added!", 3);
+                FileUtils.moveFileToDirectory(examplecircularmine, MineMe.minesFolder, false);
+                plugin.debug("examplecircularmine.yml added!", 3);
             } catch (IOException ex) {
-                f.delete();
-                plugin.debug("There was a problem trying to copy examplemine.yml to the mines folder. Skipping.", true);
+                examplecuboidmine.delete();
+                plugin.debug("There was a problem trying to copy the example mines to the mines folder. Skipping.", true);
             }
         }
         if (MineMe.useHolograms && MineMe.hologramAdapter == null) {
