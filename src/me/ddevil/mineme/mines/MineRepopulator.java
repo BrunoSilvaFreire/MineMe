@@ -16,7 +16,9 @@
  */
 package me.ddevil.mineme.mines;
 
+import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.utils.RandomCollection;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -35,12 +37,8 @@ public class MineRepopulator {
 
         private RepopulateMap(Mine m) {
             randomCollection = new RandomCollection<>();
-            for (Material m1
-                    : m.getComposition().
-                    keySet()) {
-                randomCollection.add(
-                        m.getComposition().get(m1),
-                        m1);
+            for (Material m1 : m.getComposition().keySet()) {
+                randomCollection.add(m.getComposition().get(m1), m1);
             }
 
         }

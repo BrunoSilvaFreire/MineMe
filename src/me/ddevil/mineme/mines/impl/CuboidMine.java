@@ -102,7 +102,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 config.getConfig().getDouble("X2"),
                 config.getConfig().getDouble("Y2"),
                 config.getConfig().getDouble("Z2")).toVector();
-        composition = config.getComposition();
+        this.composition = config.getComposition();
         this.config = config.getConfig();
 
     }
@@ -496,16 +496,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     @Override
     public int getVolume() {
         return this.getSizeX() * this.getSizeY() * this.getSizeZ();
-    }
-
-    @Override
-    public Vector getMaximumPoint() {
-        return pos2;
-    }
-
-    @Override
-    public Vector getMinimumPoint() {
-        return pos1;
     }
 
     public class CuboidMineIterator implements Iterator<Block> {

@@ -28,7 +28,9 @@ import me.ddevil.mineme.holograms.impl.HolographicDisplaysAdapter;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
+import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -206,7 +208,12 @@ public class PluginLoader extends CustomThread {
                 MineConfig config = new MineConfig(mine);
                 //Instanciate
                 plugin.debug("Instancializating mine " + name + " in world " + config.getWorld().getName(), 3);
-                Mine m = new CuboidMine(config);
+                Mine m;
+                if (config.getType().equals(MineType.CIRCULAR)) {
+                    m = new CircularMine(config);
+                } else {
+                    m = new CuboidMine(config);
+                }
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
                     @Override
@@ -236,8 +243,7 @@ public class PluginLoader extends CustomThread {
                 plugin.debug();
                 i++;
             } catch (Throwable t) {
-
-                plugin.printException("Something went wrong while loading " + file.getName() + " :(", t);
+                plugin.printException("Something went wrong while loading " + file.getName() + " :( Are you sure you did everything right?", t);
             }
             plugin.debug("Loaded  " + i + " mines :D", true);
         }

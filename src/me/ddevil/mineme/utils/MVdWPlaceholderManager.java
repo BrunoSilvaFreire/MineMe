@@ -19,6 +19,7 @@ package me.ddevil.mineme.utils;
 import be.maximvdw.placeholderapi.PlaceholderAPI;
 import be.maximvdw.placeholderapi.PlaceholderReplaceEvent;
 import be.maximvdw.placeholderapi.PlaceholderReplacer;
+import java.util.ArrayList;
 import me.ddevil.mineme.MineMe;
 import static me.ddevil.mineme.MineMe.useMVdWPlaceholderAPI;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -95,50 +96,62 @@ public class MVdWPlaceholderManager {
             });
             for (Mine m : MineManager.getMines()) {
                 //Register mines placeholders
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":remaining", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return String.valueOf(m.getRemainingBlocks());
-                    }
-                });
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":mined", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return String.valueOf(m.getMinedBlocks());
-                    }
-                });
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":totalminedblocks", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return String.valueOf(StorageManager.getTotalBrokenBlocks(m));
-                    }
-                });
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":totalresets", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return String.valueOf(StorageManager.getTotalResets(m));
-                    }
-                });
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":remainingpercent", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return String.valueOf(m.getPercentageRemaining());
-                    }
-                });
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":resettime", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return MineMeMessageManager.secondsToString(m.getTimeToNextReset());
-                    }
-                });
-                PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":minedpercent", new PlaceholderReplacer() {
-                    @Override
-                    public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                        return String.valueOf(m.getPercentageMined());
-                    }
-                });
+                registerMinePlaceholders(m);
             }
             MineMe.instance.debug("Placeholders registered!", true);
         }
+
     }
+
+    public static boolean isPlaceholderRegistered(Mine m) {
+        return registeredMines.contains(m);
+    }
+    private final static ArrayList<Mine> registeredMines = new ArrayList();
+
+    public static void registerMinePlaceholders(Mine m) {
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":remaining", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return String.valueOf(m.getRemainingBlocks());
+            }
+        });
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":mined", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return String.valueOf(m.getMinedBlocks());
+            }
+        });
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":totalminedblocks", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return String.valueOf(StorageManager.getTotalBrokenBlocks(m));
+            }
+        });
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":totalresets", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return String.valueOf(StorageManager.getTotalResets(m));
+            }
+        });
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":remainingpercent", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return String.valueOf(m.getPercentageRemaining());
+            }
+        });
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":resettime", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return MineMeMessageManager.secondsToString(m.getTimeToNextReset());
+            }
+        });
+        PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":minedpercent", new PlaceholderReplacer() {
+            @Override
+            public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
+                return String.valueOf(m.getPercentageMined());
+            }
+        });
+        registeredMines.add(m);
+    }
+
 }

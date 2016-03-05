@@ -261,20 +261,6 @@ public interface Mine extends Iterable<Block>, Listener {
     public int getMaximumY();
 
     /**
-     * Gets the minimum Y value
-     *
-     * @return the Y value
-     */
-    public Vector getMaximumPoint();
-
-    /**
-     * Gets the maximum Y value
-     *
-     * @return the Y value
-     */
-    public Vector getMinimumPoint();
-
-    /**
      * Get's the time till next reset.
      *
      * @return The remaining time till the next reset.

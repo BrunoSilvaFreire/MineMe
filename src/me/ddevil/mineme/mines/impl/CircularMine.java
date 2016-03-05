@@ -16,24 +16,32 @@
  */
 package me.ddevil.mineme.mines.impl;
 
-import java.io.File;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.internal.LocalWorldAdapter;
+import com.sk89q.worldedit.regions.CylinderRegion;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.mineme.MineMe;
-import me.ddevil.mineme.mines.Mine;
+import me.ddevil.mineme.events.MineResetEvent;
+import me.ddevil.mineme.messages.MineMeMessageManager;
+import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
+import me.ddevil.mineme.storage.StorageManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -42,14 +50,28 @@ import org.bukkit.util.Vector;
 public class CircularMine extends BasicMine {
 
     //General
-    private Vector center;
-    private Vector radius;
-    private int minY;
-    private int maxY;
-    protected File saveFile;
+    private final Vector center;
+    private final double radius;
+    private final int minY;
+    private final int maxY;
+    private final CylinderRegion area;
 
     public CircularMine(MineConfig config) {
         super(config);
+        this.center = new Vector(config.getConfig().getDouble("X"), config.getConfig().getDouble("Y"), config.getConfig().getDouble("Z"));
+        this.radius = config.getConfig().getDouble("radius");
+        this.minY = (int) center.getY();
+        this.maxY = (int) (config.getConfig().getInt("height") + center.getY());
+        this.composition = config.getComposition();
+        area = new CylinderRegion(
+                new BukkitWorld(world),
+                new com.sk89q.worldedit.Vector(
+                        center.getX(),
+                        center.getY(),
+                        center.getZ()),
+                new Vector2D(radius, radius),
+                minY,
+                maxY);
     }
 
     @Override
@@ -59,24 +81,60 @@ public class CircularMine extends BasicMine {
 
     }
 
-    public CircularMine(String name, World world, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay, Vector center, double radius) {
-        super(name, world, broadcastOnReset, nearbyBroadcast, broadcastRadius, resetMinutesDelay);
-        this.center = center;
-        this.radius = new Vector(center.getX(), center.getY() - radius, center.getZ());
-    }
-
     @Override
     public void reset() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (isDeleted()) {
+            return;
+        }
+        System.out.println(area.getArea());
+        System.out.println(area.getWorld().getName());
+        System.out.println(area.getCenter().toString());
+        MineResetEvent event = (MineResetEvent) new MineResetEvent(this).call();
+        if (!event.isCancelled()) {
+            MineMe.getInstance().debug("Reseting mine " + name, 2);
+            //Pull players up
+            for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+                Location l = p.getLocation();
+                if (contains(p)) {
+                    l.setY(getMaximumY() + 2);
+                    p.teleport(l);
+                }
+            }
+            currentResetDelay = totalResetDelay;
+            new MineRepopulator().repopulate(this);
+            if (broadcastOnReset) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (broadcastNearby) {
+                        if (p.getLocation().distance(getLocation()) <= broadcastRadius) {
+                            p.sendMessage(
+                                    MineMeMessageManager.translateTagsAndColors(
+                                            broadcastMessage,
+                                            this));
+                        }
+                    } else {
+                        p.sendMessage(MineMeMessageManager.translateTagsAndColors(broadcastMessage, this));
+                    }
+                }
+            }
+            try {
+                StorageManager.addReset(this);
+            } catch (IOException | ParseException ex) {
+                MineMe.instance.printException("There was an error trying to update the total broken blocks in " + name + "'s storage file!", ex);
+            }
+            brokenBlocks.clear();
+        } else {
+            MineMe.getInstance().debug("Reset event for mine " + name + " was cancelled", 2);
+        }
     }
 
     @Override
     public void save() {
         FileConfiguration file = getBasicSavedConfig();
-        file.set("centerX", center.getX());
-        file.set("centerY", center.getY());
-        file.set("centerZ", center.getZ());
-        file.set("radius", radius.distance(center));
+        file.set("X", center.getX());
+        file.set("Y", center.getY());
+        file.set("Z", center.getZ());
+        file.set("radius", radius);
+        file.set("height", getHeight());
         try {
             file.save(MineMe.getMineFile(this));
         } catch (IOException ex) {
@@ -91,11 +149,7 @@ public class CircularMine extends BasicMine {
 
     @Override
     public boolean contains(double x, double y, double z) {
-        if (y < minY || y > maxY) {
-            return false;
-        }
-        Vector v = new Vector(x, y, z).subtract(center).divide(radius);
-        return v.getX() * v.getX() + v.getZ() * v.getZ() <= 1;
+        return area.contains(new com.sk89q.worldedit.Vector(x, y, z));
     }
 
     @Override
@@ -125,22 +179,18 @@ public class CircularMine extends BasicMine {
 
     @Override
     public Iterator<Block> iterator() {
-        return new CircularIterator(this);
+        return new CircularIterator();
     }
 
     public int getArea() {
-        return (int) Math.floor(radius.getX() * radius.getZ() * Math.PI * getHeight());
+        return area.getArea();
     }
 
     public int getHeight() {
         return maxY - minY + 1;
     }
 
-    public int getLength() {
-        return (int) (2 * radius.getZ());
-    }
-
-    public Vector getRadius() {
+    public double getRadius() {
         return radius;
     }
 
@@ -158,103 +208,26 @@ public class CircularMine extends BasicMine {
         return maxY;
     }
 
-    @Override
-    public Vector getMinimumPoint() {
-        Vector base = center.subtract(getRadius());
-        return new Vector(base.getX(), minY, base.getY());
-    }
-
-    @Override
-    public Vector getMaximumPoint() {
-        Vector base = center.add(getRadius());
-        return new Vector(base.getX(), maxY, base.getY());
-    }
-
     public class CircularIterator implements Iterator<Block> {
 
-        private final CircularMine mine;
-        //X
-        private final int minX;
-        private final int maxX;
-        private int nextX;
-
-        //Y
-        private final int minY;
-        private final int maxY;
-        private int nextY;
-        //Z
-        private final int minZ;
-        private final int maxZ;
-        private int nextZ;
-        //World
-        private final World world;
-
-        public CircularIterator(CircularMine mine) {
-            this.mine = mine;
-            Vector min = mine.getCenter();
-            Vector max = mine.getMaximumPoint();
-            //X
-            this.minX = min.getBlockX();
-            this.maxX = max.getBlockX();
-            this.nextX = minX;
-            //Y
-            this.minY = min.getBlockY();
-            this.maxY = max.getBlockY();
-            this.nextY = minY;
-            //Z
-            this.minZ = max.getBlockZ();
-            this.maxZ = max.getBlockZ();
-            this.nextZ = minZ;
-            this.world = mine.getWorld();
-            forward();
+        public CircularIterator() {
+            for (BlockVector bv : area) {
+                blocks.add(new Location(world, bv.getX(), bv.getX(), bv.getX()).getBlock());
+            }
         }
+        private final ArrayList<Block> blocks = new ArrayList<>();
+        private int current = 0;
 
         @Override
         public boolean hasNext() {
-            return nextX != Integer.MIN_VALUE;
-        }
-
-        private void forward() {
-            while (hasNext() && !mine.contains(new Location(mine.world, nextX, minY, nextZ))) {
-                forwardOne();
-            }
+            return current != blocks.size() - 1;
         }
 
         @Override
         public Block next() {
-            if (!hasNext()) {
-                throw new java.util.NoSuchElementException();
-            }
-
-            Block b = new Location(world, nextX, nextY, nextZ).getBlock();
-            forwardOne();
-            forward();
-            if (nextY < maxY) {
-                nextY++;
-            } else if (hasNext()) {
-
-                nextY = minY;
-            }
-            return b;
+            Block get = blocks.get(current);
+            current++;
+            return get;
         }
-
-        private void forwardOne() {
-            if (++nextX <= maxX) {
-                return;
-            }
-            nextX = minX;
-
-            if (++nextZ <= maxZ) {
-                return;
-            }
-            nextX = Integer.MIN_VALUE;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
     }
-
 }

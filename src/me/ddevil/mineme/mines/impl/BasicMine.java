@@ -216,6 +216,7 @@ public abstract class BasicMine implements Mine {
     public List<String> getInfo() {
         String[] basic = new String[]{
             "$1Mine: $2" + getName(),
+            "$1Type: $2" + getType(),
             "$1World: $2" + getLocation().getWorld().getName(),
             "$1Location: $2" + getLocation().getBlockX() + ", " + getLocation().getBlockY() + ", " + getLocation().getBlockZ() + ", ",
             "$1Broadcast on reset: $2" + broadcastOnReset(),

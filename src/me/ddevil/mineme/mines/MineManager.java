@@ -26,6 +26,7 @@ import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.utils.MVdWPlaceholderManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -56,6 +57,11 @@ public class MineManager {
     public static void registerMine(Mine m) {
         mines.add(m);
         MineMe.registerListener(m);
+        if (MineMe.useMVdWPlaceholderAPI) {
+            if (!MVdWPlaceholderManager.isPlaceholderRegistered(m)) {
+                MVdWPlaceholderManager.registerMinePlaceholders(m);
+            }
+        }
         mineMe.debug("Mine " + m.getName() + " registered to manager!");
     }
 
