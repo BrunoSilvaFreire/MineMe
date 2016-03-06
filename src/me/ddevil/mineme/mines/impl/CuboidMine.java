@@ -55,46 +55,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     protected final Vector pos2;
     private List<String> hologramsLines;
 
-    public CuboidMine(String name, Location l1, Location l2, Map<ItemStack, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius) {
-        super(name, l1.getWorld(), broadcastOnReset, nearbyBroadcast, broadcastRadius, delay);
-        if (!l1.getWorld().equals(l2.getWorld())) {
-            throw new IllegalArgumentException("Locations must be on the same world");
-        }
-        Location fl1 = l1.clone();
-        Location fl2 = l2.clone();
-        fl1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
-        fl1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
-        fl1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
-        fl2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
-        fl2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
-        fl2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
-        this.pos1 = l1.toVector();
-        this.pos2 = l2.toVector();
-        this.composition = composition;
-        this.config = MineMe.getYAMLMineFile(this);
-        this.enabled = true;
-    }
-
-    public CuboidMine(String name, Location l1, Location l2, Map<ItemStack, Double> composition, Integer delay, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, String resetMsg) {
-        super(name, l1.getWorld(), broadcastOnReset, nearbyBroadcast, resetMsg, broadcastRadius, delay);
-        if (!l1.getWorld().equals(l2.getWorld())) {
-            throw new IllegalArgumentException("Locations must be on the same world");
-        }
-        Location fl1 = l1.clone();
-        Location fl2 = l2.clone();
-        fl1.setX(Math.min(l1.getBlockX(), l2.getBlockX()));
-        fl1.setY(Math.min(l1.getBlockY(), l2.getBlockY()));
-        fl1.setZ(Math.min(l1.getBlockZ(), l2.getBlockZ()));
-        fl2.setX(Math.max(l1.getBlockX(), l2.getBlockX()));
-        fl2.setY(Math.max(l1.getBlockY(), l2.getBlockY()));
-        fl2.setZ(Math.max(l1.getBlockZ(), l2.getBlockZ()));
-        this.pos1 = l1.toVector();
-        this.pos2 = l2.toVector();
-        this.composition = composition;
-        this.config = MineMe.getYAMLMineFile(this);
-        this.enabled = true;
-    }
-
     public CuboidMine(MineConfig config) {
         super(config);
         this.pos1 = new Location(world,
@@ -105,9 +65,19 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                 config.getConfig().getDouble("X2"),
                 config.getConfig().getDouble("Y2"),
                 config.getConfig().getDouble("Z2")).toVector();
-        this.composition = config.getComposition();
-        this.config = config.getConfig();
+    }
 
+    public CuboidMine(String name, Location loc1, Location loc2) {
+        super(name, loc1.getWorld());
+        this.pos1 = loc1.toVector();
+        this.pos2 = loc2.toVector();
+        this.config = getBasicSavedConfig();
+        config.set("X1", pos1.getBlockX());
+        config.set("Y1", pos1.getBlockY());
+        config.set("Z1", pos1.getBlockZ());
+        config.set("X2", pos2.getBlockX());
+        config.set("Y2", pos2.getBlockY());
+        config.set("Z2", pos2.getBlockZ());
     }
 
     public Vector getPos2() {
@@ -249,7 +219,7 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     @Override
     public void delete() {
         setEnabled(false);
-        save();
+        saveFile.delete();
         MineManager.unregisterMine(this);
         deleted = true;
         for (CompatibleHologram hologram : holograms) {
@@ -408,10 +378,20 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
     @Override
     public void setupHolograms() {
         MineMe.getInstance().debug("Creating holograms for " + name + "...");
+        if (MineMe.forceDefaultHolograms) {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
+            hologramsLines = MineMe.defaultHologramText;
+        } else if (config.getBoolean("useCustomHologramText")) {
+            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
+            hologramsLines = config.getStringList("hologramsText");
+        } else {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
+            hologramsLines = MineMe.defaultHologramText;
+        }
         Location l = getCenter();
         Location temp;
         temp = l.clone();
-        temp.setY(getUpperY() + 4);
+        temp.setY(getUpperY() + 4 + (hologramsLines.size() * 0.15));
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(getSizeX() / 2 + 1, 0, 0);
@@ -426,16 +406,6 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
         temp.add(0, 0, ((getSizeZ() / 2) * -1) - 1);
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
-        if (MineMe.forceDefaultHolograms) {
-            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
-            hologramsLines = MineMe.defaultHologramText;
-        } else if (config.getBoolean("useCustomHologramText")) {
-            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
-            hologramsLines = config.getStringList("hologramsText");
-        } else {
-            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
-            hologramsLines = MineMe.defaultHologramText;
-        }
         updateHolograms();
 
         hologramsReady = true;
@@ -575,6 +545,11 @@ public class CuboidMine extends BasicMine implements HologramCompatible {
                     return Unknown;
             }
         }
+    }
+
+    @Override
+    public List<CompatibleHologram> getHolograms() {
+        return holograms;
     }
 
     @Override

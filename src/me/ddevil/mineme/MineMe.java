@@ -21,7 +21,10 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
@@ -81,17 +84,28 @@ public class MineMe extends CustomPlugin {
                 WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
                 registerBaseCommands();
                 if (useMVdWPlaceholderAPI) {
-                    MVdWPlaceholderManager.setupPlaceholders();
+                    try {
+                        MVdWPlaceholderManager.setupPlaceholders();
+                    } catch (Exception ex) {
+                        printException("There was an error creting MVdWPlaceholder! Skipping", ex);
+                    }
                 }
                 if (convertMineResetLite) {
                     MineMe.instance.debug("Converting MineResetLite...", true);
                     MRLConverter.convert();
                     MineMe.instance.debug("Converted MineResetLite!", true);
                 }
+                debug("Starting metrics...");
+                try {
+                    Metrics metrics = new Metrics(MineMe.this);
+                    metrics.start();
+                    debug("Metrics started!");
+                } catch (IOException ex) {
+                    printException("There was an error start metrics! Skipping", ex);
+                }
                 debug("It's all right, it's all favorable :D");
             }
         });
-
     }
 
     @Override
@@ -105,7 +119,6 @@ public class MineMe extends CustomPlugin {
 
     public static File getMineFile(Mine m) {
         return new File(minesFolder.getPath(), m.getName() + ".yml");
-
     }
 
     public static void setHologramsUsable(boolean hologramsUsable) {

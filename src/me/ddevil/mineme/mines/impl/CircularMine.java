@@ -32,12 +32,14 @@ import me.ddevil.mineme.events.MineResetEvent;
 import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.HologramCompatible;
+import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.storage.StorageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -60,12 +62,11 @@ public class CircularMine extends BasicMine implements HologramCompatible {
     public CircularMine(MineConfig config) {
         super(config);
         Vector fakecenter = new Vector(config.getConfig().getDouble("X"), config.getConfig().getDouble("Y"), config.getConfig().getDouble("Z"));
+        //Selection
         this.radius = config.getConfig().getDouble("radius");
         this.minY = (int) fakecenter.getY();
         this.maxY = (int) (config.getConfig().getInt("height") + fakecenter.getY());
-        this.composition = config.getComposition();
-        this.config = config.getConfig();
-        area = new CylinderRegion(
+        this.area = new CylinderRegion(
                 new BukkitWorld(world),
                 new com.sk89q.worldedit.Vector(
                         fakecenter.getX(),
@@ -83,10 +84,33 @@ public class CircularMine extends BasicMine implements HologramCompatible {
         center.setZ(center.getZ() + 0.5);
     }
 
-    @Override
-    public void delete() {
-        saveFile.delete();
-        deleted = true;
+    public CircularMine(String name, Location center, double radius, int height) {
+        super(name, center.getWorld());
+        Vector fakecenter = center.toVector();
+        //Selection
+        this.radius = radius;
+        this.minY = (int) fakecenter.getY();
+        this.maxY = height + minY;
+        this.area = new CylinderRegion(
+                new BukkitWorld(world),
+                new com.sk89q.worldedit.Vector(
+                        fakecenter.getX(),
+                        fakecenter.getY(),
+                        fakecenter.getZ()),
+                new Vector2D(radius, radius),
+                minY,
+                maxY);
+        this.center = new Vector(
+                area.getCenter().getX(),
+                area.getCenter().getY(),
+                area.getCenter().getZ()
+        );
+        center.setX(center.getX() + 0.5);
+        center.setZ(center.getZ() + 0.5);
+        this.config = getBasicSavedConfig();
+        config.set("X", center.getBlockX());
+        config.set("Y", center.getBlockY());
+        config.set("Z", center.getBlockZ());
 
     }
 
@@ -221,10 +245,20 @@ public class CircularMine extends BasicMine implements HologramCompatible {
     @Override
     public void setupHolograms() {
         MineMe.getInstance().debug("Creating holograms for " + name + "...");
+        if (MineMe.forceDefaultHolograms) {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
+            hologramsLines = MineMe.defaultHologramText;
+        } else if (config.getBoolean("useCustomHologramText")) {
+            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
+            hologramsLines = config.getStringList("hologramsText");
+        } else {
+            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
+            hologramsLines = MineMe.defaultHologramText;
+        }
         Location l = getCenter().toLocation(world);
         Location temp;
         temp = l.clone();
-        temp.setY(getMaximumY() + 4);
+        temp.setY(getMaximumY() + 4 + (hologramsLines.size() * 0.15));
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(area.getRadius().getX() + 1, 0, 0);
@@ -239,16 +273,6 @@ public class CircularMine extends BasicMine implements HologramCompatible {
         temp.add(0, 0, (area.getRadius().getZ() * -1) - 1);
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
-        if (MineMe.forceDefaultHolograms) {
-            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
-            hologramsLines = MineMe.defaultHologramText;
-        } else if (config.getBoolean("useCustomHologramText")) {
-            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
-            hologramsLines = config.getStringList("hologramsText");
-        } else {
-            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
-            hologramsLines = MineMe.defaultHologramText;
-        }
         updateHolograms();
 
         hologramsReady = true;
@@ -291,6 +315,11 @@ public class CircularMine extends BasicMine implements HologramCompatible {
         }
     }
     private Integer lightHologramUpdateId = null;
+
+    @Override
+    public List<CompatibleHologram> getHolograms() {
+        return holograms;
+    }
 
     @Override
     public void softHologramUpdate() {

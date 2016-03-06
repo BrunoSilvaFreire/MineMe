@@ -19,14 +19,17 @@ package me.ddevil.mineme.mines.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.challenge.Challenge;
 import me.ddevil.mineme.challenge.ChallengeEndListener;
+import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
+import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -46,6 +49,7 @@ public abstract class BasicMine implements Mine {
     protected final String alias;
     protected FileConfiguration config;
     protected File saveFile = MineMe.getMineFile(this);
+    protected boolean enabled = false;
 
     //Messages
     protected boolean broadcastOnReset;
@@ -75,54 +79,33 @@ public abstract class BasicMine implements Mine {
         this.name = config.getName();
         this.alias = MineMeMessageManager.translateColors(config.getAlias());
         this.world = config.getWorld();
+        this.composition = config.getComposition();
+        this.config = config.getConfig();
     }
 
-    public BasicMine(String name, World world, boolean broadcastOnReset, boolean nearbyBroadcast, String broadcastMessage, double broadcastRadius, int resetMinutesDelay) {
-        this.broadcastOnReset = broadcastOnReset;
-        this.broadcastNearby = nearbyBroadcast;
-        this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay * 60;
-        this.currentResetDelay = totalResetDelay;
-        this.broadcastMessage = broadcastMessage;
+    /**
+     * Creates a new mine with the default settings
+     *
+     * @param name The name of the mine
+     * @param world The world of the mine
+     */
+    public BasicMine(String name, World world) {
+        //General
+        this.enabled = true;
         this.name = name;
-        this.alias = MineMeMessageManager.translateColors(name);
+        this.alias = name;
         this.world = world;
-    }
-
-    public BasicMine(String name, World world, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay) {
-        this.broadcastOnReset = broadcastOnReset;
-        this.broadcastNearby = nearbyBroadcast;
-        this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay * 60;
+        HashMap<ItemStack, Double> composition = new HashMap();
+        composition.put(new ItemStack(Material.STONE), 100d);
+        this.composition = composition;
+        //Broadcast
+        this.broadcastOnReset = true;
+        this.broadcastRadius = 50;
+        this.broadcastMessage = MineMeMessageManager.globalResetMessage;
+        this.broadcastNearby = false;
+        //Resets
+        this.totalResetDelay = 300;
         this.currentResetDelay = totalResetDelay;
-        broadcastMessage = MineMe.messagesConfig.getString("messages.mineReset");
-        this.name = name;
-        this.alias = MineMeMessageManager.translateColors(name);
-        this.world = world;
-    }
-
-    public BasicMine(String name, World world, String alias, boolean broadcastOnReset, boolean nearbyBroadcast, String broadcastMessage, double broadcastRadius, int resetMinutesDelay) {
-        this.broadcastOnReset = broadcastOnReset;
-        this.broadcastNearby = nearbyBroadcast;
-        this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay * 60;
-        this.currentResetDelay = totalResetDelay;
-        this.broadcastMessage = broadcastMessage;
-        this.name = name;
-        this.alias = MineMeMessageManager.translateColors(alias);
-        this.world = world;
-    }
-
-    public BasicMine(String name, World world, String alias, boolean broadcastOnReset, boolean nearbyBroadcast, double broadcastRadius, int resetMinutesDelay) {
-        this.broadcastOnReset = broadcastOnReset;
-        this.broadcastNearby = nearbyBroadcast;
-        this.broadcastRadius = broadcastRadius;
-        this.totalResetDelay = resetMinutesDelay * 60;
-        this.currentResetDelay = totalResetDelay;
-        broadcastMessage = MineMe.messagesConfig.getString("messages.mineReset");
-        this.name = name;
-        this.alias = MineMeMessageManager.translateColors(alias);
-        this.world = world;
     }
 
     @Override
@@ -216,21 +199,22 @@ public abstract class BasicMine implements Mine {
     @Override
     public List<String> getInfo() {
         String[] basic = new String[]{
-            "$1Name: $2" + getName(),
-            "$1Alias: $2" + getAlias(),
-            "$1Type: $2" + getType(),
-            "$1World: $2" + getLocation().getWorld().getName(),
-            "$1Location: $2" + getLocation().getBlockX() + ", " + getLocation().getBlockY() + ", " + getLocation().getBlockZ() + ", ",
-            "$1Broadcast on reset: $2" + broadcastOnReset(),
-            "$1Nearby broadcast: $2" + broadcastToNearbyOnly(),
-            "$1Broadcast radius: $2" + broadcastRadius(),
-            "$1Composition: $2"
+            "%header%",
+            "$3Name: $2" + getName(),
+            "$3Alias: $2" + getAlias(),
+            "$3Type: $2" + getType(),
+            "$3World: $2" + getLocation().getWorld().getName(),
+            "$3Location: $2" + getLocation().getBlockX() + ", " + getLocation().getBlockY() + ", " + getLocation().getBlockZ() + ", ",
+            "$3Broadcast on reset: $2" + broadcastOnReset(),
+            "$3Nearby broadcast: $2" + broadcastToNearbyOnly(),
+            "$3Broadcast radius: $2" + broadcastRadius(),
+            "$3Composition: $2"
         };
         ArrayList<String> comp = new ArrayList();
 
         comp.addAll(Arrays.asList(basic));
         for (ItemStack m : getMaterials()) {
-            comp.add("$1" + m.getType() + "$4:$1" + m.getData().getData() + " $2= $1" + composition.get(m));
+            comp.add("$3" + m.getType() + "$1:$3" + m.getData().getData() + " $2= $1" + composition.get(m));
         }
         return comp;
     }
@@ -332,7 +316,6 @@ public abstract class BasicMine implements Mine {
             hc.softHologramUpdate();
         }
     }
-    protected boolean enabled = false;
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -454,6 +437,20 @@ public abstract class BasicMine implements Mine {
             currentChallenge.complete(ChallengeEndListener.ChallengeResult.FAILED);
         }
         currentChallenge = challenge;
+    }
+
+    @Override
+    public void delete() {
+        setEnabled(false);
+        MineMe.getMineFile(this).delete();
+        MineManager.unregisterMine(this);
+        deleted = true;
+        if (this instanceof HologramCompatible) {
+            HologramCompatible hc = (HologramCompatible) this;
+            for (CompatibleHologram hologram : hc.getHolograms()) {
+                hologram.delete();
+            }
+        }
     }
 
     @Override

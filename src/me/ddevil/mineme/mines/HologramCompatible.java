@@ -16,6 +16,9 @@
  */
 package me.ddevil.mineme.mines;
 
+import java.util.List;
+import me.ddevil.mineme.holograms.CompatibleHologram;
+
 public interface HologramCompatible {
 
     public abstract void setupHolograms();
@@ -29,4 +32,6 @@ public interface HologramCompatible {
     public abstract void softHologramUpdate();
 
     public abstract boolean isHologramsVisible();
+
+    public List<CompatibleHologram> getHolograms();
 }

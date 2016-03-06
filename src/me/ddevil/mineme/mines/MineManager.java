@@ -76,7 +76,7 @@ public class MineManager {
     public static void unregisterMine(Mine mine) {
         mines.remove(mine);
         MineMe.unregisterListener(mine);
-        MineMe.getInstance().debug("Unloaded all mines!");
+        MineMe.getInstance().debug("Unloaded mine " + mine.getName() + "!");
     }
 
     public static Mine getMine(String name) {

@@ -34,7 +34,7 @@ import org.bukkit.entity.Player;
  */
 public class MVdWPlaceholderManager {
 
-    public static void setupPlaceholders() {
+    public static void setupPlaceholders() throws Exception {
         if (useMVdWPlaceholderAPI) {
             MineMe.instance.debug("Registering MVdW placeholders...", true);
             //Players placeholders
@@ -100,7 +100,6 @@ public class MVdWPlaceholderManager {
             }
             MineMe.instance.debug("Placeholders registered!", true);
         }
-
     }
 
     public static boolean isPlaceholderRegistered(Mine m) {

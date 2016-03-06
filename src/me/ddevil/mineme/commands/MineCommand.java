@@ -16,9 +16,10 @@
  */
 package me.ddevil.mineme.commands;
 
+import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
+import com.sk89q.worldedit.bukkit.selections.CylinderSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.Arrays;
-import java.util.HashMap;
 import me.ddevil.core.commands.CustomCommand;
 import me.ddevil.core.commands.SubCommand;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -27,6 +28,7 @@ import me.ddevil.mineme.messages.MessageColor;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,7 +36,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class MineCommand extends CustomCommand {
 
@@ -218,7 +219,7 @@ public class MineCommand extends CustomCommand {
                         } else {
                             radius = 50;
                         }
-                        createNewMine(p, mineName, loc1, loc2, delay, broadcast, nearby, radius);
+                        createNewMine(p, mineName, sel);
                     } else {
                         MineMe.messageManager.sendMessage(p, new String[]{
                             MineMeMessageManager.invalidArguments,
@@ -308,22 +309,37 @@ public class MineCommand extends CustomCommand {
         return true;
     }
 
-    private void createNewMine(Player p, String name, Location loc1, Location loc2, Integer delay, boolean broadcastMessage, boolean nearby, double radius) {
+    private void createNewMine(Player p, String name, Selection selection) {
         if (!checkPerm(p)) {
             MineMe.messageManager.sendMessage(p, MineMeMessageManager.noPermission);
             return;
         }
-        Location fl1 = loc1.clone();
-        Location fl2 = loc2.clone();
-        fl1.setX(Math.min(loc1.getBlockX(), loc2.getBlockX()));
-        fl1.setY(Math.min(loc1.getBlockY(), loc2.getBlockY()));
-        fl1.setZ(Math.min(loc1.getBlockZ(), loc2.getBlockZ()));
-        fl2.setX(Math.max(loc1.getBlockX(), loc2.getBlockX()));
-        fl2.setY(Math.max(loc1.getBlockY(), loc2.getBlockY()));
-        fl2.setZ(Math.max(loc1.getBlockZ(), loc2.getBlockZ()));
-        HashMap<ItemStack, Double> map = new HashMap<>();
-        map.put(new ItemStack(Material.STONE), 100d);
-        Mine m = new CuboidMine(name, fl1, fl2, map, delay, broadcastMessage, nearby, radius);
+        Mine m = null;
+        MineMe.messageManager.sendMessage(p, "$2WorldEdit selection type: $4" + selection.getClass().getSimpleName());
+        if (selection instanceof CylinderSelection) {
+            CylinderSelection cs = (CylinderSelection) selection;
+            Location center = new Location(p.getWorld(), cs.getCenter().getX(), cs.getMinimumPoint().getBlockY(), cs.getCenter().getZ());
+            int height = cs.getMaximumPoint().getBlockY() - cs.getMinimumPoint().getBlockY();
+            m = new CircularMine(name, center, cs.getRadius().getX(), height);
+        } else if (selection instanceof CuboidSelection) {
+            CuboidSelection cuboidSelection = (CuboidSelection) selection;
+            Location loc1 = cuboidSelection.getMinimumPoint();
+            Location loc2 = cuboidSelection.getMaximumPoint();
+            Location fl1 = loc1.clone();
+            Location fl2 = loc2.clone();
+            fl1.setX(Math.min(loc1.getBlockX(), loc2.getBlockX()));
+            fl1.setY(Math.min(loc1.getBlockY(), loc2.getBlockY()));
+            fl1.setZ(Math.min(loc1.getBlockZ(), loc2.getBlockZ()));
+            fl2.setX(Math.max(loc1.getBlockX(), loc2.getBlockX()));
+            fl2.setY(Math.max(loc1.getBlockY(), loc2.getBlockY()));
+            fl2.setZ(Math.max(loc1.getBlockZ(), loc2.getBlockZ()));
+            m = new CuboidMine(name, fl1, fl2);
+        }
+        if (m == null) {
+            MineMe.messageManager.sendMessage(p, "$4There was an error in mine creation! Check the console!");
+            MineMe.instance.printException(name, new Error("Could not instancializate mine"));
+            return;
+        }
         for (Block m1 : m) {
             if (MineManager.isPartOfMine(m1)) {
                 MineMe.messageManager.sendMessage(p, "It seems that there is already a mine here! Please try somewhere else :D");
@@ -332,18 +348,12 @@ public class MineCommand extends CustomCommand {
         }
         MineManager.registerMine(m);
         MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColors(MineMeMessageManager.mineCreateMessage, m));
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
-
-            @Override
-            public void run() {
-                m.save();
-                if (m instanceof HologramCompatible) {
-                    HologramCompatible h = (HologramCompatible) m;
-                    h.setupHolograms();
-                }
-                m.reset();
-            }
-        }, 20l);
+        m.save();
+        if (m instanceof HologramCompatible) {
+            HologramCompatible h = (HologramCompatible) m;
+            h.setupHolograms();
+        }
+        m.reset();
     }
 
     private void listMines(Player p) {

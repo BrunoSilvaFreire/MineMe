@@ -117,8 +117,6 @@ public class PluginLoader extends CustomThread {
             return;
         }
         MineMe.useMVdWPlaceholderAPI = Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI");
-        System.out.println("Is available = " + Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI"));
-        System.out.println("Is available = " + MineMe.useMVdWPlaceholderAPI);
         //Holograms
         MineMe.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
         //Holographic Displays
@@ -249,8 +247,8 @@ public class PluginLoader extends CustomThread {
             } catch (Throwable t) {
                 plugin.printException("Something went wrong while loading " + file.getName() + " :( Are you sure you did everything right?", t);
             }
-            plugin.debug("Loaded  " + i + " mines :D", true);
         }
+        plugin.debug("Loaded " + i + " mines :D", true);
         //Check if timer is running
         if (MineMe.resetId != null) {
             Bukkit.getScheduler().cancelTask(MineMe.resetId);
