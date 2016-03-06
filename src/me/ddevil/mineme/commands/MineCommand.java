@@ -152,7 +152,7 @@ public class MineCommand extends CustomCommand {
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "create (name) [broadcast message] [nearbyBroadcast] [broadcastRadius] " + MessageColor.NEUTRAL + "Creates a new mine full of stone :D",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "delete (name) " + MessageColor.NEUTRAL + "Deletes the specified mine",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "info (name) " + MessageColor.NEUTRAL + "Displays infos about the specified mine",
-            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name)" + MessageColor.NEUTRAL + "Displays infos about the specified mine",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name)" + MessageColor.NEUTRAL + "Edits the mine",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "list " + MessageColor.NEUTRAL + "List all the loaded mines.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reset (name|all) " + MessageColor.NEUTRAL + "Reset the mine. (If you put all as the name, will reset all the mines)",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
