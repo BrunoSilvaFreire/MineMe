@@ -20,6 +20,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.ddevil.core.thread.CustomThread;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
@@ -43,6 +45,7 @@ public class PluginLoader extends CustomThread {
 
     @Override
     public void doRun() {
+        long startms = System.currentTimeMillis();
         plugin.debug("Loading config...");
         setupConfig();
         plugin.debug("Config loaded!");
@@ -54,7 +57,9 @@ public class PluginLoader extends CustomThread {
         setupDependencies();
         plugin.debug("Loading Plugin...");
         setupPlugin();
-        plugin.debug("Plugin loaded!");
+        long endms = System.currentTimeMillis();
+        long startupTime = startms - endms;
+        plugin.debug("Plugin loaded after " + (startupTime / 1000) + " seconds(" + startupTime + "ms)!");
     }
 
     private void setupConfig() {
@@ -120,19 +125,18 @@ public class PluginLoader extends CustomThread {
         //Holograms
         MineMe.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
         //Holographic Displays
-
         MineMe.forceDefaultHolograms = MineMe.pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
         MineMe.useHolographicDisplay = MineMe.pluginConfig.getBoolean("settings.holograms.useHolographicDisplaysAPI");
         if (MineMe.useHolograms) {
             //Check if HD is available
             MineMe.holographicDisplaysUsable = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
+            //useHolographicDisplaysAPI is true in config
             if (MineMe.useHolographicDisplay) {
                 if (MineMe.holographicDisplaysUsable) {
                     plugin.debug();
                     plugin.debug("Detected HolographicDisplays!", 3);
-
                     plugin.debug("Using Holographic Displays as the hologram adapter...", 3);
-                    MineMe.setForceHologramsUse(MineMe.forceDefaultHolograms);
+                    //Set the hologram adapter
                     MineMe.hologramAdapter = new HolographicDisplaysAdapter();
                     if (MineMe.forceDefaultHolograms) {
                         plugin.debug("Forcing all holograms to use default preset.", 3);
@@ -150,8 +154,19 @@ public class PluginLoader extends CustomThread {
                     }
                 }
             }
-        }
+            //Check hologram adapter
+            if (MineMe.hologramAdapter == null) {
+                MineMe.useHolograms = false;
+                plugin.debug("Holograms were set enabled, but not HologramAdapter was setup. Are you sure you enabled an API in the config? Disabling holograms...", 3);
+                try {
+                    MineMe.pluginConfig.set("settings.holograms.enableHolograms", false);
+                    MineMe.pluginConfig.save(new File(plugin.getDataFolder(), "config.yml"));
+                } catch (IOException ex) {
+                    MineMe.instance.printException("There was an error correcting enableHolograms in the config!", ex);
+                }
 
+            }
+        }
     }
 
     private void setupPlugin() {

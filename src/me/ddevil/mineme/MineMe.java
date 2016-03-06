@@ -23,8 +23,6 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;

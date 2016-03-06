@@ -349,9 +349,11 @@ public class MineCommand extends CustomCommand {
         MineManager.registerMine(m);
         MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColors(MineMeMessageManager.mineCreateMessage, m));
         m.save();
-        if (m instanceof HologramCompatible) {
-            HologramCompatible h = (HologramCompatible) m;
-            h.setupHolograms();
+        if (MineMe.useHolograms) {
+            if (m instanceof HologramCompatible) {
+                HologramCompatible h = (HologramCompatible) m;
+                h.setupHolograms();
+            }
         }
         m.reset();
     }
