@@ -26,6 +26,7 @@ import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.challenge.Challenge;
 import me.ddevil.mineme.challenge.ChallengeEndListener;
+import me.ddevil.mineme.events.MineUpdateEvent;
 import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
@@ -46,10 +47,10 @@ public abstract class BasicMine implements Mine {
 
     //General
     protected final String name;
-    protected final String alias;
+    protected String alias;
     protected FileConfiguration config;
     protected File saveFile = MineMe.getMineFile(this);
-    protected boolean enabled = false;
+    protected boolean enabled = true;
 
     //Messages
     protected boolean broadcastOnReset;
@@ -118,7 +119,7 @@ public abstract class BasicMine implements Mine {
     }
 
     public void setResetMinutesDelay(int resetMinutesDelay) {
-        this.totalResetDelay = resetMinutesDelay;
+        this.totalResetDelay = resetMinutesDelay * 60;
         save();
     }
 
@@ -149,9 +150,11 @@ public abstract class BasicMine implements Mine {
 
     }
 
+    @Override
     public void setResetDelay(int resetDelay) {
-        this.currentResetDelay = resetDelay;
+        this.totalResetDelay = resetDelay * 60;
         save();
+        reset();
     }
 
     public void setNearbyBroadcast(boolean nearbyBroadcast) {
@@ -159,7 +162,8 @@ public abstract class BasicMine implements Mine {
         save();
     }
 
-    public void setBroadcastRadius(double broadcastRadius) {
+    @Override
+    public void setBroadcastRange(double broadcastRadius) {
         this.broadcastRadius = broadcastRadius;
         save();
     }
@@ -272,6 +276,7 @@ public abstract class BasicMine implements Mine {
             if (!wasAlreadyBroken(b)) {
                 brokenBlocks.add(b);
                 lastSecond.add(b);
+                new MineUpdateEvent(this).call();
             }
         }
     }
@@ -283,6 +288,7 @@ public abstract class BasicMine implements Mine {
             if (!wasAlreadyBroken(b)) {
                 brokenBlocks.add(b);
                 lastSecond.add(b);
+                new MineUpdateEvent(this).call();
                 if (this instanceof HologramCompatible) {
                     HologramCompatible hc = (HologramCompatible) this;
                     hc.updateHolograms();
@@ -298,6 +304,7 @@ public abstract class BasicMine implements Mine {
                 if (!wasAlreadyBroken(b)) {
                     brokenBlocks.add(b);
                     lastSecond.add(b);
+                    new MineUpdateEvent(this).call();
                 }
             }
         }
@@ -311,6 +318,7 @@ public abstract class BasicMine implements Mine {
     public void setBlockAsBroken(Block block) {
         brokenBlocks.add(block);
         lastSecond.add(block);
+        new MineUpdateEvent(this).call();
         if (this instanceof HologramCompatible) {
             HologramCompatible hc = (HologramCompatible) this;
             hc.softHologramUpdate();
@@ -349,8 +357,8 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public void setMaterial(Material material, double percentage) {
-        composition.put(new ItemStack(material), percentage);
+    public void setMaterial(ItemStack material, double percentage) {
+        composition.put(material, percentage);
         save();
     }
 
@@ -437,6 +445,12 @@ public abstract class BasicMine implements Mine {
             currentChallenge.complete(ChallengeEndListener.ChallengeResult.FAILED);
         }
         currentChallenge = challenge;
+    }
+
+    @Override
+    public void setAlias(String alias) {
+        this.alias = alias;
+        save();
     }
 
     @Override

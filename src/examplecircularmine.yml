@@ -1,5 +1,5 @@
 enabled: false
-name: 'circularmine'
+name: 'examplecircularmine'
 alias: '&cSpiral'
 world: world
 type: CIRCULAR

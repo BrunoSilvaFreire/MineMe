@@ -1,0 +1,80 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package me.ddevil.core.utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+/**
+ *
+ * @author Selma
+ */
+public class InventoryUtils {
+
+    public static Inventory createInventory(String title, int totalLanes) {
+        return Bukkit.createInventory(null, totalLanes * 9, title);
+    }
+
+    public static int getMiddlePoint(Inventory m) {
+        return getMiddlePoint(m.getSize());
+    }
+
+    public static int getBottomMiddlePoint(Inventory m) {
+        return getBottomMiddlePoint(m.getSize());
+    }
+
+    public static Integer[] getLane(Inventory i, int lane) {
+        return getLane(i.getSize(), lane);
+    }
+
+    public static int getTotalLanes(Inventory i) {
+        return getTotalLanes(i.getSize());
+    }
+
+    public static int getTotalLanes(int i) {
+        return i / 9;
+    }
+
+    public static int getMiddlePoint(int size) {
+        if (size % 9 != 0 || size == 0) {
+            return 0;
+        }
+        int totalLanes = size / 9;
+        int middleLane = (totalLanes / 2) + 1;
+        return (middleLane * 9) - 5;
+    }
+
+    public static int getBottomMiddlePoint(int size) {
+        if (size % 9 != 0 || size == 0) {
+            return 0;
+        }
+        int totalLanes = size / 9;
+        return (totalLanes * 9) - 5;
+    }
+
+    public static Integer[] getLane(int size, int lane) {
+        if (size % 9 != 0 || size == 0) {
+            return null;
+        }
+        int totalLanes = size / 9;
+        if (lane > totalLanes) {
+            return null;
+        } else {
+            int startingpoint = lane * 9;
+            int endpoint = startingpoint + 9;
+            ArrayList<Integer> locations = new ArrayList();
+            for (int i = startingpoint; i < endpoint; i++) {
+                locations.add(i);
+            }
+            return locations.toArray(new Integer[locations.size()]);
+        }
+    }
+}

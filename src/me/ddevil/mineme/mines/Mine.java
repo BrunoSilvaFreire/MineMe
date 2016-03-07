@@ -70,6 +70,8 @@ public interface Mine extends Iterable<Block>, Listener {
      */
     public boolean isDeleted();
 
+    public void setResetDelay(int delayInMinutes);
+
     /**
      * Return if the mine is set to broadcast it's reset message.
      *
@@ -148,6 +150,8 @@ public interface Mine extends Iterable<Block>, Listener {
      * @return The broadcast eadius
      */
     public double broadcastRadius();
+
+    public void setAlias(String alias);
 
     /**
      * Get's a list of information about the mine
@@ -230,7 +234,7 @@ public interface Mine extends Iterable<Block>, Listener {
      * @param material The material to set
      * @param percentage The percentage to set
      */
-    public void setMaterial(Material material, double percentage);
+    public void setMaterial(ItemStack material, double percentage);
 
     /**
      * Remove the material from the mine's composition, if the material is party
@@ -345,4 +349,6 @@ public interface Mine extends Iterable<Block>, Listener {
     public void forceSetCurrentChallenge(Challenge challenge);
 
     public void addChallengeToQueue(Challenge challenge);
+
+    public void setBroadcastRange(double range);
 }

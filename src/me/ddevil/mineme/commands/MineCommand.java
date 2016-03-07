@@ -36,6 +36,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class MineCommand extends CustomCommand {
 
@@ -51,6 +52,7 @@ public class MineCommand extends CustomCommand {
                 MessageColor.ERROR + " () = Obligatory " + MessageColor.PRIMARY + "/" + MessageColor.ERROR + " [] = optional",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) add (material) (number from 0 to 100) " + MessageColor.NEUTRAL + "Add's this material to the mines composition.",
                 MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) remove (material) " + MessageColor.NEUTRAL + "Removes this material to the mines composition.",
+                MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "edit (name) set (alias|resetdelay|nearbybroadcast|broadcastRange) (value) " + MessageColor.NEUTRAL + "Set's the selected parameter to the said value.",
                 "%header%"});
         }
 
@@ -68,14 +70,27 @@ public class MineCommand extends CustomCommand {
                                 //Add block to mine
                                 if (args.length > 3) {
                                     String mname = args[3].toUpperCase();
+                                    String[] split = mname.split(":");
                                     try {
-                                        Material material = Material.valueOf(mname);
+                                        Material material = Material.valueOf(split[0]);
                                         if (material.isBlock()) {
                                             if (args.length > 4) {
                                                 String stringpercent = args[4].replace("%", "");
                                                 try {
                                                     double percent = Double.valueOf(stringpercent);
-                                                    mine.setMaterial(material, percent);
+                                                    byte b;
+                                                    if (split.length > 1) {
+                                                        String bs = split[1];
+                                                        try {
+                                                            b = Byte.valueOf(bs);
+                                                        } catch (NumberFormatException e) {
+                                                            sendInvalidArguments(p, MessageColor.ERROR + bs + MessageColor.NEUTRAL + " isn't a valid number!");
+                                                            return true;
+                                                        }
+                                                    } else {
+                                                        b = 0;
+                                                    }
+                                                    mine.setMaterial(new ItemStack(material, 1, (short) 0, b), percent);
                                                     mine.reset();
                                                     MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + material.name() + MessageColor.SECONDARY + " was set to " + MessageColor.PRIMARY + percent + MessageColor.SECONDARY + " in mine " + MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + " !");
                                                 } catch (NumberFormatException e) {
@@ -111,6 +126,59 @@ public class MineCommand extends CustomCommand {
                                     }
                                 } else {
                                     sendInvalidArguments(p, MessageColor.NEUTRAL + "Please give us a material!");
+                                }
+                            } else if (toDo.equalsIgnoreCase("set")) {
+                                //Removes block from composition
+                                //edit (name) set (alias|resetdelay|nearbybroadcast|broadcastRange) (value)
+                                if (args.length > 3) {
+                                    String param = args[3].toUpperCase();
+                                    if (param.equalsIgnoreCase("alias")) {
+                                        if (args.length > 4) {
+                                            String alias = "";
+                                            for (int i = 4; i < args.length; i++) {
+                                                alias += " " + args[i];
+                                            }
+                                            mine.setAlias(alias);
+                                            MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + "'s alias was set to " + MessageColor.PRIMARY + alias + MessageColor.PRIMARY + "! :)");
+                                        }
+                                    } else if (param.equalsIgnoreCase("resetdelay")) {
+                                        if (args.length > 4) {
+                                            String stringdelay = args[4];
+                                            try {
+                                                int minutes = Integer.valueOf(stringdelay);
+                                                mine.setResetDelay(minutes);
+                                                MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + "'s reset delay was set to " + MessageColor.PRIMARY + minutes + MessageColor.PRIMARY + "! :)");
+                                            } catch (NumberFormatException e) {
+                                                sendInvalidArguments(p, MessageColor.PRIMARY + stringdelay + MessageColor.NEUTRAL + " isn't a number!");
+                                            }
+                                        }
+                                    } else if (param.equalsIgnoreCase("nearbybroadcast")) {
+                                        if (args.length > 4) {
+                                            String stringboolean = args[4];
+                                            try {
+                                                boolean bol = Boolean.valueOf(stringboolean);
+                                                mine.setBroadcastOnReset(bol);
+                                                MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + "'s nearbyBroadcast was set to " + MessageColor.PRIMARY + bol + MessageColor.PRIMARY + "! :)");
+                                            } catch (Exception e) {
+                                                sendInvalidArguments(p, MessageColor.PRIMARY + stringboolean + MessageColor.NEUTRAL + " isn't a boolean (true/false)!");
+                                            }
+                                        }
+                                    } else if (param.equalsIgnoreCase("broadcastRange")) {
+                                        if (args.length > 4) {
+                                            String stringdouble = args[4];
+                                            try {
+                                                double range = Double.valueOf(stringdouble);
+                                                mine.setBroadcastRange(range);
+                                                MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + "'s broadcast range was set to " + MessageColor.PRIMARY + range + MessageColor.PRIMARY + "! :)");
+                                            } catch (Exception e) {
+                                                sendInvalidArguments(p, MessageColor.PRIMARY + stringdouble + MessageColor.NEUTRAL + " isn't a boolean (true/false)!");
+                                            }
+                                        }
+                                    } else {
+                                        sendInvalidArguments(p, MessageColor.NEUTRAL + "Please give us a alias to set to the mine!");
+                                    }
+                                } else {
+                                    sendInvalidArguments(p, MessageColor.NEUTRAL + "Please give us a parameter to change!");
                                 }
                             } else {
                                 sendUsage(p);
