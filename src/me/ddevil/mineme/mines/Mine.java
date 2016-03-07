@@ -281,6 +281,8 @@ public interface Mine extends Iterable<Block>, Listener {
      */
     public boolean isEnabled();
 
+    public ItemStack getIcon();
+
     /**
      * Set's the enabled in the config
      *

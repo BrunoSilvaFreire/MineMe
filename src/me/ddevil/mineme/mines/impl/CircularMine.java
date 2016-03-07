@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.events.MineResetEvent;
@@ -39,6 +40,7 @@ import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.storage.StorageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -50,7 +52,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author Selma
  */
-public class CircularMine extends BasicMine implements HologramCompatible {
+public class CircularMine extends BasicHologramMine {
 
     //General
     private final Vector center;
@@ -85,7 +87,7 @@ public class CircularMine extends BasicMine implements HologramCompatible {
     }
 
     public CircularMine(String name, Location center, double radius, int height) {
-        super(name, center.getWorld());
+        super(name, center.getWorld(), ItemUtils.createItem(Material.STONE, name));
         Vector fakecenter = center.toVector();
         //Selection
         this.radius = radius;
@@ -238,12 +240,21 @@ public class CircularMine extends BasicMine implements HologramCompatible {
         return maxY;
     }
     //Holograms
-    private final ArrayList<CompatibleHologram> holograms = new ArrayList();
-    private boolean hologramsReady = false;
-    private List<String> hologramsLines;
+    protected final ArrayList<CompatibleHologram> holograms = new ArrayList();
+    protected List<String> hologramsLines;
 
     @Override
-    public void setupHolograms() {
+    public List<String> getHologramsLines() {
+        return hologramsLines;
+    }
+
+    @Override
+    public void setHologramsLines(List<String> lines) {
+        this.hologramsLines = lines;
+    }
+
+    @Override
+    public void placeHolograms() {
         MineMe.getInstance().debug("Creating holograms for " + name + "...");
         if (MineMe.forceDefaultHolograms) {
             MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
@@ -279,66 +290,8 @@ public class CircularMine extends BasicMine implements HologramCompatible {
     }
 
     @Override
-    public void showHolograms() {
-        updateHolograms();
-    }
-
-    @Override
-    public void hideHolograms() {
-        for (CompatibleHologram m : holograms) {
-            m.clearLines();
-        }
-    }
-
-    @Override
-    public void updateHolograms() {
-        if (isDeleted()) {
-            return;
-        }
-        if (holograms.isEmpty()) {
-            return;
-        }
-        MineMe.getInstance().debug("Updating holograms for " + name, 2);
-        MineMe.getInstance().debug("Total lines: " + hologramsLines.size(), 2);
-        MineHologramUpdateEvent event = (MineHologramUpdateEvent) new MineHologramUpdateEvent(this).call();
-        if (!event.isCancelled()) {
-            for (CompatibleHologram h : holograms) {
-                h.clearLines();
-                for (int i = 0; i < hologramsLines.size(); i++) {
-                    String text = hologramsLines.get(i);
-                    h.appendTextLine(MineMeMessageManager.translateTagsAndColors(text, this));
-                }
-            }
-            MineMe.getInstance().debug("Holograms updated", 2);
-        } else {
-            MineMe.getInstance().debug("Hologram Update Event for mine " + name + " was cancelled", 2);
-        }
-    }
-    private Integer lightHologramUpdateId = null;
-
-    @Override
     public List<CompatibleHologram> getHolograms() {
         return holograms;
-    }
-
-    @Override
-    public void softHologramUpdate() {
-        if (lightHologramUpdateId == null) {
-            MineMe.getInstance().debug("Updating hologram softly.");
-            lightHologramUpdateId = Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
-
-                @Override
-                public void run() {
-                    updateHolograms();
-                    lightHologramUpdateId = null;
-                }
-            }, 60l);
-        }
-    }
-
-    @Override
-    public boolean isHologramsVisible() {
-        return hologramsReady;
     }
 
     public class CircularIterator implements Iterator<Block> {

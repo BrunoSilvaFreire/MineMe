@@ -16,6 +16,8 @@
  */
 package me.ddevil.mineme.holograms;
 
+import org.bukkit.inventory.ItemStack;
+
 /**
  *
  * @author Selma
@@ -23,6 +25,8 @@ package me.ddevil.mineme.holograms;
 public interface CompatibleHologram {
 
     public void clearLines();
+
+    public void appendItemLine(ItemStack icon);
 
     public void appendTextLine(String translateTagsAndColors);
 

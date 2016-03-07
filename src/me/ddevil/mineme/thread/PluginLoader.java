@@ -20,8 +20,6 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.ddevil.core.thread.CustomThread;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
@@ -59,7 +57,7 @@ public class PluginLoader extends CustomThread {
         setupPlugin();
         long endms = System.currentTimeMillis();
         long startupTime = startms - endms;
-        plugin.debug("Plugin loaded after " + (startupTime / 1000) + " seconds(" + startupTime + "ms)!");
+        plugin.debug("Plugin loaded after " + (startupTime / 1000) + " seconds(" + startupTime + "ms)!", true);
     }
 
     private void setupConfig() {

@@ -79,8 +79,21 @@ public class BasicMineEditorGUI implements MineEditorGUI {
     @Override
     public void updateInventory(Mine mine) {
         Inventory inv = getMineInventory(mine);
-        for (int i : InventoryUtils.getLane(inv, InventoryUtils.getTotalLanes(inv))) {
+        for (int i : InventoryUtils.getLane(inv, InventoryUtils.getTotalLanes(inv) - 1)) {
             inv.setItem(i, GUIManager.splitter);
+        }
+        inv.setItem(mainInventorySize, null);
+    }
+
+    @Override
+    public void open(Player p) {
+        p.openInventory(mainInventory);
+    }
+
+    @Override
+    public void updateMainInventory() {
+        for (int i : InventoryUtils.getLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 1)) {
+            mainInventory.setItem(i, GUIManager.splitter);
         }
     }
 }

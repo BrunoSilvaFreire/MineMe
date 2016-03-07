@@ -17,7 +17,13 @@
 package me.ddevil.mineme.holograms.impl;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.line.ItemLine;
+import com.gmail.filoghost.holographicdisplays.object.CraftHologram;
+import com.gmail.filoghost.holographicdisplays.object.line.CraftHologramLine;
+import com.gmail.filoghost.holographicdisplays.object.line.CraftTextLine;
 import me.ddevil.mineme.holograms.CompatibleHologram;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -52,10 +58,18 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
 
     @Override
     public void setLine(int line, String text) {
-        if (line < hologram.size()) {
-            hologram.removeLine(line);
+        if (hologram instanceof CraftHologram) {
+            CraftHologram h = (CraftHologram) hologram;
+            if (h.size() > line) {
+                if (h.getLine(line) instanceof CraftHologramLine) {
+                    CraftHologramLine hline = h.getLine(line);
+                    if (hline instanceof CraftTextLine) {
+                        CraftTextLine ctl = (CraftTextLine) hline;
+                        ctl.setText(text);
+                    }
+                }
+            }
         }
-        hologram.insertTextLine(line, text);
     }
 
     @Override
@@ -68,4 +82,12 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
         hologram.removeLine(line);
     }
 
+    @Override
+    public void appendItemLine(ItemStack icon) {
+        hologram.appendItemLine(icon);
+    }
+
+    public boolean isItemLine(int line) {
+        return hologram.getLine(line) instanceof ItemLine;
+    }
 }

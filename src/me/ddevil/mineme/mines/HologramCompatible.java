@@ -34,4 +34,8 @@ public interface HologramCompatible {
     public abstract boolean isHologramsVisible();
 
     public List<CompatibleHologram> getHolograms();
+
+    public List<String> getHologramsLines();
+
+    public void setHologramsLines(List<String> lines);
 }

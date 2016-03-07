@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.challenge.Challenge;
@@ -35,6 +36,7 @@ import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -67,6 +69,7 @@ public abstract class BasicMine implements Mine {
     protected int currentResetDelay;
     protected int totalResetDelay;
     protected boolean deleted = false;
+    protected ItemStack icon;
 
     public BasicMine(MineConfig config) {
         this.broadcastMessage = MineMe.forceDefaultBroadcastMessage
@@ -82,6 +85,9 @@ public abstract class BasicMine implements Mine {
         this.world = config.getWorld();
         this.composition = config.getComposition();
         this.config = config.getConfig();
+        ConfigurationSection iconsection = config.getConfig().getConfigurationSection("icon");
+        List<String> lore = iconsection.getStringList("lore");
+        this.icon = ItemUtils.createItem(Material.valueOf(iconsection.getString("type")), iconsection.getString("name"), lore.toArray(new String[lore.size()]));
     }
 
     /**
@@ -89,8 +95,9 @@ public abstract class BasicMine implements Mine {
      *
      * @param name The name of the mine
      * @param world The world of the mine
+     * @param icon The icon of the mine
      */
-    public BasicMine(String name, World world) {
+    public BasicMine(String name, World world, ItemStack icon) {
         //General
         this.enabled = true;
         this.name = name;
@@ -107,11 +114,21 @@ public abstract class BasicMine implements Mine {
         //Resets
         this.totalResetDelay = 300;
         this.currentResetDelay = totalResetDelay;
+        this.icon = icon;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    public void setIcon(ItemStack icon) {
+        this.icon = icon;
+    }
+
+    @Override
+    public ItemStack getIcon() {
+        return icon;
     }
 
     public int getResetMinutesDelay() {

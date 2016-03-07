@@ -35,6 +35,7 @@
    defaultHologramText:
     - '%header%'
     - '%alias%'
+    - '%icon%'
     - '$2Mined: $1%minedblocks%$4/$1%volume% $2blocks'
     - '$1%remainingblockspercent%$2% remaining'
     - '&7Stone $2percentage:$1 %composition:STONE%'

@@ -1,59 +1,64 @@
- #This will prevent the mine from being loaded
- enabled: false
+#This will prevent the mine from being loaded
+enabled: false
 
- #The mine name, this name won't be displayed at all, this is mostly for
- #technical reasons(Like finding itself in things like /mineme info).
- name: "examplemine"
- #The name that
- alias: "&3Miku &bHatsune"
- world: "world"
- #For now, planned types are: CUBOID, CIRCULAR, CUSTOM
- #CIRCULAR AND CUSTOM ARE ~NOT~ READY YET, so whatever you do
- #DO. NOT. PUT. CIRCULAR. OR. CUSTOM. BELOW
- #Actually don't even touch this
- type: CUBOID
- 
- #In minutes
- resetDelay: 5
- 
- #false will reset to mine silently
- broadcastOnReset: true 
- 
- #Send broadcast only to nearby player?
- broadcastToNearbyOnly: true
- #If nearbyOnly (Above) is set to true, the broadcast
- #will be sent to all the players inside this radius;
- broadcastRadius: 50.0
- #false uses the broadcast message in config.yml
- #true uses the customBroadcast below
- useCustomBroadcast: false
- customBroadcast: "%prefix%%separator%I BE A CUSTOM BROADCAST :D"
- #Mine coordinates
- X1: 0
- Y1: 64
- Z1: 0
+#The mine name, this name won't be displayed at all, this is mostly for
+#technical reasons(Like finding itself in things like /mineme info).
+name: "examplemine"
+#The name that
+alias: "&3Miku &bHatsune"
+world: "world"
+#For now, planned types are: CUBOID, CIRCULAR, CUSTOM
+#CIRCULAR AND CUSTOM ARE ~NOT~ READY YET, so whatever you do
+#DO. NOT. PUT. CIRCULAR. OR. CUSTOM. BELOW
+#Actually don't even touch this
+type: CUBOID
+icon:
+   type: DIAMOND_PICKAXE
+   data: 0
+   name: %name%
+   lore:
+       - '$3The basic circular mine'
+       - '$3created by %prefix%'
+#In minutes
+resetDelay: 5
 
- X2: 20
- Y2: 84
- Z2: 20
- composition:
- #{Material}:[Data(Optional)]={Percentage}
- #STONE=25
- #WOOL:9=25
- - STONE=35
- - EMERALD_ORE=60
- - GOLD_ORE=5
- 
- #If this mine will use the hologramsText below
- #False will use the default text in config.yml
- useCustomHologramText: false
- 
- #This will only be used in case HolographicDisplays is available and enabled
- #in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
- hologramsText:
-   - '%alias%'
-   - '$1Mined: $2%minedblocks% $1blocks'
-   - '$2%remainingblockspercent%$1% remaining'
-   - '$3This is a custom hologram text! :D'
- challenges:
-     - minerampage:1
+#false will reset to mine silently
+broadcastOnReset: true 
+
+#Send broadcast only to nearby player?
+broadcastToNearbyOnly: true
+#If nearbyOnly (Above) is set to true, the broadcast
+#will be sent to all the players inside this radius;
+broadcastRadius: 50.0
+#false uses the broadcast message in config.yml
+#true uses the customBroadcast below
+useCustomBroadcast: false
+customBroadcast: "%prefix%%separator%I BE A CUSTOM BROADCAST :D"
+#Mine coordinates
+X1: 0
+Y1: 64
+Z1: 0
+X2: 20
+Y2: 84
+Z2: 20
+composition:
+#{Material}:[Data(Optional)]={Percentage}
+#STONE=25
+#WOOL:9=25
+    - STONE=35
+    - EMERALD_ORE=60
+    - GOLD_ORE=5
+
+#If this mine will use the hologramsText below
+#False will use the default text in config.yml
+useCustomHologramText: false
+
+#This will only be used in case HolographicDisplays is available and enabled
+#in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
+hologramsText:
+    - '%alias%'
+    - '$1Mined: $2%minedblocks% $1blocks'
+    - '$2%remainingblockspercent%$1% remaining'
+    - '$3This is a custom hologram text! :D'
+challenges:
+    - minerampage:1

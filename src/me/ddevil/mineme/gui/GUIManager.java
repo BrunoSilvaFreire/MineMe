@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.gui.impl.BasicMineEditorGUI;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,13 +33,25 @@ import org.bukkit.inventory.ItemStack;
  */
 public class GUIManager {
 
+    public static MineEditorGUI mineEditorGUI;
+
     public static void setup() {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(MineMe.pluginFolder, "guiconfig.yml"));
         ConfigurationSection slipperItem = config.getConfigurationSection("global.splitter");
         splitter = ItemUtils.createItem(Material.valueOf(slipperItem.getString("type")), slipperItem.getString("name"));
+        ConfigurationSection mainMenu = config.getConfigurationSection("mainMenu");
+        String mainMenuName = mainMenu.getString("name");
+        int mainMenuSize = mainMenu.getInt("totalLanes") * 9;
+        ConfigurationSection mineMenu = config.getConfigurationSection("mineMenu");
+        int mineMenuSize = mineMenu.getInt("totalLanes") * 9;
+        mineEditorGUI = new BasicMineEditorGUI(mainMenuName, mainMenuSize, mineMenuSize);
+
     }
     private static final HashMap<String, ItemStack> customItems = new HashMap();
+    //Global items
     public static ItemStack splitter;
+    //Mine utils
+    public static String mineItemNameFormat;
 
     public static void registerItem(String name, ItemStack i) {
         name = name.toUpperCase();
@@ -52,4 +65,9 @@ public class GUIManager {
     public static ItemStack getItem(String name, Mine m) {
         return customItems.get(name);
     }
+
+    public static ItemStack getMineIcon(Mine m) {
+        return null;
+    }
+
 }

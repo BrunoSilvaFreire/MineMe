@@ -3,6 +3,13 @@ name: 'examplecircularmine'
 alias: '&cSpiral'
 world: world
 type: CIRCULAR
+icon:
+    type: EYE_OF_ENDER
+    data: 0
+    name: %name%
+    lore:
+        - '$3The basic circular mine'
+        - '$3created by %prefix%'
 resetDelay: 1
 broadcastOnReset: true
 broadcastToNearbyOnly: false

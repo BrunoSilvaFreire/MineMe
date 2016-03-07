@@ -31,6 +31,10 @@ public interface MineEditorGUI extends Listener {
 
     public void openMineMenu(Mine m, Player p);
 
+    public void open(Player p);
+
+    public void updateMainInventory();
+
     public void updateInventory(Mine m);
 
     public Inventory getMineInventory(Mine m);
