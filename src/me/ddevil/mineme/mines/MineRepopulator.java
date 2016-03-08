@@ -16,10 +16,7 @@
  */
 package me.ddevil.mineme.mines;
 
-import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.utils.RandomCollection;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 

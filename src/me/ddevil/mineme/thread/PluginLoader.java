@@ -24,6 +24,7 @@ import me.ddevil.core.thread.CustomThread;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineLoadEvent;
+import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.holograms.impl.HolographicDisplaysAdapter;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
@@ -56,7 +57,7 @@ public class PluginLoader extends CustomThread {
         plugin.debug("Loading Plugin...");
         setupPlugin();
         long endms = System.currentTimeMillis();
-        long startupTime = startms - endms;
+        long startupTime = endms - startms;
         plugin.debug("Plugin loaded after " + (startupTime / 1000) + " seconds(" + startupTime + "ms)!", true);
     }
 
@@ -66,13 +67,20 @@ public class PluginLoader extends CustomThread {
             plugin.debug("Plugin folder not found! Making one...", 3);
             MineMe.pluginFolder.mkdir();
         }
-        File config = new File(plugin.getDataFolder(), "config.yml");
-        if (!config.exists()) {
+        File pluginconfig = new File(plugin.getDataFolder(), "config.yml");
+        if (!pluginconfig.exists()) {
             //Load from plugin
             plugin.debug("Config file not found! Making one...", 3);
             plugin.saveResource("config.yml", false);
         }
-        MineMe.pluginConfig = YamlConfiguration.loadConfiguration(config);
+        MineMe.pluginConfig = YamlConfiguration.loadConfiguration(pluginconfig);
+        File guiconfig = new File(plugin.getDataFolder(), "guiconfig.yml");
+        if (!guiconfig.exists()) {
+            //Load from plugin
+            plugin.debug("GUI config file not found! Making one...", 3);
+            plugin.saveResource("guiconfig.yml", false);
+        }
+        MineMe.guiConfig = YamlConfiguration.loadConfiguration(guiconfig);
         plugin.minimumDebugPriotity = MineMe.pluginConfig.getInt("settings.minimumDebugLevel");
         MineMe.storageFolder = new File(MineMe.pluginFolder.getPath(), "storage");
         if (!MineMe.storageFolder.exists()) {
@@ -174,6 +182,7 @@ public class PluginLoader extends CustomThread {
             plugin.debug("Mines folder not found! Making one...", 3);
             MineMe.minesFolder.mkdir();
         }
+        //Check if mines folder is empty
         if (MineMe.minesFolder.listFiles().length == 0) {
             plugin.debug("Mines folder is empty! Adding examplemines...", 3);
             plugin.saveResource("examplemine.yml", false);
@@ -229,8 +238,8 @@ public class PluginLoader extends CustomThread {
                 } else {
                     m = new CuboidMine(config);
                 }
+                //Setup mines after bukkit is loaded
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
                     @Override
                     public void run() {
                         try {
@@ -251,7 +260,7 @@ public class PluginLoader extends CustomThread {
                             m.reset();
                         }
                     }
-                }, 0l);
+                }, 2l);
                 MineManager.registerMine(m);
                 new MineLoadEvent(m).call();
                 plugin.debug("Loaded mine " + m.getName() + ".", true);
@@ -261,7 +270,6 @@ public class PluginLoader extends CustomThread {
                 plugin.printException("Something went wrong while loading " + file.getName() + " :( Are you sure you did everything right?", t);
             }
         }
-        plugin.debug("Loaded " + i + " mines :D", true);
         //Check if timer is running
         if (MineMe.resetId != null) {
             Bukkit.getScheduler().cancelTask(MineMe.resetId);
@@ -281,6 +289,7 @@ public class PluginLoader extends CustomThread {
 
             }
         }, 20l, 20l);
+        plugin.debug("Loaded " + i + " mines :D", true);
     }
 
 }

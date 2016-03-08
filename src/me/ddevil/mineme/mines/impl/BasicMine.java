@@ -33,6 +33,7 @@ import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.configs.MineConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -42,7 +43,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONObject;
 
 public abstract class BasicMine implements Mine {
@@ -87,7 +90,25 @@ public abstract class BasicMine implements Mine {
         this.config = config.getConfig();
         ConfigurationSection iconsection = config.getConfig().getConfigurationSection("icon");
         List<String> lore = iconsection.getStringList("lore");
-        this.icon = ItemUtils.createItem(Material.valueOf(iconsection.getString("type")), iconsection.getString("name"), lore.toArray(new String[lore.size()]));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
+
+            @Override
+            public void run() {
+                BasicMine.this.icon = ItemUtils.createItem(
+                        Material.valueOf(iconsection.getString("type")),
+                        MineMeMessageManager.translateTagsAndColors(
+                                iconsection.getString("name"),
+                                BasicMine.this),
+                        MineMeMessageManager.translateTagsAndColors(
+                                lore.toArray(new String[lore.size()]),
+                                BasicMine.this));
+                icon.getData().setData(((Integer) iconsection.get("data")).byteValue());
+                ItemMeta im = icon.getItemMeta();
+                im.addItemFlags(ItemFlag.values());
+                icon.setItemMeta(im);
+            }
+        }, 0l);
+
     }
 
     /**

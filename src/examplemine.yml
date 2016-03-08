@@ -13,12 +13,14 @@ world: "world"
 #Actually don't even touch this
 type: CUBOID
 icon:
-   type: DIAMOND_PICKAXE
-   data: 0
-   name: %name%
-   lore:
-       - '$3The basic circular mine'
-       - '$3created by %prefix%'
+    type: DIAMOND_PICKAXE
+    data: 0
+    name: '%alias%'
+    lore:
+        - '$3The basic mine'
+        - '$3created by %prefix%'
+        - '$3Name: $2%mine%'
+        - '$3Type: $2%type%'
 #In minutes
 resetDelay: 5
 

@@ -17,7 +17,9 @@
 package me.ddevil.core.utils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -80,6 +82,32 @@ public class ItemUtils {
         i.setItemMeta(im);
     }
 
+    public static boolean checkDisplayName(ItemStack i) {
+        if (checkItemMeta(i)) {
+            ItemMeta im = i.getItemMeta();
+            if (im.getDisplayName() != null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean checkItemMeta(ItemStack i) {
+        ItemMeta im = i.getItemMeta();
+        return im != null;
+    }
+
+    public static boolean checkLore(ItemStack i) {
+        if (checkItemMeta(i)) {
+            ItemMeta im = i.getItemMeta();
+            if (im.getDisplayName() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void registerGlow() {
         try {
             Field f = Enchantment.class.getDeclaredField("acceptingNew");
@@ -122,6 +150,14 @@ public class ItemUtils {
             }
         }
         return false;
+    }
+
+    public static List<String> getLore(ItemStack i) {
+        if (checkLore(i)) {
+            return i.getItemMeta().getLore();
+        } else {
+            return new ArrayList();
+        }
     }
 
 }

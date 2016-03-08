@@ -1,20 +1,35 @@
-globalItens:
+config:
+    clickToSeeMine: '$2Click to see mine configuration!'
+    clickToRemove: '$4Click to remove!'
+    clickToEdit: '$1Click to edit!'
+globalItems:
+#DO NOT DELETE ANY OF THESE!!!
+#But you can edit them AS LONG AS YOU DON'T DELETE THEM
     splitter:
         type: IRON_FENCE
         data: 0
         name: '&r'
+    back:
+        type: EMERALD
+        data: 0
+        name: '&a&lGo back'
+    empty:
+        type: STAINED_GLASS_PANE
+        data: 7
+        name: '&cNone'
 mainMenu:
-    name: "&a&lMine Editor"
+    name: "$2&lMegui"
     #The total lanes the main menu will have
-    totalLanes: 7
+    totalLanes: 6
     icons:
+        #DON'T DELETE THIS
         main:
             type: DIAMOND_PICKAXE
             data: 0
-            name: '&a&lMine editor'
+            name: '$2&lMine editor'
             lore:
-            - ''
-            - ''
+            - '$3An editor provided by' 
+            - '%prefix% $3to easily edit mines! :)'
 mineMenu:
     #Must be divisible by 9
-    totalLanes: 5
+    totalLanes: 6

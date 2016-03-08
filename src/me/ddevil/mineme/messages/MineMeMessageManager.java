@@ -94,6 +94,7 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%volume%", m.getVolume() + "");
         get = get.replaceAll("%resettime%", secondsToString(m.getTimeToNextReset()));
         get = get.replaceAll("%alias%", m.getAlias());
+        get = get.replaceAll("%type%", m.getType().name());
         //LifeTime stats
         get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
         get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));

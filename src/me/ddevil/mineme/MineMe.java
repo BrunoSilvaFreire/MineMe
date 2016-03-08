@@ -27,6 +27,7 @@ import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.thread.FinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.conversion.MRLConverter;
+import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.holograms.HologramAdapter;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -41,6 +42,7 @@ public class MineMe extends CustomPlugin {
 
     //Configs
     public static FileConfiguration pluginConfig;
+    public static FileConfiguration guiConfig;
     public static FileConfiguration messagesConfig;
     public static File pluginFolder;
     public static File minesFolder;
@@ -93,15 +95,23 @@ public class MineMe extends CustomPlugin {
                     MRLConverter.convert();
                     MineMe.instance.debug("Converted MineResetLite!", true);
                 }
-                debug("Starting metrics...");
+                debug("Starting metrics...", 3);
                 try {
                     Metrics metrics = new Metrics(MineMe.this);
                     metrics.start();
-                    debug("Metrics started!");
+                    debug("Metrics started!", 3);
                 } catch (IOException ex) {
                     printException("There was an error start metrics! Skipping", ex);
                 }
-                debug("It's all right, it's all favorable :D");
+                Bukkit.getScheduler().runTask(instance, new Runnable() {
+
+                    @Override
+                    public void run() {
+                        debug("Starting MineEditorGUI...", 3);
+                        GUIManager.setup();
+                        debug("MineEditorGUI started!", 3);
+                    }
+                });
             }
         });
     }

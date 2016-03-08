@@ -27,7 +27,9 @@ import org.bukkit.inventory.Inventory;
  */
 public interface MineEditorGUI extends Listener {
 
-    public void setup();
+    public MineEditorGUI setup();
+
+    public void end();
 
     public void openMineMenu(Mine m, Player p);
 
@@ -35,7 +37,7 @@ public interface MineEditorGUI extends Listener {
 
     public void updateMainInventory();
 
-    public void updateInventory(Mine m);
+    public void updateMineInventory(Mine m);
 
-    public Inventory getMineInventory(Mine m);
+    public MineMenu getMineInventory(Mine m);
 }

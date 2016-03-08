@@ -24,6 +24,7 @@ import me.ddevil.core.commands.CustomCommand;
 import me.ddevil.core.commands.SubCommand;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.messages.MessageColor;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
@@ -192,7 +193,7 @@ public class MineCommand extends CustomCommand {
                         );
                     }
                 } else {
-                    sendUsage(p);
+                    GUIManager.mineEditorGUI.open(p);
                 }
             } else {
                 sender.sendMessage("You can only use this command ingame");
@@ -224,6 +225,7 @@ public class MineCommand extends CustomCommand {
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "list " + MessageColor.NEUTRAL + "List all the loaded mines.",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reset (name|all) " + MessageColor.NEUTRAL + "Reset the mine. (If you put all as the name, will reset all the mines)",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "help " + MessageColor.NEUTRAL + "Shows this.",
+            MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "gui " + MessageColor.NEUTRAL + "Open's MEGUI (MineEditorGUI).",
             MessageColor.PRIMARY + "/mineme " + MessageColor.SECONDARY + "reload " + MessageColor.NEUTRAL + "Reloads the config. :)",
             MessageColor.ERROR + "NEVER USE /RELOAD (Sincerely, every Minecraft Developer ever)",
             "%header%"}
@@ -362,6 +364,9 @@ public class MineCommand extends CustomCommand {
                 } else if (func.equalsIgnoreCase("help")) {
                     //lies
                     MineMe.messageManager.sendMessage(p, MineMeMessageManager.translateTagsAndColor(MessageColor.ERROR + "The help is a lie! " + MessageColor.PRIMARY + "Use /mineme"));
+                } else if (func.equalsIgnoreCase("gui") || func.equalsIgnoreCase("megui")) {
+                    //MineEditorGUI
+                    GUIManager.mineEditorGUI.open(p);
                 } else {
                     //none
                     sendUsage(p);
