@@ -19,19 +19,17 @@ package me.ddevil.mineme.gui.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.utils.InventoryUtils;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineUpdateEvent;
-import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.gui.MineEditorGUI;
 import me.ddevil.mineme.gui.MineMenu;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
-import net.md_5.bungee.api.ChatColor;
+import me.ddevil.mineme.mines.MineUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -83,6 +81,9 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         mainInventory = null;
         mainInventoryConfig = null;
         mainInventoryIcon = null;
+        for (MineMenu m : inventories.values()) {
+            m.end();
+        }
         inventories.clear();
     }
 
@@ -108,7 +109,9 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         if (inventories.containsKey(m)) {
             return inventories.get(m);
         } else {
+            MineMe.instance.debug("Creating new MineMenu with size " + minesInventorySize + " for mine " + m.getName(), 2);
             MineMenu inv = new MineMenu(minesInventorySize, m.getAlias(), m);
+            inv.setup();
             inventories.put(m, inv);
             updateMineInventory(m);
             return inv;
@@ -173,10 +176,12 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         }
     }
 
+    @Override
     public boolean isMainInventory(Inventory inv) {
         return inv.equals(mainInventory);
     }
 
+    @Override
     public boolean isMainMineInventory(Inventory inv) {
         for (Mine m : inventories.keySet()) {
             if (inventories.get(m).getMainInventory().equals(inv)) {
@@ -186,27 +191,43 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         return false;
     }
 
+    @Override
+    public Mine ownerOf(Inventory inv) {
+        for (Mine m : inventories.keySet()) {
+            if (inventories.get(m).contains(inv)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         Inventory inv = e.getClickedInventory();
+        Player p = (Player) e.getWhoClicked();
+        ItemStack i = e.getCurrentItem();
         if (isMainInventory(inv)) {
             e.setCancelled(true);
             Mine mine = mineReference.get(e.getSlot());
             if (mine != null) {
-                openMineMenu(mine, (Player) e.getWhoClicked());
+                openMineMenu(mine, p);
             }
         } else if (isMainMineInventory(inv)) {
             e.setCancelled(true);
             //Clicked an Mine Inventory
-            ItemStack i = e.getCurrentItem();
             if (ItemUtils.checkDisplayName(i)) {
+                Mine m = ownerOf(inv);
                 //Item has display name
                 ItemMeta itemMeta = i.getItemMeta();
                 String itemName = itemMeta.getDisplayName();
-                Bukkit.broadcastMessage(itemName);
-                Bukkit.broadcastMessage(GUIResourcesUtils.backButton.getItemMeta().getDisplayName());
+                //Check go back
                 if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                    open((Player) e.getWhoClicked());
+                    open(p);
+                }
+
+                //Check edit percentage
+                if (MineUtils.containsRelativeItemStackInComposition(m, i)) {
+                    inventories.get(m).openCompositionEditor(MineUtils.getItemStackInComposition(m, i), p);
                 }
             }
         }

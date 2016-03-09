@@ -20,6 +20,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.exception.ItemConversionException;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -157,6 +159,27 @@ public class ItemUtils {
             return i.getItemMeta().getLore();
         } else {
             return new ArrayList();
+        }
+    }
+
+    public static ItemStack convertFromInput(String input) throws ItemConversionException {
+        try {
+            String[] materialanddata = input.split(":");
+            Material mat = Material.valueOf(materialanddata[0]);
+            Byte b;
+            if (materialanddata.length > 1) {
+                try {
+                    b = Byte.valueOf(materialanddata[1]);
+                } catch (NumberFormatException exception) {
+                    MineMe.getInstance().debug(materialanddata[1] + " in " + input + "isn't a number! Setting byte to 0");
+                    b = 0;
+                }
+            } else {
+                b = 0;
+            }
+            return new ItemStack(mat, 1, (short) 0, b);
+        } catch (Exception e) {
+            throw new ItemConversionException(input);
         }
     }
 

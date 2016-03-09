@@ -14,36 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.gui;
-
-import me.ddevil.mineme.mines.Mine;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.Inventory;
+package me.ddevil.mineme.exception;
 
 /**
  *
  * @author Selma
  */
-public interface MineEditorGUI extends Listener {
+public class ItemConversionException extends Exception {
 
-    public MineEditorGUI setup();
+    public ItemConversionException(String input) {
+        super("Input String " + input + " is badly formatted for item conversion!");
+    }
 
-    public void end();
-
-    public void openMineMenu(Mine m, Player p);
-
-    public void open(Player p);
-
-    public void updateMainInventory();
-
-    public void updateMineInventory(Mine m);
-
-    public Mine ownerOf(Inventory inv);
-
-    public boolean isMainInventory(Inventory inv);
-
-    public boolean isMainMineInventory(Inventory inv);
-
-    public MineMenu getMineInventory(Mine m);
 }

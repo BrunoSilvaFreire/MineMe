@@ -22,6 +22,7 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.Arrays;
 import me.ddevil.core.commands.CustomCommand;
 import me.ddevil.core.commands.SubCommand;
+import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.gui.GUIManager;
@@ -91,7 +92,7 @@ public class MineCommand extends CustomCommand {
                                                     } else {
                                                         b = 0;
                                                     }
-                                                    mine.setMaterial(new ItemStack(material, 1, (short) 0, b), percent);
+                                                    mine.setMaterialPercentage(new ItemStack(material, 1, (short) 0, b), percent);
                                                     mine.reset();
                                                     MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + material.name() + MessageColor.SECONDARY + " was set to " + MessageColor.PRIMARY + percent + MessageColor.SECONDARY + " in mine " + MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + " !");
                                                 } catch (NumberFormatException e) {
@@ -114,13 +115,13 @@ public class MineCommand extends CustomCommand {
                                 if (args.length > 3) {
                                     String mname = args[3].toUpperCase();
                                     try {
-                                        Material material = Material.valueOf(mname);
-                                        if (mine.containsMaterial(material)) {
-                                            mine.removeMaterial(material);
+                                        ItemStack is = ItemUtils.convertFromInput(mname);
+                                        if (mine.containsMaterial(is)) {
+                                            mine.removeMaterial(is);
                                             mine.reset();
-                                            MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + material.name() + MessageColor.SECONDARY + " was removed from " + MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + " !");
+                                            MineMe.messageManager.sendMessage(p, MessageColor.PRIMARY + mname + MessageColor.SECONDARY + " was removed from " + MessageColor.PRIMARY + mine.getName() + MessageColor.SECONDARY + " !");
                                         } else {
-                                            sendInvalidArguments(p, MessageColor.NEUTRAL + "Mine " + MessageColor.ERROR + mine.getName() + MessageColor.NEUTRAL + " doesn't contain any " + MessageColor.ERROR + material.name() + MessageColor.NEUTRAL + "!");
+                                            sendInvalidArguments(p, MessageColor.NEUTRAL + "Mine " + MessageColor.ERROR + mine.getName() + MessageColor.NEUTRAL + " doesn't contain any " + MessageColor.ERROR + mname + MessageColor.NEUTRAL + "!");
                                         }
                                     } catch (Exception e) {
                                         sendInvalidArguments(p, MessageColor.ERROR + mname + MessageColor.NEUTRAL + " isn't a Material!");

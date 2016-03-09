@@ -9,6 +9,10 @@ globalItems:
         type: IRON_FENCE
         data: 0
         name: '&r'
+    removeMaterial:
+        type: BARRIER
+        data: 0
+        name: '$4Click to remove'
     back:
         type: EMERALD
         data: 0
@@ -31,5 +35,5 @@ mainMenu:
             - '$3An editor provided by' 
             - '%prefix% $3to easily edit mines! :)'
 mineMenu:
-    #Must be divisible by 9
+    #DO, NOOOT CHANGE THIS, unless you want some weird menus, then that's fine :D
     totalLanes: 6

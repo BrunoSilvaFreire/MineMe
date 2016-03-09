@@ -280,19 +280,6 @@ public class CuboidMine extends BasicHologramMine {
         return name;
     }
 
-    /**
-     *
-     * @param resetMinutesDelay
-     */
-    public void setResetMinutesDelay(int resetMinutesDelay) {
-        this.totalResetDelay = resetMinutesDelay;
-    }
-
-    @Override
-    public int getResetMinutesDelay() {
-        return totalResetDelay;
-    }
-
     public FileConfiguration toConfig() {
         try {
             File f = new File(MineMe.minesFolder.getCanonicalPath() + "/" + name + ".yml");

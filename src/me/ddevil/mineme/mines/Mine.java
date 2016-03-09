@@ -175,7 +175,7 @@ public interface Mine extends Iterable<Block>, Listener {
      * @return The percentage of the material in the mines composition, returns
      * 0 if the mine doesn't contains the material;
      */
-    public double getPercentage(Material material);
+    public double getPercentage(ItemStack material);
 
     /**
      * Remove's a second from the mines countdown, also updates the holograms,
@@ -217,7 +217,7 @@ public interface Mine extends Iterable<Block>, Listener {
      * @param material The material to check
      * @return true if the mine contains this material in it's composition.
      */
-    public boolean containsMaterial(Material material);
+    public boolean containsMaterial(ItemStack material);
 
     /**
      * Delete's the old mine composition as set's the map as the new composition
@@ -234,7 +234,7 @@ public interface Mine extends Iterable<Block>, Listener {
      * @param material The material to set
      * @param percentage The percentage to set
      */
-    public void setMaterial(ItemStack material, double percentage);
+    public void setMaterialPercentage(ItemStack material, double percentage);
 
     /**
      * Remove the material from the mine's composition, if the material is party
@@ -242,7 +242,7 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @param material The material to remove
      */
-    public void removeMaterial(Material material);
+    public void removeMaterial(ItemStack material);
 
     /**
      * Get's the world the mine is in.

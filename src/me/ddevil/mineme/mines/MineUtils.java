@@ -14,36 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.gui;
+package me.ddevil.mineme.mines;
 
-import me.ddevil.mineme.mines.Mine;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
  * @author Selma
  */
-public interface MineEditorGUI extends Listener {
+public class MineUtils {
 
-    public MineEditorGUI setup();
+    public static ItemStack getItemStackInComposition(Mine m, ItemStack i) {
+        for (ItemStack a : m.getMaterials()) {
+            if (a.getType() == i.getType()) {
+                if (a.getData().getData() == i.getData().getData()) {
+                    return a;
+                }
+            }
+        }
+        return null;
+    }
 
-    public void end();
-
-    public void openMineMenu(Mine m, Player p);
-
-    public void open(Player p);
-
-    public void updateMainInventory();
-
-    public void updateMineInventory(Mine m);
-
-    public Mine ownerOf(Inventory inv);
-
-    public boolean isMainInventory(Inventory inv);
-
-    public boolean isMainMineInventory(Inventory inv);
-
-    public MineMenu getMineInventory(Mine m);
+    public static boolean containsRelativeItemStackInComposition(Mine m, ItemStack i) {
+        return getItemStackInComposition(m, i) != null;
+    }
 }

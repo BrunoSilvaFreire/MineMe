@@ -32,6 +32,7 @@ import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.mines.MineUtils;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -88,12 +89,12 @@ public abstract class BasicMine implements Mine {
         this.world = config.getWorld();
         this.composition = config.getComposition();
         this.config = config.getConfig();
-        ConfigurationSection iconsection = config.getConfig().getConfigurationSection("icon");
-        List<String> lore = iconsection.getStringList("lore");
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MineMe.instance, new Runnable() {
+        Bukkit.getScheduler().runTask(MineMe.instance, new Runnable() {
 
             @Override
             public void run() {
+                ConfigurationSection iconsection = config.getConfig().getConfigurationSection("icon");
+                List<String> lore = iconsection.getStringList("lore");
                 BasicMine.this.icon = ItemUtils.createItem(
                         Material.valueOf(iconsection.getString("type")),
                         MineMeMessageManager.translateTagsAndColors(
@@ -107,7 +108,7 @@ public abstract class BasicMine implements Mine {
                 im.addItemFlags(ItemFlag.values());
                 icon.setItemMeta(im);
             }
-        }, 0l);
+        });
 
     }
 
@@ -153,7 +154,10 @@ public abstract class BasicMine implements Mine {
     }
 
     public int getResetMinutesDelay() {
-        return totalResetDelay / 60;
+        int minutes = totalResetDelay / 60;
+        Bukkit.broadcastMessage("totalResetDelay = " + totalResetDelay);
+        Bukkit.broadcastMessage("minutes = " + minutes);
+        return minutes;
     }
 
     public void setResetMinutesDelay(int resetMinutesDelay) {
@@ -277,9 +281,9 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public double getPercentage(Material m) {
+    public double getPercentage(ItemStack m) {
         for (ItemStack i : getMaterials()) {
-            if (i.getType() == m) {
+            if (i.equals(m)) {
                 return composition.get(i);
             }
         }
@@ -374,9 +378,10 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public boolean containsMaterial(Material material) {
+    public boolean containsMaterial(ItemStack material) {
+        material = MineUtils.getItemStackInComposition(this, icon);
         for (ItemStack i : getMaterials()) {
-            if (i.getType() == material) {
+            if (i.equals(material)) {
                 return true;
             }
         }
@@ -384,18 +389,28 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public void removeMaterial(Material material) {
+    public void removeMaterial(ItemStack material) {
+        material = MineUtils.getItemStackInComposition(this, material);
+        boolean found = false;
         for (ItemStack i : getMaterials()) {
-            if (i.getType() == material) {
+            if (i.equals(material)) {
                 composition.remove(i);
+                found = true;
                 break;
             }
+        }
+        if (!found) {
+            MineMe.instance.debug("Tried to remove material "
+                    + material.getType() + ":"
+                    + material.getData().getData() + " from mine "
+                    + name + ", but it isn't a part of the composition.", 2);
         }
         save();
     }
 
     @Override
-    public void setMaterial(ItemStack material, double percentage) {
+    public void setMaterialPercentage(ItemStack material, double percentage) {
+        MineMe.instance.debug("The percentage of " + material.getType() + ":" + material.getData().getData() + " of mine " + name + " was changed to " + percentage + ".", 2);
         composition.put(material, percentage);
         save();
     }
@@ -439,6 +454,7 @@ public abstract class BasicMine implements Mine {
         c.set("world", world.getName());
         c.set("type", getType().name());
         c.set("resetDelay", getResetMinutesDelay());
+        Bukkit.broadcastMessage("delay1:" + getResetMinutesDelay());
         c.set("broadcastOnReset", broadcastOnReset);
         c.set("broadcastToNearbyOnly", broadcastNearby);
         c.set("broadcastRadius", broadcastRadius);

@@ -18,12 +18,15 @@ package me.ddevil.mineme.messages;
 
 import java.util.ArrayList;
 import me.ddevil.core.chat.BasicMessageManager;
+import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
+import me.ddevil.mineme.mines.MineUtils;
 import me.ddevil.mineme.storage.StorageManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class MineMeMessageManager extends BasicMessageManager {
 
@@ -104,21 +107,22 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%separator%", messageSeparator);
         boolean translateComposition = get.contains("%composition:");
         while (translateComposition) {
-            int inicio = get.indexOf("%composition") + 13;
-            Integer fim = null;
-            for (int i = inicio - 12; i < get.length(); i++) {
+            int start = get.indexOf("%composition") + 13;
+            Integer end = null;
+            for (int i = start - 12; i < get.length(); i++) {
                 char c = get.charAt(i);
                 if (c == '%') {
-                    fim = i;
+                    end = i;
                 }
             }
-            if (fim == null) {
+            if (end == null) {
                 break;
             }
-            String mname = get.substring(inicio, fim);
+            String itemName = get.substring(start, end);
             try {
-                Material material = Material.valueOf(mname);
-                get = get.replaceAll("%composition:" + material.name() + "%", String.valueOf(m.getPercentage(material)));
+                ItemStack item = ItemUtils.convertFromInput(itemName);
+                Material material = item.getType();
+                get = get.replaceAll("%composition:" + material.name() + "%", String.valueOf(m.getPercentage(MineUtils.getItemStackInComposition(m, item))));
                 translateComposition = get.contains("%composition:");
             } catch (Exception e) {
                 break;

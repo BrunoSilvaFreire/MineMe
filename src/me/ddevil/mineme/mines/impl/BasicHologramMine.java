@@ -125,8 +125,8 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
         if (getHolograms().isEmpty()) {
             return;
         }
-        MineMe.getInstance().debug("Updating holograms for " + name, 2);
-        MineMe.getInstance().debug("Total lines: " + getHologramsLines().size(), 2);
+        MineMe.getInstance().debug("Updating holograms for " + name, 1);
+        MineMe.getInstance().debug("Total lines: " + getHologramsLines().size(), 1);
         MineHologramUpdateEvent event = (MineHologramUpdateEvent) new MineHologramUpdateEvent(this).call();
         if (!event.isCancelled()) {
             for (CompatibleHologram h : getHolograms()) {
@@ -135,9 +135,9 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
                     h.setLine(i, MineMeMessageManager.translateTagsAndColors(text, this));
                 }
             }
-            MineMe.getInstance().debug("Holograms updated", 2);
+            MineMe.getInstance().debug("Holograms updated", 1);
         } else {
-            MineMe.getInstance().debug("Hologram Update Event for mine " + name + " was cancelled", 2);
+            MineMe.getInstance().debug("Hologram Update Event for mine " + name + " was cancelled", 1);
         }
     }
 

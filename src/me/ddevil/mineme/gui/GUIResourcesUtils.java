@@ -18,9 +18,12 @@ package me.ddevil.mineme.gui;
 
 import java.util.HashMap;
 import java.util.List;
+import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -35,6 +38,7 @@ public class GUIResourcesUtils {
     //Global items
     public static ItemStack splitter;
     public static ItemStack empty;
+    public static ItemStack removeButton;
     public static ItemStack backButton;
     //Mine utils
     public static String mineItemNameFormat;
@@ -53,4 +57,32 @@ public class GUIResourcesUtils {
         return is;
     }
 
+    public static ItemStack generateCompositionChangeItemStack(double change) {
+        boolean add = change > 0;
+        String prefix = add ? "§a+" : "§c";
+        Material m = add ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
+        ItemStack is = new ItemStack(m);
+        ItemMeta im = is.getItemMeta();
+        im.setDisplayName(MineMeMessageManager.translateTagsAndColor(prefix + change + "%"));
+        is.setItemMeta(im);
+        return is;
+    }
+
+    public static double getCompositionChangeValue(ItemStack i) {
+        if (ItemUtils.checkDisplayName(i)) {
+            String intString = i.getItemMeta().
+                    getDisplayName().
+                    replace("§a+", "")
+                    .replace("§c", "").replace("%", "");
+            try {
+                return Double.valueOf(intString);
+            } catch (NumberFormatException e) {
+                MineMe.getInstance().printException("There was an error getting the change value of " + intString, e);
+                return 0;
+            }
+        } else {
+            MineMe.getInstance().debug("Tried to get the change value of item, but display name is null.", true);
+            return 0;
+        }
+    }
 }

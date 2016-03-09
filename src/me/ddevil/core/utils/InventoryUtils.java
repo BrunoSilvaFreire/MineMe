@@ -19,6 +19,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class InventoryUtils {
 
+    public static boolean wasClickedInLane(Inventory i, int clickedSlot, int lane) {
+        return Arrays.asList(getLane(i, lane)).contains(clickedSlot);
+    }
+
     public static Inventory createInventory(String title, int totalLanes) {
         return Bukkit.createInventory(null, totalLanes * 9, title);
     }
@@ -31,8 +35,34 @@ public class InventoryUtils {
         return getBottomMiddlePoint(m.getSize());
     }
 
+    public static int getTopMiddlePoint(Inventory m) {
+        return getTopMiddlePoint(m.getSize());
+    }
+
     public static Integer[] getLane(Inventory i, int lane) {
         return getLane(i.getSize(), lane);
+    }
+
+    public static Integer[] getPartialLane(Inventory i, int lane, int start, int end) {
+        return getPartialLane(i.getSize(), lane, start, end);
+    }
+
+    public static Integer[] getPartialLane(int size, int lane, int start, int end) {
+        if (size % 9 != 0 || size == 0) {
+            return null;
+        }
+        int totalLanes = size / 9;
+        if (lane > totalLanes) {
+            return null;
+        } else {
+            int startingpoint = lane * 9 + start;
+            int endpoint = lane * 9 + end + 1;
+            ArrayList<Integer> locations = new ArrayList();
+            for (int i = startingpoint; i < endpoint; i++) {
+                locations.add(i);
+            }
+            return locations.toArray(new Integer[locations.size()]);
+        }
     }
 
     public static int getTotalLanes(Inventory i) {
@@ -41,6 +71,14 @@ public class InventoryUtils {
 
     public static int getTotalLanes(int i) {
         return i / 9;
+    }
+
+    public static int getFirstSlotInLane(int lane) {
+        return lane * 9;
+    }
+
+    public static int getLastSlotInLane(int lane) {
+        return lane * 9 + 8;
     }
 
     public static int getMiddlePoint(int size) {
@@ -58,6 +96,13 @@ public class InventoryUtils {
         }
         int totalLanes = size / 9;
         return (totalLanes * 9) - 5;
+    }
+
+    public static int getTopMiddlePoint(int size) {
+        if (size % 9 != 0 || size == 0) {
+            return 0;
+        }
+        return 4;
     }
 
     public static Integer[] getLane(int size, int lane) {

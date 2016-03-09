@@ -55,6 +55,15 @@ public class GUIManager {
                 backName);
         byte backData = ((Integer) backButtonConfig.get("data")).byteValue();
         GUIResourcesUtils.backButton.getData().setData(backData);
+        //Load removeMaterial
+        ConfigurationSection removeConfig = MineMe.guiConfig.getConfigurationSection("globalItems.removeMaterial");
+        Material removeMaterial = Material.valueOf(removeConfig.getString("type"));
+        String removeName = MineMeMessageManager.translateTagsAndColor(removeConfig.getString("name"));
+        GUIResourcesUtils.removeButton = ItemUtils.createItem(
+                removeMaterial,
+                removeName);
+        byte removeData = ((Integer) removeConfig.get("data")).byteValue();
+        GUIResourcesUtils.removeButton.getData().setData(removeData);
         //Load emptyitem
         ConfigurationSection emptyItemConfig = MineMe.guiConfig.getConfigurationSection("globalItems.empty");
         Material emptyMaterial = Material.valueOf(emptyItemConfig.getString("type"));
