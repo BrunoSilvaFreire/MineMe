@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.exception.ItemConversionException;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -39,6 +40,21 @@ public class ItemUtils {
     //geral
     public static final ItemStack NA = ItemUtils.createItem(Material.BARRIER, "§4§l§o§nN/A");
     public static final ItemStack Gray = ItemUtils.createItem(Material.IRON_FENCE, "§r");
+
+    public static String toString(ItemStack i) {
+        return i.getType() + ":" + i.getData().getData();
+    }
+
+    public static ItemStack addToLore(ItemStack i, String... strings) {
+        List<String> lore = getLore(i);
+        for (String toAdd : strings) {
+            lore.add(toAdd);
+        }
+        ItemMeta itemMeta = i.getItemMeta();
+        itemMeta.setLore(lore);
+        i.setItemMeta(itemMeta);
+        return i;
+    }
 
     public static ItemStack createItem(Material material, String nome) {
         ItemStack is = new ItemStack(material);
@@ -103,7 +119,7 @@ public class ItemUtils {
     public static boolean checkLore(ItemStack i) {
         if (checkItemMeta(i)) {
             ItemMeta im = i.getItemMeta();
-            if (im.getDisplayName() != null) {
+            if (im.getLore() != null) {
                 return true;
             }
         }
@@ -162,6 +178,10 @@ public class ItemUtils {
         }
     }
 
+    public static ItemStack convertFromInput(String input, String name) throws ItemConversionException {
+        return createItem(convertFromInput(input), name);
+    }
+
     public static ItemStack convertFromInput(String input) throws ItemConversionException {
         try {
             String[] materialanddata = input.split(":");
@@ -180,6 +200,14 @@ public class ItemUtils {
             return new ItemStack(mat, 1, (short) 0, b);
         } catch (Exception e) {
             throw new ItemConversionException(input);
+        }
+    }
+
+    public static boolean equals(ItemStack a, ItemStack b) {
+        if (!checkDisplayName(a) || !checkDisplayName(b)) {
+            return false;
+        } else {
+            return a.getItemMeta().getDisplayName().equalsIgnoreCase(b.getItemMeta().getDisplayName());
         }
     }
 

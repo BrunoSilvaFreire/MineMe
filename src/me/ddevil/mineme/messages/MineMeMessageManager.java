@@ -122,7 +122,7 @@ public class MineMeMessageManager extends BasicMessageManager {
             try {
                 ItemStack item = ItemUtils.convertFromInput(itemName);
                 Material material = item.getType();
-                get = get.replaceAll("%composition:" + material.name() + "%", String.valueOf(m.getPercentage(MineUtils.getItemStackInComposition(m, item))));
+                get = get.replaceAll("%composition:" + material.name() + "%", String.valueOf(m.getPercentage(item)));
                 translateComposition = get.contains("%composition:");
             } catch (Exception e) {
                 break;

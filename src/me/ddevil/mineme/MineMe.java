@@ -50,11 +50,14 @@ public class MineMe extends CustomPlugin {
     public static File storageFolder;
     //World Edit
     public static WorldEditPlugin WEP;
+    //Scheduler ids
+    public static Integer timerID;
+    public static Integer hologramUpdaterID;
     //MineMe
-    public static Integer resetId;
     public static boolean useHolograms = false;
     public static boolean forceDefaultBroadcastMessage = true;
     public static boolean forceDefaultHolograms = false;
+    public static long hologramRefreshRate;
 
     public static MineMe getInstance() {
         return (MineMe) instance;
@@ -103,7 +106,7 @@ public class MineMe extends CustomPlugin {
                 } catch (IOException ex) {
                     printException("There was an error start metrics! Skipping", ex);
                 }
-                Bukkit.getScheduler().runTask(instance, new Runnable() {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
 
                     @Override
                     public void run() {
@@ -111,7 +114,7 @@ public class MineMe extends CustomPlugin {
                         GUIManager.setup();
                         debug("MineEditorGUI started!", 3);
                     }
-                });
+                }, 2l);
             }
         });
     }
@@ -148,7 +151,7 @@ public class MineMe extends CustomPlugin {
     public void reload(Player p) {
         messageManager.sendMessage(p, "Reloading config...");
         debug("Stopping reseter task...");
-        Bukkit.getScheduler().cancelTask(resetId);
+        Bukkit.getScheduler().cancelTask(timerID);
         debug("Unloading...");
         unloadEverything();
         PluginLoader l = new PluginLoader();
@@ -173,7 +176,7 @@ public class MineMe extends CustomPlugin {
         pluginConfig = null;
         pluginFolder = null;
         messagesConfig = null;
-        resetId = null;
+        timerID = null;
     }
 
 }

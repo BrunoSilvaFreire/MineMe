@@ -271,24 +271,39 @@ public class PluginLoader extends CustomThread {
             }
         }
         //Check if timer is running
-        if (MineMe.resetId != null) {
-            Bukkit.getScheduler().cancelTask(MineMe.resetId);
+        if (MineMe.timerID != null) {
+            Bukkit.getScheduler().cancelTask(MineMe.timerID);
         }
+        MineMe.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.hologramRefreshRate")).longValue();
         //Start timer
-        MineMe.resetId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
             @Override
             public void run() {
                 for (Mine mine : MineManager.getMines()) {
                     mine.secondCountdown();
-                    if (mine instanceof HologramCompatible) {
-                        HologramCompatible compatible = (HologramCompatible) mine;
-                        compatible.updateHolograms();
-                    }
                 }
-
             }
         }, 20l, 20l);
+        if (MineMe.hologramUpdaterID != null) {
+            Bukkit.getScheduler().cancelTask(MineMe.hologramUpdaterID);
+        }
+
+        //Start timer
+        if (MineMe.useHolograms) {
+            MineMe.hologramUpdaterID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
+                @Override
+                public void run() {
+                    for (Mine mine : MineManager.getMines()) {
+                        if (mine instanceof HologramCompatible) {
+                            HologramCompatible compatible = (HologramCompatible) mine;
+                            compatible.updateHolograms();
+                        }
+                    }
+                }
+            }, 20l, MineMe.hologramRefreshRate);
+        }
         plugin.debug("Loaded " + i + " mines :D", true);
     }
 

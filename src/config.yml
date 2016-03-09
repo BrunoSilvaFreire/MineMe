@@ -1,51 +1,56 @@
 #Very complex config v1.0
- settings:
-  #The minimum priority level for messages to be logged into the console
-  # 0 = All (by myseeeeeeelf, together weeeeeee)
-  # 1 = Secondary mine updates (Hologram Updates) (Includes all level 2 msgs)
-  # 2 = Priority mine updates (Resets, Saves, Loads) (Includes all level 3 msgs) (Loading mines from config messages are always shown btw)
-  # 3 = Loading/Unloading (Loads, Unloads, Reloads, Configs, etc)
-  # 4 = None (Not actually none, displays only primordial messages)
-  # Errors will always be displayed, trust me, you'll need them.
-  minimumDebugLevel: 3
-     
-     
-  #This section is about using holograms to display information on mines
-  #Currently supported hologram plugins are: ...Well... HolographicDisplays
-  #But if you have a suggestion for a hologram plugin, leave it on the spigot thread :D
-  holograms:
-   #If you want to enable holograms, set this to true, otherwise, false
-   #You can configurate mines holograms individualy on their respective mine file, or you can force
-   #them to use the default hologram pattern, which is right below.
-   #Remember: You need to choose a Hologram API to use for this to work!
-   enableHolograms: false
-   
-   #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
-   forceDefaultHologramOnAllMines: false
-   
-   #---Compatible Holograms API's---#
-   #Uses HolographicDisplays as the API to displays Hologram information about mines!
-   #This will only work if you have Holographic Displays installed on your server!
-   useHolographicDisplaysAPI: true
-   #---Compatible Holograms API's---#
-   
-   #This is the preset that will be setup to all the mines if forceHologramOnAllMines is enabled
-   #
-   # Check tags @ https://www.spigotmc.org/resources/mineme.19380/
-   defaultHologramText:
-    - '%header%'
-    - '%alias%'
-    - '%icon%'
-    - '$2Mined: $1%minedblocks%$4/$1%volume% $2blocks'
-    - '$1%remainingblockspercent%$2% remaining'
-    - '&7Stone $2percentage:$1 %composition:STONE%'
-    - '&2Emerald $2percentage$1 %composition:EMERALD_ORE%'
-    - '&6Gold $2percentage$1 %composition:GOLD_ORE%'
-    - '$2Time until next reset: $1%resettime%'
-    - '$2Lifetime mined blocks: $1%totalminedblocks%'
-    - '%header%'
+settings:
+    #The minimum priority level for messages to be logged into the console
+    # 0 = All (by myseeeeeeelf, together weeeeeee)
+    # 1 = Secondary mine updates (Hologram Updates) (Includes all level 2 msgs)
+    # 2 = Priority mine updates (Resets, Saves, Loads) (Includes all level 3 msgs) (Loading mines from config messages are always shown btw)
+    # 3 = Loading/Unloading (Loads, Unloads, Reloads, Configs, etc)
+    # 4 = None (Not actually none, displays only primordial messages)
+    # Errors will always be displayed, trust me, you'll need them.
+    minimumDebugLevel: 3
+            
+            
+    #This section is about using holograms to display information on mines
+    #Currently supported hologram plugins are: ...Well... HolographicDisplays
+    #But if you have a suggestion for a hologram plugin, leave it on the spigot thread :D
+    holograms:
+        #If you want to enable holograms, set this to true, otherwise, false
+        #You can configurate mines holograms individualy on their respective mine file, or you can force
+        #them to use the default hologram pattern, which is right below.
+        #Remember: You need to choose a Hologram API to use for this to work!
+        enableHolograms: false
+        #The refresh speed of the holograms in minecraft ticks
+        #40 = 2 seconds
+        #20 = 1 second
+        #10 = 0.5 seconds
+        #5 = 0.25 seconds
+        hologramRefreshRate: 20
+        #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
+        forceDefaultHologramOnAllMines: false
+        
+        #---Compatible Holograms API's---#
+        #Uses HolographicDisplays as the API to displays Hologram information about mines!
+        #This will only work if you have Holographic Displays installed on your server!
+        useHolographicDisplaysAPI: true
+        #---Compatible Holograms API's---#
+        
+        #This is the preset that will be setup to all the mines if forceHologramOnAllMines is enabled
+        #
+        # Check tags @ https://www.spigotmc.org/resources/mineme.19380/
+        defaultHologramText:
+            - '%header%'
+            - '%alias%'
+            - '%icon%'
+            - '$2Mined: $1%minedblocks%$4/$1%volume% $2blocks'
+            - '$1%remainingblockspercent%$2% remaining'
+            - '&7Stone $2percentage:$1 %composition:STONE%'
+            - '&2Emerald $2percentage$1 %composition:EMERALD_ORE%'
+            - '&6Gold $2percentage$1 %composition:GOLD_ORE%'
+            - '$2Time until next reset: $1%resettime%'
+            - '$2Lifetime mined blocks: $1%totalminedblocks%'
+            - '%header%'
 #Everything below here will affect ~ALL~ the mines
- global:
-  convertFromMineResetLite: false
-  #Forces all the mines to use the default broadcast message in messages.yml
-  forceDefaultBroadcastMessage: true
+global:
+    convertFromMineResetLite: false
+    #Forces all the mines to use the default broadcast message in messages.yml
+    forceDefaultBroadcastMessage: true

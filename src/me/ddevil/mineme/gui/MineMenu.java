@@ -24,6 +24,7 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -85,7 +86,16 @@ public class MineMenu implements Listener {
     //Composition editors.
     public void updateCompositionEditingInventory(ItemStack is) {
         Inventory inv = getCompositionEditInventory(is);
-        ItemStack invIcon = ItemUtils.createItem(is, inv.getTitle(), MineMeMessageManager.translateTagsAndColors(new String[]{"$3Current: $1" + owner.getPercentage(is)}));
+        ItemStack invIcon = ItemUtils.createItem(
+                //Reference item stack
+                is,
+                //Item name
+                inv.getTitle(),
+                //Lore
+                MineMeMessageManager.translateTagsAndColors(
+                        new String[]{
+                            "$3Current: $1" + owner.getPercentage(is)
+                        }));
         double currentAddPercentage = 50;
         //Top left 4 add buttons
         for (int i : InventoryUtils.getPartialLane(inv, 0, 0, 3)) {
@@ -188,27 +198,29 @@ public class MineMenu implements Listener {
         Inventory inventory = e.getInventory();
         Player p = (Player) e.getWhoClicked();
         //Composition editors
-        if (isCompositionEditor(inventory)) {
-            e.setCancelled(true);
-            ItemStack i = e.getCurrentItem();
-            ItemMeta itemMeta = i.getItemMeta();
-            String itemName = itemMeta.getDisplayName();
-            ItemStack invOwner = getItemStackOwnerOfEditor(inventory);
-            //Check go back
-            if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                p.openInventory(getMainInventory());
-            }
-            //Check go back
-            if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
-                owner.removeMaterial(MineUtils.getItemStackInComposition(owner, invOwner));
-                p.closeInventory();
-            }
-            //Check change percentage
-            if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
-                    || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
-                double compositionChangeValue = GUIResourcesUtils.getCompositionChangeValue(i);
-                owner.setMaterialPercentage(invOwner, owner.getPercentage(invOwner) + compositionChangeValue);
-                updateCompositionEditingInventory(invOwner);
+        if (inventory != null) {
+            if (isCompositionEditor(inventory)) {
+                e.setCancelled(true);
+                ItemStack i = e.getCurrentItem();
+                ItemMeta itemMeta = i.getItemMeta();
+                String itemName = itemMeta.getDisplayName();
+                ItemStack invOwner = getItemStackOwnerOfEditor(inventory);
+                //Check go back
+                if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
+                    p.openInventory(getMainInventory());
+                }
+                //Check go back
+                if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
+                    owner.removeMaterial(invOwner);
+                    p.closeInventory();
+                }
+                //Check change percentage
+                if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
+                        || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
+                    double compositionChangeValue = GUIResourcesUtils.getCompositionChangeValue(i);
+                    owner.setMaterialPercentage(invOwner, owner.getPercentage(invOwner) + compositionChangeValue);
+                    updateCompositionEditingInventory(invOwner);
+                }
             }
         }
     }

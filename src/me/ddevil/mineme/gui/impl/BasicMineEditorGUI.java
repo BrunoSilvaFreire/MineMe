@@ -85,6 +85,7 @@ public class BasicMineEditorGUI implements MineEditorGUI {
             m.end();
         }
         inventories.clear();
+        MineMe.unregisterListener(this);
     }
 
     //MainInventory
@@ -178,7 +179,9 @@ public class BasicMineEditorGUI implements MineEditorGUI {
 
     @Override
     public boolean isMainInventory(Inventory inv) {
-        return inv.equals(mainInventory);
+        return inv.equals(
+                mainInventory
+        );
     }
 
     @Override
@@ -206,28 +209,40 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         Inventory inv = e.getClickedInventory();
         Player p = (Player) e.getWhoClicked();
         ItemStack i = e.getCurrentItem();
-        if (isMainInventory(inv)) {
-            e.setCancelled(true);
-            Mine mine = mineReference.get(e.getSlot());
-            if (mine != null) {
-                openMineMenu(mine, p);
-            }
-        } else if (isMainMineInventory(inv)) {
-            e.setCancelled(true);
-            //Clicked an Mine Inventory
-            if (ItemUtils.checkDisplayName(i)) {
-                Mine m = ownerOf(inv);
-                //Item has display name
-                ItemMeta itemMeta = i.getItemMeta();
-                String itemName = itemMeta.getDisplayName();
-                //Check go back
-                if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                    open(p);
+        if (inv != null) {
+            if (isMainInventory(inv)) {
+                e.setCancelled(true);
+                Mine mine = mineReference.get(e.getSlot());
+                if (mine != null) {
+                    openMineMenu(mine, p);
                 }
+            } else if (isMainMineInventory(inv)) {
+                e.setCancelled(true);
+                //Clicked an Mine Inventory
+                if (ItemUtils.checkDisplayName(i)) {
+                    Mine m = ownerOf(inv);
+                    //Item has display name
+                    ItemMeta itemMeta = i.getItemMeta();
+                    String itemName = itemMeta.getDisplayName();
+                    //Check go back
+                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
+                        open(p);
+                        //Check edit percentage
+                    } else if (MineUtils.containsRelativeItemStackInComposition(m, i) && !ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                        inventories.get(m).openCompositionEditor(MineUtils.getItemStackInComposition(m, i), p);
+                    } else if (e.getCursor() != null) {
+                        ItemStack cursor = e.getCursor();
+                        if (cursor.getType() != Material.AIR) {
+                            if (cursor.getType().isBlock()) {
 
-                //Check edit percentage
-                if (MineUtils.containsRelativeItemStackInComposition(m, i)) {
-                    inventories.get(m).openCompositionEditor(MineUtils.getItemStackInComposition(m, i), p);
+                                if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                                    cursor.setAmount(1);
+                                    m.setMaterialPercentage(cursor, 0.0d);
+                                    updateMineInventory(m);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

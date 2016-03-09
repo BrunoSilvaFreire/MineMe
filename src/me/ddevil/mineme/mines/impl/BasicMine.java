@@ -154,10 +154,7 @@ public abstract class BasicMine implements Mine {
     }
 
     public int getResetMinutesDelay() {
-        int minutes = totalResetDelay / 60;
-        Bukkit.broadcastMessage("totalResetDelay = " + totalResetDelay);
-        Bukkit.broadcastMessage("minutes = " + minutes);
-        return minutes;
+        return totalResetDelay / 60;
     }
 
     public void setResetMinutesDelay(int resetMinutesDelay) {
@@ -282,8 +279,12 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public double getPercentage(ItemStack m) {
-        for (ItemStack i : getMaterials()) {
+        m = MineUtils.getItemStackInComposition(this, m);
+        for (ItemStack i : composition.keySet()) {
             if (i.equals(m)) {
+                if (composition.get(i) == null) {
+                    return 0;
+                }
                 return composition.get(i);
             }
         }
@@ -410,7 +411,13 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public void setMaterialPercentage(ItemStack material, double percentage) {
+        if (MineUtils.containsRelativeItemStackInComposition(this, material)) {
+            material = MineUtils.getItemStackInComposition(this, material);
+        }
         MineMe.instance.debug("The percentage of " + material.getType() + ":" + material.getData().getData() + " of mine " + name + " was changed to " + percentage + ".", 2);
+        if (percentage < 0) {
+            percentage = 0;
+        }
         composition.put(material, percentage);
         save();
     }
@@ -454,7 +461,6 @@ public abstract class BasicMine implements Mine {
         c.set("world", world.getName());
         c.set("type", getType().name());
         c.set("resetDelay", getResetMinutesDelay());
-        Bukkit.broadcastMessage("delay1:" + getResetMinutesDelay());
         c.set("broadcastOnReset", broadcastOnReset);
         c.set("broadcastToNearbyOnly", broadcastNearby);
         c.set("broadcastRadius", broadcastRadius);

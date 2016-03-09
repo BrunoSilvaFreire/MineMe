@@ -17,11 +17,15 @@
 package me.ddevil.mineme.gui;
 
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.exception.ItemConversionException;
 import me.ddevil.mineme.gui.impl.BasicMineEditorGUI;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -36,47 +40,55 @@ public class GUIManager {
     public static boolean ready = false;
 
     public static void setup() {
+        //Load Strings
+        GUIResourcesUtils.clickToSee = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.clickToSeeMine"));
+        GUIResourcesUtils.clickToRemove = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.clickToRemove"));
+        GUIResourcesUtils.clickToEdit = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.clickToEdit"));
+        GUIResourcesUtils.dropAddMaterial = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.dropAddMaterial"));
         //Load items
         //Load splitter
         ConfigurationSection splitterConfig = MineMe.guiConfig.getConfigurationSection("globalItems.splitter");
         Material splitterMaterial = Material.valueOf(splitterConfig.getString("type"));
         String splitterName = MineMeMessageManager.translateTagsAndColor(splitterConfig.getString("name"));
-        GUIResourcesUtils.splitter = ItemUtils.createItem(
-                splitterMaterial,
-                splitterName);
         byte splitterData = ((Integer) splitterConfig.get("data")).byteValue();
-        GUIResourcesUtils.splitter.getData().setData(splitterData);
+        try {
+            GUIResourcesUtils.splitter = ItemUtils.convertFromInput(splitterMaterial + ":" + splitterData, splitterName);
+        } catch (ItemConversionException ex) {
+            MineMe.instance.printException("There was a problem loading GUIItem splitter, is it configured correctly?", ex);
+        }
         //Load backitem
         ConfigurationSection backButtonConfig = MineMe.guiConfig.getConfigurationSection("globalItems.back");
         Material backMaterial = Material.valueOf(backButtonConfig.getString("type"));
         String backName = MineMeMessageManager.translateTagsAndColor(backButtonConfig.getString("name"));
-        GUIResourcesUtils.backButton = ItemUtils.createItem(
-                backMaterial,
-                backName);
         byte backData = ((Integer) backButtonConfig.get("data")).byteValue();
-        GUIResourcesUtils.backButton.getData().setData(backData);
+
+        try {
+            GUIResourcesUtils.backButton = ItemUtils.convertFromInput(backMaterial + ":" + backData, backName);
+        } catch (ItemConversionException ex) {
+            MineMe.instance.printException("There was a problem loading GUIItem backButton, is it configured correctly?", ex);
+        }
         //Load removeMaterial
         ConfigurationSection removeConfig = MineMe.guiConfig.getConfigurationSection("globalItems.removeMaterial");
         Material removeMaterial = Material.valueOf(removeConfig.getString("type"));
         String removeName = MineMeMessageManager.translateTagsAndColor(removeConfig.getString("name"));
-        GUIResourcesUtils.removeButton = ItemUtils.createItem(
-                removeMaterial,
-                removeName);
         byte removeData = ((Integer) removeConfig.get("data")).byteValue();
-        GUIResourcesUtils.removeButton.getData().setData(removeData);
+        try {
+            GUIResourcesUtils.removeButton = ItemUtils.convertFromInput(removeMaterial + ":" + removeData, removeName);
+        } catch (ItemConversionException ex) {
+            MineMe.instance.printException("There was a problem loading GUIItem removeButton, is it configured correctly?", ex);
+        }
         //Load emptyitem
         ConfigurationSection emptyItemConfig = MineMe.guiConfig.getConfigurationSection("globalItems.empty");
         Material emptyMaterial = Material.valueOf(emptyItemConfig.getString("type"));
-        String emptyName = MineMeMessageManager.translateTagsAndColor(emptyItemConfig.getString("name"));
-        GUIResourcesUtils.empty = ItemUtils.createItem(
-                emptyMaterial,
-                emptyName);
         byte emptyData = ((Integer) emptyItemConfig.get("data")).byteValue();
-        GUIResourcesUtils.empty.getData().setData(emptyData);
-        //Load Strings
-        GUIResourcesUtils.clickToSee = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.clickToSeeMine"));
-        GUIResourcesUtils.clickToRemove = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.clickToRemove"));
-        GUIResourcesUtils.clickToEdit = MineMeMessageManager.translateTagsAndColor(MineMe.guiConfig.getString("config.clickToEdit"));
+
+        String emptyName = MineMeMessageManager.translateTagsAndColor(emptyItemConfig.getString("name"));
+        try {
+            GUIResourcesUtils.empty = ItemUtils.convertFromInput(emptyMaterial + ":" + emptyData, emptyName);
+            ItemUtils.addToLore(GUIResourcesUtils.empty, GUIResourcesUtils.dropAddMaterial);
+        } catch (ItemConversionException ex) {
+            MineMe.instance.printException("There was a problem loading GUIItem empty, is it configured correctly?", ex);
+        }
 
         //Load mainMenu
         ConfigurationSection mainMenu = MineMe.guiConfig.getConfigurationSection("mainMenu");

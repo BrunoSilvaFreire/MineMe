@@ -40,11 +40,12 @@ public class GUIResourcesUtils {
     public static ItemStack empty;
     public static ItemStack removeButton;
     public static ItemStack backButton;
+
     //Mine utils
     public static String mineItemNameFormat;
     public static String clickToEdit;
-    //Global strings
     public static String clickToSee;
+    public static String dropAddMaterial;
 
     public static ItemStack generateCompositionItemStack(Mine m, ItemStack i) {
         ItemStack is = new ItemStack(i);

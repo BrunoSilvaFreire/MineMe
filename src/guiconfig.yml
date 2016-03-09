@@ -2,6 +2,7 @@ config:
     clickToSeeMine: '$2Click to see mine configuration!'
     clickToRemove: '$4Click to remove!'
     clickToEdit: '$1Click to edit!'
+    dropAddMaterial: '$1Drop a material here to add!'
 globalItems:
 #DO NOT DELETE ANY OF THESE!!!
 #But you can edit them AS LONG AS YOU DON'T DELETE THEM
@@ -9,6 +10,10 @@ globalItems:
         type: IRON_FENCE
         data: 0
         name: '&r'
+    teleporter:
+        type: IRON_FENCE
+        data: 0
+        name: '$2Teleport to mine location!'
     removeMaterial:
         type: BARRIER
         data: 0
@@ -19,8 +24,8 @@ globalItems:
         name: '&a&lGo back'
     empty:
         type: STAINED_GLASS_PANE
-        data: 7
-        name: '&cNone'
+        data: 15
+        name: '$4None'
 mainMenu:
     name: "$2&lMegui"
     #The total lanes the main menu will have
