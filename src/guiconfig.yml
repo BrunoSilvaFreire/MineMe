@@ -11,7 +11,7 @@ globalItems:
         data: 0
         name: '&r'
     teleporter:
-        type: IRON_FENCE
+        type: ENDER_PEARL
         data: 0
         name: '$2Teleport to mine location!'
     removeMaterial:

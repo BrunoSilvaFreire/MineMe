@@ -16,6 +16,7 @@
  */
 package me.ddevil.mineme.gui;
 
+import me.ddevil.mineme.gui.menus.MineMenu;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;

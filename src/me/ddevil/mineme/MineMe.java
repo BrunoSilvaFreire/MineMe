@@ -29,6 +29,7 @@ import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.conversion.MRLConverter;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.holograms.HologramAdapter;
+import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.thread.PluginLoader;
@@ -179,4 +180,38 @@ public class MineMe extends CustomPlugin {
         timerID = null;
     }
 
+    public static void startTimers() {
+        MineMe.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.hologramRefreshRate")).longValue() * 2;
+        if (MineMe.timerID != null) {
+            Bukkit.getScheduler().cancelTask(MineMe.timerID);
+            timerID = null;
+        }
+        if (MineMe.hologramUpdaterID != null) {
+            Bukkit.getScheduler().cancelTask(MineMe.hologramUpdaterID);
+            hologramUpdaterID = null;
+        }
+        //Start timer
+        MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
+            @Override
+            public void run() {
+                for (Mine mine : MineManager.getMines()) {
+                    mine.secondCountdown();
+                }
+            }
+        }, 20l, 20l);
+        if (MineMe.useHolograms) {
+            MineMe.hologramUpdaterID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
+
+                @Override
+                public void run() {
+                    for (Mine mine : MineManager.getMines()) {
+                        if (mine instanceof HologramCompatible) {
+                            HologramCompatible compatible = (HologramCompatible) mine;
+                            compatible.updateHolograms();
+                        }
+                    }
+                }
+            }, 20l, MineMe.hologramRefreshRate);
+        }
+    }
 }

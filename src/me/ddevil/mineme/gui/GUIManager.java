@@ -16,16 +16,12 @@
  */
 package me.ddevil.mineme.gui;
 
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.exception.ItemConversionException;
 import me.ddevil.mineme.gui.impl.BasicMineEditorGUI;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -88,6 +84,16 @@ public class GUIManager {
             ItemUtils.addToLore(GUIResourcesUtils.empty, GUIResourcesUtils.dropAddMaterial);
         } catch (ItemConversionException ex) {
             MineMe.instance.printException("There was a problem loading GUIItem empty, is it configured correctly?", ex);
+        }//Load emptyitem
+        ConfigurationSection teleporterConfig = MineMe.guiConfig.getConfigurationSection("globalItems.teleporter");
+        Material teleporterMaterial = Material.valueOf(teleporterConfig.getString("type"));
+        byte teleporterData = ((Integer) teleporterConfig.get("data")).byteValue();
+
+        String teleporterName = MineMeMessageManager.translateTagsAndColor(teleporterConfig.getString("name"));
+        try {
+            GUIResourcesUtils.teleporter = ItemUtils.convertFromInput(teleporterMaterial + ":" + teleporterData, teleporterName);
+        } catch (ItemConversionException ex) {
+            MineMe.instance.printException("There was a problem loading GUIItem teleporter, is it configured correctly?", ex);
         }
 
         //Load mainMenu

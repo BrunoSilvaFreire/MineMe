@@ -210,6 +210,7 @@ public class PluginLoader extends CustomThread {
         plugin.debug();
         File[] mineFiles = MineMe.minesFolder.listFiles();
         int i = 0;
+        //Start loading mines
         for (File file : mineFiles) {
             String filename = file.getName();
             plugin.debug("Attempting to load " + filename + "...", 3);
@@ -270,41 +271,11 @@ public class PluginLoader extends CustomThread {
                 plugin.printException("Something went wrong while loading " + file.getName() + " :( Are you sure you did everything right?", t);
             }
         }
-        //Check if timer is running
-        if (MineMe.timerID != null) {
-            Bukkit.getScheduler().cancelTask(MineMe.timerID);
-        }
-        MineMe.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.hologramRefreshRate")).longValue();
-        //Start timer
-        MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                for (Mine mine : MineManager.getMines()) {
-                    mine.secondCountdown();
-                }
-            }
-        }, 20l, 20l);
-        if (MineMe.hologramUpdaterID != null) {
-            Bukkit.getScheduler().cancelTask(MineMe.hologramUpdaterID);
-        }
-
-        //Start timer
-        if (MineMe.useHolograms) {
-            MineMe.hologramUpdaterID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                @Override
-                public void run() {
-                    for (Mine mine : MineManager.getMines()) {
-                        if (mine instanceof HologramCompatible) {
-                            HologramCompatible compatible = (HologramCompatible) mine;
-                            compatible.updateHolograms();
-                        }
-                    }
-                }
-            }, 20l, MineMe.hologramRefreshRate);
-        }
         plugin.debug("Loaded " + i + " mines :D", true);
+        plugin.debug("Starting timer...", 2);
+        MineMe.startTimers();
+        plugin.debug("Timer started!", 2);
+
     }
 
 }

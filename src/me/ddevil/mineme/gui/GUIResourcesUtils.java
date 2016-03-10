@@ -40,6 +40,7 @@ public class GUIResourcesUtils {
     public static ItemStack empty;
     public static ItemStack removeButton;
     public static ItemStack backButton;
+    public static ItemStack teleporter;
 
     //Mine utils
     public static String mineItemNameFormat;

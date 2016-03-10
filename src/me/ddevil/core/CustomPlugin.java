@@ -131,7 +131,7 @@ public class CustomPlugin extends JavaPlugin implements Listener {
     public FileConfiguration loadResource(File config, String resource) {
         if (!config.exists()) {
             //Load from plugin
-            saveResource("messages.yml", false);
+            saveResource(resource, false);
         }
         return YamlConfiguration.loadConfiguration(config);
     }

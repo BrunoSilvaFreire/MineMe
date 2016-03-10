@@ -25,7 +25,7 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineUpdateEvent;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.gui.MineEditorGUI;
-import me.ddevil.mineme.gui.MineMenu;
+import me.ddevil.mineme.gui.menus.MineMenu;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;

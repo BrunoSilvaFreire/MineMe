@@ -125,9 +125,8 @@ public abstract class BasicMine implements Mine {
         this.name = name;
         this.alias = name;
         this.world = world;
-        HashMap<ItemStack, Double> composition = new HashMap();
+        this.composition = new HashMap();
         composition.put(new ItemStack(Material.STONE), 100d);
-        this.composition = composition;
         //Broadcast
         this.broadcastOnReset = true;
         this.broadcastRadius = 50;

@@ -158,9 +158,9 @@ public class CircularMine extends BasicHologramMine {
     @Override
     public void save() {
         FileConfiguration file = getBasicSavedConfig();
-        file.set("X", center.getX());
+        file.set("X", center.getBlockX());
         file.set("Y", getMinimumY());
-        file.set("Z", center.getZ());
+        file.set("Z", center.getBlockZ());
         file.set("radius", radius);
         file.set("height", getHeight());
         try {
