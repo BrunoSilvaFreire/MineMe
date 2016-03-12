@@ -1,7 +1,7 @@
 config:
     clickToSeeMine: '$2Click to see mine configuration!'
     clickToRemove: '$4Click to remove!'
-    clickToEdit: '$1Click to edit!'
+    clickToEdit: '$2Click to edit!'
     dropAddMaterial: '$1Drop a material here to add!'
 globalItems:
 #DO NOT DELETE ANY OF THESE!!!
@@ -26,6 +26,13 @@ globalItems:
         type: STAINED_GLASS_PANE
         data: 15
         name: '$4None'
+    info:
+        type: BOOK
+        data: 0
+        name: '$2Stats'
+        lore:
+            - '$3Total percentage: $1%totalpercentage%'
+            - '$3Total materials: $1%totalmaterials%'
 mainMenu:
     name: "$2&lMegui"
     #The total lanes the main menu will have

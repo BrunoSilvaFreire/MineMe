@@ -111,7 +111,7 @@ public class CustomPlugin extends JavaPlugin implements Listener {
 
     public static void registerListener(Listener l) {
         Bukkit.getPluginManager().registerEvents(l, instance);
-        instance.debug("Listener " + l.getClass().getSimpleName() + " registered.");
+        instance.debug("Listener " + l.getClass().getSimpleName() + " registered.", 2);
     }
 
     public static void unregisterListener(Listener l) {

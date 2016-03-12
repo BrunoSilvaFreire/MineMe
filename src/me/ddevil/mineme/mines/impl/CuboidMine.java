@@ -145,11 +145,13 @@ public class CuboidMine extends BasicHologramMine {
      *
      * @return Location at the centre of the Mine
      */
+    @Override
     public Location getCenter() {
         int x1 = this.getUpperX() + 1;
         int y1 = this.getUpperY() + 1;
         int z1 = this.getUpperZ() + 1;
-        return new Location(this.getWorld(), this.getLowerX() + (x1 - this.getLowerX()) / 2.0, this.getMinimumY() + (y1 - this.getMinimumY()) / 2.0, this.getMaximumY() + (z1 - this.getMaximumY()) / 2.0);
+
+        return new Location(this.getWorld(), this.getLowerX() + (x1 - this.getLowerX()) / 2.0, this.getLowerY() + (y1 - this.getLowerY()) / 2.0, this.getLowerZ() + (z1 - this.getLowerZ()) / 2.0);
     }
 
     /**
@@ -162,12 +164,21 @@ public class CuboidMine extends BasicHologramMine {
     }
 
     /**
+     * Get the minimum Z co-ordinate of this Mine
+     *
+     * @return the minimum Z co-ordinate
+     */
+    public int getLowerZ() {
+        return this.pos1.getBlockZ();
+    }
+
+    /**
      * Get the minimum Y co-ordinate of this Mine
      *
      * @return the minimum Y co-ordinate
      */
     @Override
-    public int getMinimumY() {
+    public int getLowerY() {
         return this.pos1.getBlockY();
     }
 
@@ -177,8 +188,8 @@ public class CuboidMine extends BasicHologramMine {
      * @return the minimum Z co-ordinate
      */
     @Override
-    public int getMaximumY() {
-        return this.pos1.getBlockZ();
+    public int getUpperY() {
+        return this.pos2.getBlockY();
     }
 
     /**
@@ -188,15 +199,6 @@ public class CuboidMine extends BasicHologramMine {
      */
     public int getUpperX() {
         return this.pos2.getBlockX();
-    }
-
-    /**
-     * Get the maximum Y co-ordinate of this Mine
-     *
-     * @return the maximum Y co-ordinate
-     */
-    public int getUpperY() {
-        return this.pos2.getBlockY();
     }
 
     /**
@@ -268,11 +270,6 @@ public class CuboidMine extends BasicHologramMine {
         } else {
             MineMe.getInstance().debug("Reset event for mine " + name + " was cancelled", 2);
         }
-    }
-
-    @Override
-    public Location getLocation() {
-        return getCenter();
     }
 
     @Override

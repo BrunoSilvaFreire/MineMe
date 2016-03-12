@@ -41,6 +41,8 @@ public class GUIResourcesUtils {
     public static ItemStack removeButton;
     public static ItemStack backButton;
     public static ItemStack teleporter;
+    protected static ItemStack information;
+    public static String[] infomationLore;
 
     //Mine utils
     public static String mineItemNameFormat;
@@ -86,5 +88,12 @@ public class GUIResourcesUtils {
             MineMe.getInstance().debug("Tried to get the change value of item, but display name is null.", true);
             return 0;
         }
+    }
+
+    public static ItemStack generateInformationItem(Mine mine) {
+        ItemStack i = new ItemStack(information);
+        i = ItemUtils.addToLore(i,
+                MineMeMessageManager.translateTagsAndColors(infomationLore, mine));
+        return i;
     }
 }

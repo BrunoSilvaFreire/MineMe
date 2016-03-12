@@ -35,6 +35,7 @@ import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.MineUtils;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -245,8 +246,8 @@ public abstract class BasicMine implements Mine {
             "$3Name: $2" + getName(),
             "$3Alias: $2" + getAlias(),
             "$3Type: $2" + getType(),
-            "$3World: $2" + getLocation().getWorld().getName(),
-            "$3Location: $2" + getLocation().getBlockX() + ", " + getLocation().getBlockY() + ", " + getLocation().getBlockZ() + ", ",
+            "$3World: $2" + getCenter().getWorld().getName(),
+            "$3Location: $2" + getCenter().getBlockX() + ", " + getCenter().getBlockY() + ", " + getCenter().getBlockZ() + ", ",
             "$3Broadcast on reset: $2" + broadcastOnReset(),
             "$3Nearby broadcast: $2" + broadcastToNearbyOnly(),
             "$3Broadcast radius: $2" + broadcastRadius(),
@@ -379,13 +380,7 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public boolean containsMaterial(ItemStack material) {
-        material = MineUtils.getItemStackInComposition(this, icon);
-        for (ItemStack i : getMaterials()) {
-            if (i.equals(material)) {
-                return true;
-            }
-        }
-        return false;
+        return MineUtils.containsRelativeItemStackInComposition(this, icon);
     }
 
     @Override
@@ -469,6 +464,8 @@ public abstract class BasicMine implements Mine {
             comp.add(s + "=" + composition.get(m));
         }
         c.set("composition", comp);
+        Bukkit.broadcastMessage("§d" + composition.toString());
+
         return c;
     }
 
@@ -476,7 +473,7 @@ public abstract class BasicMine implements Mine {
     public String toString() {
         JSONObject obj = new JSONObject();
         obj.put("name", name);
-        obj.put("location", getLocation().toString());
+        obj.put("location", getCenter().toString());
         return obj.toJSONString();
     }
 
@@ -534,6 +531,25 @@ public abstract class BasicMine implements Mine {
     @Override
     public boolean isRunningAChallenge() {
         return currentChallenge != null;
+    }
+
+    @Override
+    public Location getTopCenterLocation() {
+        return new Location(world, getCenter().getX(), getUpperY() + 1, getCenter().getZ());
+    }
+
+    @Override
+    public double getTotalPercentage() {
+        double total = 0;
+        for (ItemStack i : composition.keySet()) {
+            total += composition.get(i);
+        }
+        return total;
+    }
+
+    @Override
+    public int getTotalMaterials() {
+        return composition.keySet().size();
     }
 
 }

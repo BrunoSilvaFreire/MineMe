@@ -146,7 +146,13 @@ public class MineMe extends CustomPlugin {
     }
 
     private void registerBaseCommands() {
-        registerCommand(new MineCommand());
+        Bukkit.getScheduler().runTask(this, new Runnable() {
+
+            @Override
+            public void run() {
+                registerCommand(new MineCommand());
+            }
+        });
     }
 
     public void reload(Player p) {

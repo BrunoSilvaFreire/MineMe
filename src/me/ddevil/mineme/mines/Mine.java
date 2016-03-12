@@ -70,6 +70,8 @@ public interface Mine extends Iterable<Block>, Listener {
      */
     public boolean isDeleted();
 
+    public double getTotalPercentage();
+
     public void setResetDelay(int delayInMinutes);
 
     /**
@@ -202,7 +204,7 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @return The mine's center
      */
-    public Location getLocation();
+    public Location getCenter();
 
     /**
      * Get the actual name that is displayed os broadcast messages, etc.
@@ -256,14 +258,14 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @return the Y value
      */
-    public int getMinimumY();
+    public int getLowerY();
 
     /**
      * Gets the maximum Y value
      *
      * @return the Y value
      */
-    public int getMaximumY();
+    public int getUpperY();
 
     /**
      * Get's the time till next reset.
@@ -337,12 +339,16 @@ public interface Mine extends Iterable<Block>, Listener {
      */
     public boolean wasAlreadyBroken(Block block);
 
+    public Location getTopCenterLocation();
+
     /**
      * Get's the Block/Second break speed
      *
      * @return The average number of blocks broken in the last second
      */
     public int averageBreakSpeed();
+
+    public int getTotalMaterials();
 
     public boolean isRunningAChallenge();
 

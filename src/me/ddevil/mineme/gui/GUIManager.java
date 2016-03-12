@@ -16,6 +16,7 @@
  */
 package me.ddevil.mineme.gui;
 
+import java.util.List;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.exception.ItemConversionException;
@@ -84,7 +85,8 @@ public class GUIManager {
             ItemUtils.addToLore(GUIResourcesUtils.empty, GUIResourcesUtils.dropAddMaterial);
         } catch (ItemConversionException ex) {
             MineMe.instance.printException("There was a problem loading GUIItem empty, is it configured correctly?", ex);
-        }//Load emptyitem
+        }
+        //Load teleporter
         ConfigurationSection teleporterConfig = MineMe.guiConfig.getConfigurationSection("globalItems.teleporter");
         Material teleporterMaterial = Material.valueOf(teleporterConfig.getString("type"));
         byte teleporterData = ((Integer) teleporterConfig.get("data")).byteValue();
@@ -95,7 +97,19 @@ public class GUIManager {
         } catch (ItemConversionException ex) {
             MineMe.instance.printException("There was a problem loading GUIItem teleporter, is it configured correctly?", ex);
         }
+        //Load info item
+        ConfigurationSection infoConfig = MineMe.guiConfig.getConfigurationSection("globalItems.info");
+        Material infoMaterial = Material.valueOf(infoConfig.getString("type"));
+        byte infoData = ((Integer) infoConfig.get("data")).byteValue();
 
+        String infoName = MineMeMessageManager.translateTagsAndColor(infoConfig.getString("name"));
+        try {
+            GUIResourcesUtils.information = ItemUtils.convertFromInput(infoMaterial + ":" + infoData, infoName);
+            List<String> ilore = infoConfig.getStringList("lore");
+            GUIResourcesUtils.infomationLore = ilore.toArray(new String[ilore.size()]);
+        } catch (ItemConversionException ex) {
+            MineMe.instance.printException("There was a problem loading GUIItem info, is it configured correctly?", ex);
+        }
         //Load mainMenu
         ConfigurationSection mainMenu = MineMe.guiConfig.getConfigurationSection("mainMenu");
         String mainMenuName = MineMeMessageManager.translateTagsAndColor(mainMenu.getString("name"));

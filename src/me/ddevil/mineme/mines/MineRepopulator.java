@@ -16,18 +16,27 @@
  */
 package me.ddevil.mineme.mines;
 
+import me.ddevil.core.CustomPlugin;
+import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.utils.RandomCollection;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public class MineRepopulator {
 
     public void repopulate(Mine m) {
-        RepopulateMap map = new RepopulateMap(m);
-        for (Block b : m) {
-            ItemStack bb = map.getRandomBlock();
-            b.setType(bb.getType());
-            b.setData(bb.getData().getData());
+        try {
+            RepopulateMap map = new RepopulateMap(m);
+            for (Block b : m) {
+                ItemStack bb = map.getRandomBlock();
+                b.setType(bb.getType());
+                b.setData(bb.getData().getData());
+            }
+        } catch (Exception e) {
+            Bukkit.broadcastMessage("Deu bosta");
+            Bukkit.broadcastMessage("§c" + m.getComposition().toString());
+            MineMe.instance.printException("There was an error repopulating mine " + m.getName() + ", is the composition correct?", e);
         }
     }
 

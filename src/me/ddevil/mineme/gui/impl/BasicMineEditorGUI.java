@@ -101,46 +101,22 @@ public class BasicMineEditorGUI implements MineEditorGUI {
 
     @Override
     public void openMineMenu(Mine m, Player p) {
-        updateMineInventory(m);
-        p.openInventory(getMineInventory(m).getMainInventory());
+        getMineInventory(m).open(p);
     }
 
     @Override
-    public MineMenu getMineInventory(Mine m) {
+    public synchronized MineMenu getMineInventory(Mine m) {
         if (inventories.containsKey(m)) {
             return inventories.get(m);
         } else {
+            Bukkit.broadcastMessage("Creating new MineMenu with size " + minesInventorySize + " for mine " + m.getName());
+            Bukkit.broadcastMessage(inventories.toString());
             MineMe.instance.debug("Creating new MineMenu with size " + minesInventorySize + " for mine " + m.getName(), 2);
             MineMenu inv = new MineMenu(minesInventorySize, m.getAlias(), m);
             inv.setup();
             inventories.put(m, inv);
-            updateMineInventory(m);
             return inv;
         }
-    }
-
-    @EventHandler
-    public void onMineUpdate(MineUpdateEvent e) {
-        MineMe.instance.debug("Updating " + e.getMine().getName() + "'s inventory.");
-        updateMineInventory(e.getMine());
-    }
-
-    @Override
-    public void updateMineInventory(Mine mine) {
-        Inventory inv = getMineInventory(mine).getMainInventory();
-        for (int i : InventoryUtils.getLane(inv, InventoryUtils.getTotalLanes(inv) - 1)) {
-            inv.setItem(i, GUIResourcesUtils.splitter);
-            inv.setItem(i - 18, GUIResourcesUtils.splitter);
-        }
-        ItemStack[] materials = mine.getMaterials();
-        int currentLoop = 0;
-        for (int i : InventoryUtils.getLane(inv, InventoryUtils.getTotalLanes(inv) - 2)) {
-            ItemStack is = materials.length > currentLoop ? GUIResourcesUtils.generateCompositionItemStack(mine, materials[currentLoop]) : GUIResourcesUtils.empty;
-            inv.setItem(i, is);
-            currentLoop++;
-        }
-        inv.setItem(InventoryUtils.getBottomMiddlePoint(inv) - 4, GUIResourcesUtils.backButton);
-        inv.setItem(InventoryUtils.getBottomMiddlePoint(inv), mine.getIcon());
     }
 
     @Override
@@ -208,7 +184,6 @@ public class BasicMineEditorGUI implements MineEditorGUI {
     public void onClick(InventoryClickEvent e) {
         Inventory inv = e.getClickedInventory();
         Player p = (Player) e.getWhoClicked();
-        ItemStack i = e.getCurrentItem();
         if (inv != null) {
             if (isMainInventory(inv)) {
                 e.setCancelled(true);
@@ -216,36 +191,13 @@ public class BasicMineEditorGUI implements MineEditorGUI {
                 if (mine != null) {
                     openMineMenu(mine, p);
                 }
-            } else if (isMainMineInventory(inv)) {
-                e.setCancelled(true);
-                //Clicked an Mine Inventory
-                if (ItemUtils.checkDisplayName(i)) {
-                    Mine m = ownerOf(inv);
-                    //Item has display name
-                    ItemMeta itemMeta = i.getItemMeta();
-                    String itemName = itemMeta.getDisplayName();
-                    //Check go back
-                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                        open(p);
-                        //Check edit percentage
-                    } else if (MineUtils.containsRelativeItemStackInComposition(m, i) && !ItemUtils.equals(i, GUIResourcesUtils.empty)) {
-                        inventories.get(m).openCompositionEditor(MineUtils.getItemStackInComposition(m, i), p);
-                    } else if (e.getCursor() != null) {
-                        ItemStack cursor = e.getCursor();
-                        if (cursor.getType() != Material.AIR) {
-                            if (cursor.getType().isBlock()) {
-
-                                if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
-                                    cursor.setAmount(1);
-                                    m.setMaterialPercentage(cursor, 0.0d);
-                                    updateMineInventory(m);
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
 
+    @EventHandler
+    public void onMineUpdate(MineUpdateEvent e) {
+        MineMe.instance.debug("Updating " + e.getMine().getName() + "'s inventory.");
+        getMineInventory(e.getMine()).update();
+    }
 }

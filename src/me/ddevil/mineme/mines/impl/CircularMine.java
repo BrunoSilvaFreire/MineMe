@@ -124,7 +124,7 @@ public class CircularMine extends BasicHologramMine {
             for (Player p : Bukkit.getServer().getOnlinePlayers()) {
                 Location l = p.getLocation();
                 if (contains(p)) {
-                    l.setY(getMaximumY() + 2);
+                    l.setY(getUpperY() + 2);
                     p.teleport(l);
                 }
             }
@@ -133,7 +133,7 @@ public class CircularMine extends BasicHologramMine {
             if (broadcastOnReset) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (broadcastNearby) {
-                        if (p.getLocation().distance(getLocation()) <= broadcastRadius) {
+                        if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
                             p.sendMessage(
                                     MineMeMessageManager.translateTagsAndColors(
                                             broadcastMessage,
@@ -159,7 +159,7 @@ public class CircularMine extends BasicHologramMine {
     public void save() {
         FileConfiguration file = getBasicSavedConfig();
         file.set("X", center.getBlockX());
-        file.set("Y", getMinimumY());
+        file.set("Y", getLowerY());
         file.set("Z", center.getBlockZ());
         file.set("radius", radius);
         file.set("height", getHeight());
@@ -196,7 +196,7 @@ public class CircularMine extends BasicHologramMine {
     }
 
     @Override
-    public Location getLocation() {
+    public Location getCenter() {
         return center.toLocation(world);
     }
 
@@ -222,17 +222,17 @@ public class CircularMine extends BasicHologramMine {
         return radius;
     }
 
-    public Vector getCenter() {
+    public Vector getVectorCenter() {
         return center;
     }
 
     @Override
-    public int getMinimumY() {
+    public int getLowerY() {
         return minY;
     }
 
     @Override
-    public int getMaximumY() {
+    public int getUpperY() {
         return maxY;
     }
     //Holograms
@@ -262,10 +262,10 @@ public class CircularMine extends BasicHologramMine {
             MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
             hologramsLines = MineMe.defaultHologramText;
         }
-        Location l = getCenter().toLocation(world);
+        Location l = getVectorCenter().toLocation(world);
         Location temp;
         temp = l.clone();
-        temp.setY(getMaximumY() + 4 + (hologramsLines.size() * 0.15));
+        temp.setY(getUpperY() + 4 + (hologramsLines.size() * 0.15));
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(area.getRadius().getX() + 1, 0, 0);

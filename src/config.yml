@@ -43,6 +43,7 @@ settings:
             - '%icon%'
             - '$2Mined: $1%minedblocks%$4/$1%volume% $2blocks'
             - '$1%remainingblockspercent%$2% remaining'
+            - '$2Break speed: $1%avgspeed%$2blocks/s'
             - '&7Stone $2percentage:$1 %composition:STONE%'
             - '&2Emerald $2percentage$1 %composition:EMERALD_ORE%'
             - '&6Gold $2percentage$1 %composition:GOLD_ORE%'

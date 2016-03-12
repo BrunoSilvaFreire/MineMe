@@ -18,24 +18,30 @@ package me.ddevil.mineme.gui.menus;
 
 import me.ddevil.core.utils.InventoryUtils;
 import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  *
  * @author Selma
  */
-public class CompositionEditorMenu {
-
+public class CompositionEditorMenu implements Listener {
+    
     private final Mine owner;
     private final ItemStack item;
     private final Inventory main;
-
+    
     public CompositionEditorMenu(Mine owner, ItemStack item, int inventorySize) {
         this.owner = owner;
         this.item = MineUtils.getItemStackInComposition(owner, item);
@@ -99,19 +105,66 @@ public class CompositionEditorMenu {
                 main.setItem(i, invIcon);
             }
         }
+        InventoryUtils.drawSquare(main, 18, middle, invIcon);
     }
-
+    
     public boolean isThis(Inventory i) {
         return i.equals(main);
     }
-
+    
     public Inventory getMainInventory() {
         return main;
     }
-
+    
     public void open(Player p) {
         update();
         p.openInventory(main);
     }
-
+    
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+        Inventory inventory = e.getInventory();
+        Player p = (Player) e.getWhoClicked();
+        //Composition editors
+        if (inventory != null) {
+            if (isThis(inventory)) {
+                e.setCancelled(true);
+                ItemStack i = e.getCurrentItem();
+                ItemMeta itemMeta = i.getItemMeta();
+                String itemName = itemMeta.getDisplayName();
+                //Check go back
+                if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
+                    GUIManager.mineEditorGUI.openMineMenu(owner, p);
+                }
+                //Check remove
+                if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
+                    owner.removeMaterial(item);
+                    GUIManager.mineEditorGUI.openMineMenu(owner, p);
+                }
+                //Check change percentage
+                if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
+                        || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
+                    double compositionChangeValue = GUIResourcesUtils.getCompositionChangeValue(i);
+                    owner.setMaterialPercentage(item, owner.getPercentage(item) + compositionChangeValue);
+                    open(p);
+                }
+            }
+        }
+    }
+    
+    public Mine getOwner() {
+        return owner;
+    }
+    
+    public ItemStack getItem() {
+        return item;
+    }
+    
+    public void setup() {
+        MineMe.registerListener(this);
+    }
+    
+    public void end() {
+        MineMe.unregisterListener(this);
+    }
 }

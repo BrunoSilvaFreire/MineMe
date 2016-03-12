@@ -23,11 +23,13 @@ import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
-import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
+import org.bukkit.Instrument;
+import org.bukkit.Material;
+import org.bukkit.Note;
+import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,6 +59,7 @@ public class MineMenu implements Listener {
 
     public void setup() {
         MineMe.registerListener(this);
+        update();
     }
 
     public void end() {
@@ -83,6 +86,10 @@ public class MineMenu implements Listener {
             }
         }
         return mainInventory.equals(inv);
+    }
+
+    public boolean isThis(Inventory i) {
+        return mainInventory.equals(i);
     }
 
     @EventHandler
@@ -125,38 +132,6 @@ public class MineMenu implements Listener {
         return false;
     }
 
-    @EventHandler
-    public void onClick(InventoryClickEvent e) {
-        Inventory inventory = e.getInventory();
-        Player p = (Player) e.getWhoClicked();
-        //Composition editors
-        if (inventory != null) {
-            if (isCompositionEditor(inventory)) {
-                e.setCancelled(true);
-                ItemStack i = e.getCurrentItem();
-                ItemMeta itemMeta = i.getItemMeta();
-                String itemName = itemMeta.getDisplayName();
-                ItemStack invOwner = getItemStackOwnerOfEditor(inventory);
-                //Check go back
-                if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                    p.openInventory(getMainInventory());
-                }
-                //Check go back
-                if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
-                    owner.removeMaterial(invOwner);
-                    GUIManager.mineEditorGUI.openMineMenu(owner, p);
-                }
-                //Check change percentage
-                if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
-                        || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
-                    double compositionChangeValue = GUIResourcesUtils.getCompositionChangeValue(i);
-                    owner.setMaterialPercentage(invOwner, owner.getPercentage(invOwner) + compositionChangeValue);
-                    getCompositionEditorMenu(invOwner).update();
-                }
-            }
-        }
-    }
-
     public void openCompositionEditor(ItemStack itemStackInComposition, Player p) {
         getCompositionEditorMenu(itemStackInComposition).open(p);
     }
@@ -169,8 +144,81 @@ public class MineMenu implements Listener {
             }
         }
         CompositionEditorMenu menu = new CompositionEditorMenu(owner, item, globalInventorySize);
+        menu.setup();
         compositionEditInventories.put(item, menu);
         return menu;
     }
 
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+        Inventory inv = e.getClickedInventory();
+        Player p = (Player) e.getWhoClicked();
+        ItemStack i = e.getCurrentItem();
+        if (inv != null) {
+            if (isThis(inv)) {
+                e.setCancelled(true);
+                //Clicked an Mine Inventory
+                if (ItemUtils.checkDisplayName(i)) {
+                    //Item has display name
+                    ItemMeta itemMeta = i.getItemMeta();
+                    String itemName = itemMeta.getDisplayName();
+                    //Check go back
+                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
+                        GUIManager.mineEditorGUI.open(p);
+                    } //Check teleport
+                    else if (itemName.equalsIgnoreCase(GUIResourcesUtils.teleporter.getItemMeta().getDisplayName())) {
+                        p.closeInventory();
+                        p.teleport(owner.getTopCenterLocation());
+                    } //Check adding material 
+                    else if (InventoryUtils.wasClickedInLane(inv, e.getRawSlot(), InventoryUtils.getTotalLanes(inv) - 2) && ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                        //Check is item is valid
+                        if (e.getCursor() != null) {
+                            ItemStack cursor = new ItemStack(e.getCursor());
+                            if (cursor.getType() != Material.AIR) {
+                                if (cursor.getType().isBlock()) {
+                                    //Check was clicked on an empty panel
+                                    if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                                        //Check if already contains material
+                                        if (!owner.containsMaterial(MineUtils.getItemStackInComposition(owner, i))) {
+                                            cursor.setAmount(1);
+                                            owner.setMaterialPercentage(cursor, 0.0d);
+                                            update();
+                                        } else {
+                                            p.playNote(p.getLocation(), Instrument.PIANO, Note.natural(0, Note.Tone.C));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } //Check edit percentage
+                    else if (MineUtils.containsRelativeItemStackInComposition(owner, i) && !ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                        openCompositionEditor(MineUtils.getItemStackInComposition(owner, i), p);
+                    }
+                }
+            }
+        }
+    }
+
+    public void update() {
+        for (int i : InventoryUtils.getLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 1)) {
+            mainInventory.setItem(i, GUIResourcesUtils.splitter);
+            mainInventory.setItem(i - 18, GUIResourcesUtils.splitter);
+        }
+        ItemStack[] materials = owner.getMaterials();
+        int currentLoop = 0;
+        for (int i : InventoryUtils.getLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 2)) {
+            ItemStack is = materials.length > currentLoop ? GUIResourcesUtils.generateCompositionItemStack(owner, materials[currentLoop]) : GUIResourcesUtils.empty;
+            mainInventory.setItem(i, is);
+            currentLoop++;
+        }
+        mainInventory.setItem(InventoryUtils.getBottomMiddlePoint(mainInventory) - 4, GUIResourcesUtils.backButton);
+        mainInventory.setItem(InventoryUtils.getBottomMiddlePoint(mainInventory) + 4, GUIResourcesUtils.generateInformationItem(owner));
+        mainInventory.setItem(InventoryUtils.getBottomMiddlePoint(mainInventory), owner.getIcon());
+        mainInventory.setItem(0, GUIResourcesUtils.teleporter);
+    }
+
+    public void open(Player p) {
+        update();
+        p.openInventory(mainInventory);
+    }
 }

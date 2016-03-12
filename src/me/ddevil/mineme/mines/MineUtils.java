@@ -25,7 +25,8 @@ import org.bukkit.inventory.ItemStack;
 public class MineUtils {
 
     public static ItemStack getItemStackInComposition(Mine m, ItemStack i) {
-        for (ItemStack a : m.getMaterials()) {
+        for (ItemStack a
+                : m.getMaterials()) {
             if (a.getType() == i.getType()) {
                 if (a.getData().getData() == i.getData().getData()) {
                     return a;
