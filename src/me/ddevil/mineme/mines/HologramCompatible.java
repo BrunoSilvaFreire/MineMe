@@ -33,6 +33,8 @@ public interface HologramCompatible {
 
     public abstract boolean isHologramsVisible();
 
+    public abstract boolean useCustomHologramText();
+
     public List<CompatibleHologram> getHolograms();
 
     public List<String> getHologramsLines();

@@ -90,7 +90,7 @@ public abstract class BasicMine implements Mine {
         this.world = config.getWorld();
         this.composition = config.getComposition();
         this.config = config.getConfig();
-        Bukkit.getScheduler().runTask(MineMe.instance, new Runnable() {
+        Bukkit.getScheduler().runTaskLater(MineMe.instance, new Runnable() {
 
             @Override
             public void run() {
@@ -109,7 +109,7 @@ public abstract class BasicMine implements Mine {
                 im.addItemFlags(ItemFlag.values());
                 icon.setItemMeta(im);
             }
-        });
+        }, 1l);
 
     }
 
@@ -458,14 +458,24 @@ public abstract class BasicMine implements Mine {
         c.set("broadcastOnReset", broadcastOnReset);
         c.set("broadcastToNearbyOnly", broadcastNearby);
         c.set("broadcastRadius", broadcastRadius);
+        if (!c.contains("icon")) {
+            c.createSection("icon");
+        }
+        c.set("icon.type", icon.getType().toString());
+        c.set("icon.data", icon.getData().getData());
+        c.set("icon.lore", ItemUtils.getLore(icon));
         ArrayList<String> comp = new ArrayList();
         for (ItemStack m : composition.keySet()) {
             String s = m.getType().name() + ":" + m.getData().getData();
             comp.add(s + "=" + composition.get(m));
         }
         c.set("composition", comp);
-        Bukkit.broadcastMessage("§d" + composition.toString());
+        if (this instanceof HologramCompatible) {
+            HologramCompatible hc = (HologramCompatible) this;
+            c.set("hologramsText", hc.getHologramsLines());
+            c.set("useCustomHologramText", hc.useCustomHologramText());
 
+        }
         return c;
     }
 

@@ -35,13 +35,16 @@ import org.bukkit.inventory.ItemStack;
 public abstract class BasicHologramMine extends BasicMine implements HologramCompatible {
 
     protected boolean hologramsReady = false;
+    private boolean useCustomHologramText;
 
     public BasicHologramMine(String name, World world, ItemStack icon) {
         super(name, world, icon);
+        useCustomHologramText = false;
     }
 
     public BasicHologramMine(MineConfig config) {
         super(config);
+        useCustomHologramText = config.getConfig().getBoolean("useCustomHologramText");
     }
     protected final List<Integer> tagLines = new ArrayList();
 
@@ -139,6 +142,11 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
         } else {
             MineMe.getInstance().debug("Hologram Update Event for mine " + name + " was cancelled", 1);
         }
+    }
+
+    @Override
+    public boolean useCustomHologramText() {
+        return useCustomHologramText;
     }
 
 }

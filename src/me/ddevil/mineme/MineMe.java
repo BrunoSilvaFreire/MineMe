@@ -58,6 +58,7 @@ public class MineMe extends CustomPlugin {
     public static boolean useHolograms = false;
     public static boolean forceDefaultBroadcastMessage = true;
     public static boolean forceDefaultHolograms = false;
+    public static boolean useHologramMineSync = false;
     public static long hologramRefreshRate;
 
     public static MineMe getInstance() {
@@ -123,6 +124,7 @@ public class MineMe extends CustomPlugin {
     @Override
     public void onDisable() {
         unloadEverything();
+        MineManager.saveAll();
     }
 
     public static FileConfiguration getYAMLMineFile(Mine m) {
@@ -187,7 +189,6 @@ public class MineMe extends CustomPlugin {
     }
 
     public static void startTimers() {
-        MineMe.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.hologramRefreshRate")).longValue() * 2;
         if (MineMe.timerID != null) {
             Bukkit.getScheduler().cancelTask(MineMe.timerID);
             timerID = null;
@@ -196,28 +197,61 @@ public class MineMe extends CustomPlugin {
             Bukkit.getScheduler().cancelTask(MineMe.hologramUpdaterID);
             hologramUpdaterID = null;
         }
-        //Start timer
-        MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
-            @Override
-            public void run() {
-                for (Mine mine : MineManager.getMines()) {
-                    mine.secondCountdown();
-                }
-            }
-        }, 20l, 20l);
-        if (MineMe.useHolograms) {
-            MineMe.hologramUpdaterID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
+        MineMe.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.customHologramRefreshRate")).longValue();
+        MineMe.useHologramMineSync = MineMe.pluginConfig.getBoolean("settings.holograms.useHologramResetSync");
 
+        if (MineMe.useHolograms) {
+            //Start timer
+            if (useHologramMineSync) {
+                instance.debug("Setting up hologram updater syncronized with mine reseter.", 3);
+                MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Mine mine : MineManager.getMines()) {
+                            mine.secondCountdown();
+                            if (mine instanceof HologramCompatible) {
+                                HologramCompatible hc = (HologramCompatible) mine;
+                                hc.updateHolograms();
+                            }
+                        }
+                    }
+                }, 20l, 20l);
+            } else {
+                MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Mine mine : MineManager.getMines()) {
+                            mine.secondCountdown();
+                        }
+                    }
+                }, 20l, 20l);
+                instance.debug("Setting up hologram updater @ " + hologramRefreshRate + " refresh speed.", 3);
+                MineMe.hologramUpdaterID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
+                    long last = System.currentTimeMillis();
+
+                    @Override
+                    public void run() {
+                        long now = System.currentTimeMillis();
+                        Bukkit.broadcastMessage("update time: " + (now - last) + "ms");
+                        for (Mine mine : MineManager.getMines()) {
+                            if (mine instanceof HologramCompatible) {
+                                HologramCompatible compatible = (HologramCompatible) mine;
+                                compatible.updateHolograms();
+                            }
+                        }
+                        last = now;
+                    }
+                }, MineMe.hologramRefreshRate, MineMe.hologramRefreshRate);
+            }
+        } else {
+            MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
                 @Override
                 public void run() {
                     for (Mine mine : MineManager.getMines()) {
-                        if (mine instanceof HologramCompatible) {
-                            HologramCompatible compatible = (HologramCompatible) mine;
-                            compatible.updateHolograms();
-                        }
+                        mine.secondCountdown();
                     }
                 }
-            }, 20l, MineMe.hologramRefreshRate);
+            }, 20l, 20l);
         }
     }
 }

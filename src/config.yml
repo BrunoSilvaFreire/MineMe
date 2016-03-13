@@ -19,12 +19,22 @@ settings:
         #them to use the default hologram pattern, which is right below.
         #Remember: You need to choose a Hologram API to use for this to work!
         enableHolograms: false
-        #The refresh speed of the holograms in minecraft ticks
+        
+        #I recommend you to leave this on if you care about data accuracy.
+        #If this is enabled, holograms will update syncronized with the reset timer, which means
+        #information will be more "accurate" since it's updated at the same time.
+        #Please note you can't customize holograms refresh rates while this is enabled because
+        #it's the reset timer who is controling the hologram updates.
+        #
+        #Planned hologram update methods are [HPSync (Hologram Placeholder Syncronization)], and will be added in future updates
+        useHologramResetSync: true
+
+        #The refresh speed of the holograms in minecraft ticks, will only be used when useHologramResetSync
         #40 = 2 seconds
         #20 = 1 second
         #10 = 0.5 seconds
         #5 = 0.25 seconds
-        hologramRefreshRate: 20
+        customHologramRefreshRate: 20
         #Forces mine to use the hologram config below, ~IF useHolographicDisplays IS ENABLED~
         forceDefaultHologramOnAllMines: false
         

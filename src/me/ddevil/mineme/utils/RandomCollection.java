@@ -22,7 +22,7 @@ import java.util.TreeMap;
 
 public class RandomCollection<E> {
 
-    private final NavigableMap<Double, E> map = new TreeMap<Double, E>();
+    private final NavigableMap<Double, E> map = new TreeMap();
     private final Random random;
     private double total = 0;
 
@@ -40,6 +40,10 @@ public class RandomCollection<E> {
         }
         total += weight;
         map.put(total, result);
+    }
+
+    public boolean isEmpty() {
+        return map.isEmpty();
     }
 
     public E next() {

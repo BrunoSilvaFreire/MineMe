@@ -172,22 +172,28 @@ public class MineMenu implements Listener {
                     } //Check adding material 
                     else if (InventoryUtils.wasClickedInLane(inv, e.getRawSlot(), InventoryUtils.getTotalLanes(inv) - 2) && ItemUtils.equals(i, GUIResourcesUtils.empty)) {
                         //Check is item is valid
-                        if (e.getCursor() != null) {
-                            ItemStack cursor = new ItemStack(e.getCursor());
-                            if (cursor.getType() != Material.AIR) {
-                                if (cursor.getType().isBlock()) {
-                                    //Check was clicked on an empty panel
-                                    if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                        if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
+                            if (e.getCursor() != null) {
+                                ItemStack cursor = new ItemStack(e.getCursor());
+                                if (cursor.getType() != Material.AIR) {
+                                    if (cursor.getType().isBlock()) {
+                                        //Check was clicked on an empty panel
                                         //Check if already contains material
-                                        if (!owner.containsMaterial(MineUtils.getItemStackInComposition(owner, i))) {
+                                        if (!owner.containsMaterial(MineUtils.getItemStackInComposition(owner, cursor))) {
                                             cursor.setAmount(1);
                                             owner.setMaterialPercentage(cursor, 0.0d);
                                             update();
                                         } else {
-                                            p.playNote(p.getLocation(), Instrument.PIANO, Note.natural(0, Note.Tone.C));
+                                            MineMe.messageManager.sendMessage(p, "$1" + owner.getName() + " $4already contains $2" + ItemUtils.toString(i) + "$4!");
                                         }
+                                    } else {
+                                        MineMe.messageManager.sendMessage(p, "$4This isn't a placeable item!");
                                     }
+                                } else {
+                                    MineMe.messageManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
                                 }
+                            } else {
+                                MineMe.messageManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
                             }
                         }
                     } //Check edit percentage

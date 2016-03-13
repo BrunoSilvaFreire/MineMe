@@ -16,10 +16,8 @@
  */
 package me.ddevil.mineme.mines;
 
-import me.ddevil.core.CustomPlugin;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.utils.RandomCollection;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,14 +26,15 @@ public class MineRepopulator {
     public void repopulate(Mine m) {
         try {
             RepopulateMap map = new RepopulateMap(m);
+            if (map.isEmpty()) {
+                return;
+            }
             for (Block b : m) {
                 ItemStack bb = map.getRandomBlock();
                 b.setType(bb.getType());
                 b.setData(bb.getData().getData());
             }
         } catch (Exception e) {
-            Bukkit.broadcastMessage("Deu bosta");
-            Bukkit.broadcastMessage("§c" + m.getComposition().toString());
             MineMe.instance.printException("There was an error repopulating mine " + m.getName() + ", is the composition correct?", e);
         }
     }
@@ -50,6 +49,10 @@ public class MineRepopulator {
                 randomCollection.add(m.getComposition().get(m1), m1);
             }
 
+        }
+
+        private boolean isEmpty() {
+            return randomCollection.isEmpty();
         }
 
         private ItemStack getRandomBlock() {

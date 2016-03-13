@@ -89,22 +89,25 @@ public class MineMeMessageManager extends BasicMessageManager {
 
     public static String translateTagsAndColors(String get, Mine m) {
         //Mine
-        get = get.replaceAll("%mine%", m.getName());
-        get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
-        get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
-        get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
-        get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
-        get = get.replaceAll("%volume%", m.getVolume() + "");
-        get = get.replaceAll("%resettime%", secondsToString(m.getTimeToNextReset()));
-        get = get.replaceAll("%alias%", m.getAlias());
-        get = get.replaceAll("%type%", m.getType().name());
-        get = get.replaceAll("%totalpercentage%", String.valueOf(m.getTotalPercentage()));
-        get = get.replaceAll("%totalmaterials%", String.valueOf(m.getTotalMaterials()));
-        get = get.replaceAll("%avgspeed%", String.valueOf(m.averageBreakSpeed()));
-        //LifeTime stats
-        get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
-        get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
-
+        if (m != null) {
+            get = get.replaceAll("%mine%", m.getName());
+            get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
+            get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
+            get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
+            get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
+            get = get.replaceAll("%volume%", m.getVolume() + "");
+            get = get.replaceAll("%resettime%", secondsToString(m.getTimeToNextReset()));
+            get = get.replaceAll("%alias%", m.getAlias());
+            get = get.replaceAll("%type%", m.getType().name());
+            get = get.replaceAll("%totalpercentage%", String.valueOf(m.getTotalPercentage()));
+            get = get.replaceAll("%totalmaterials%", String.valueOf(m.getTotalMaterials()));
+            get = get.replaceAll("%avgspeed%", String.valueOf(m.averageBreakSpeed()));
+            //LifeTime stats
+            get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
+            get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
+        } else {
+            MineMe.instance.debug("The mine used to translate " + get + " is null! Skipping mine tags...", true);
+        }
         //Plugin
         get = get.replaceAll("%prefix%", pluginPrefix);
         get = get.replaceAll("%header%", header);
