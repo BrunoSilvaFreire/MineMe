@@ -109,8 +109,6 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         if (inventories.containsKey(m)) {
             return inventories.get(m);
         } else {
-            Bukkit.broadcastMessage("Creating new MineMenu with size " + minesInventorySize + " for mine " + m.getName());
-            Bukkit.broadcastMessage(inventories.toString());
             MineMe.instance.debug("Creating new MineMenu with size " + minesInventorySize + " for mine " + m.getName(), 2);
             MineMenu inv = new MineMenu(minesInventorySize, m.getAlias(), m);
             inv.setup();

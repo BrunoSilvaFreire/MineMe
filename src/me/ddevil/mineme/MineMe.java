@@ -232,7 +232,6 @@ public class MineMe extends CustomPlugin {
                     @Override
                     public void run() {
                         long now = System.currentTimeMillis();
-                        Bukkit.broadcastMessage("update time: " + (now - last) + "ms");
                         for (Mine mine : MineManager.getMines()) {
                             if (mine instanceof HologramCompatible) {
                                 HologramCompatible compatible = (HologramCompatible) mine;

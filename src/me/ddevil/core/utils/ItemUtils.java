@@ -211,6 +211,14 @@ public class ItemUtils {
         }
     }
 
+    public static boolean equalMaterial(ItemStack a, ItemStack b) {
+        if (a.getType() == b.getType()) {
+            if (a.getData().getData() == b.getData().getData()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 class Glow extends Enchantment {

@@ -24,6 +24,7 @@ import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,11 +38,11 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author Selma
  */
 public class CompositionEditorMenu implements Listener {
-    
+
     private final Mine owner;
     private final ItemStack item;
     private final Inventory main;
-    
+
     public CompositionEditorMenu(Mine owner, ItemStack item, int inventorySize) {
         this.owner = owner;
         this.item = MineUtils.getItemStackInComposition(owner, item);
@@ -59,7 +60,7 @@ public class CompositionEditorMenu implements Listener {
                 //Lore
                 MineMeMessageManager.translateTagsAndColors(
                         new String[]{
-                            "$3Current: $1" + owner.getPercentage(item)
+                            "$3Current: $1" + owner.getPercentage(item) + "%"
                         }));
         double currentAddPercentage = 50;
         //Top left 4 add buttons
@@ -97,30 +98,27 @@ public class CompositionEditorMenu implements Listener {
         main.setItem(InventoryUtils.getTopMiddlePoint(main), GUIResourcesUtils.splitter);
         main.setItem(InventoryUtils.getBottomMiddlePoint(main), GUIResourcesUtils.splitter);
         int middle = InventoryUtils.getMiddlePoint(main);
+        InventoryUtils.drawSquare(main, 18, 35, invIcon);
         main.setItem(middle, owner.getIcon());
+        main.setItem(middle - 18, GUIResourcesUtils.generateInformationItem(owner));
+
         main.setItem(middle - 9, GUIResourcesUtils.backButton);
         main.setItem(middle + 9, GUIResourcesUtils.removeButton);
-        for (int i = 18; i < 36; i++) {
-            if (main.getItem(i) == null) {
-                main.setItem(i, invIcon);
-            }
-        }
-        InventoryUtils.drawSquare(main, 18, middle, invIcon);
     }
-    
+
     public boolean isThis(Inventory i) {
         return i.equals(main);
     }
-    
+
     public Inventory getMainInventory() {
         return main;
     }
-    
+
     public void open(Player p) {
         update();
         p.openInventory(main);
     }
-    
+
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         Inventory inventory = e.getInventory();
@@ -144,26 +142,26 @@ public class CompositionEditorMenu implements Listener {
                 //Check change percentage
                 if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
                         || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
-                    double compositionChangeValue = GUIResourcesUtils.getCompositionChangeValue(i);
-                    owner.setMaterialPercentage(item, owner.getPercentage(item) + compositionChangeValue);
+                    double finalValue = GUIResourcesUtils.getCompositionChangeValue(i) + owner.getPercentage(item);
+                    owner.setMaterialPercentage(item, finalValue);
                     open(p);
                 }
             }
         }
     }
-    
+
     public Mine getOwner() {
         return owner;
     }
-    
+
     public ItemStack getItem() {
         return item;
     }
-    
+
     public void setup() {
         MineMe.registerListener(this);
     }
-    
+
     public void end() {
         MineMe.unregisterListener(this);
     }

@@ -53,7 +53,7 @@ public class GUIResourcesUtils {
     public static ItemStack generateCompositionItemStack(Mine m, ItemStack i) {
         ItemStack is = new ItemStack(i);
         ItemMeta im = is.getItemMeta();
-        im.setDisplayName(MineMeMessageManager.translateTagsAndColor("$1" + is.getType() + "$3-$2" + m.getComposition().get(i) + "%"));
+        im.setDisplayName(MineMeMessageManager.translateTagsAndColor("$1" + is.getType() + "$3:$2" + i.getData().getData() + "$3-$1" + m.getComposition().get(i) + "%"));
         List<String> lore = ItemUtils.getLore(i);
         lore.add(GUIResourcesUtils.clickToEdit);
         im.setLore(lore);

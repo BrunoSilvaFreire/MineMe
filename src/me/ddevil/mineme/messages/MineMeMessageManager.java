@@ -114,7 +114,7 @@ public class MineMeMessageManager extends BasicMessageManager {
         get = get.replaceAll("%separator%", messageSeparator);
         boolean translateComposition = get.contains("%composition:");
         while (translateComposition) {
-            int start = get.indexOf("%composition") + 13;
+            int start = get.indexOf("%composition:") + 13;
             Integer end = null;
             for (int i = start - 12; i < get.length(); i++) {
                 char c = get.charAt(i);
@@ -128,8 +128,7 @@ public class MineMeMessageManager extends BasicMessageManager {
             String itemName = get.substring(start, end);
             try {
                 ItemStack item = ItemUtils.convertFromInput(itemName);
-                Material material = item.getType();
-                get = get.replaceAll("%composition:" + material.name() + "%", String.valueOf(m.getPercentage(item)));
+                get = get.replaceAll("%composition:" + ItemUtils.toString(item) + "%", String.valueOf(m.getPercentage(item)));
                 translateComposition = get.contains("%composition:");
             } catch (Exception e) {
                 break;

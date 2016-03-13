@@ -281,7 +281,7 @@ public abstract class BasicMine implements Mine {
     public double getPercentage(ItemStack m) {
         m = MineUtils.getItemStackInComposition(this, m);
         for (ItemStack i : composition.keySet()) {
-            if (i.equals(m)) {
+            if (ItemUtils.equalMaterial(i, m)) {
                 if (composition.get(i) == null) {
                     return 0;
                 }
@@ -460,10 +460,11 @@ public abstract class BasicMine implements Mine {
         c.set("broadcastRadius", broadcastRadius);
         if (!c.contains("icon")) {
             c.createSection("icon");
+            c.set("icon.type", icon.getType().toString());
+            c.set("icon.data", icon.getData().getData());
+            c.set("icon.name", icon.getItemMeta().getDisplayName());
+            c.set("icon.lore", ItemUtils.getLore(icon));
         }
-        c.set("icon.type", icon.getType().toString());
-        c.set("icon.data", icon.getData().getData());
-        c.set("icon.lore", ItemUtils.getLore(icon));
         ArrayList<String> comp = new ArrayList();
         for (ItemStack m : composition.keySet()) {
             String s = m.getType().name() + ":" + m.getData().getData();
