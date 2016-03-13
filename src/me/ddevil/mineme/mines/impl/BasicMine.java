@@ -279,16 +279,20 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public double getPercentage(ItemStack m) {
-        m = MineUtils.getItemStackInComposition(this, m);
-        for (ItemStack i : composition.keySet()) {
-            if (ItemUtils.equalMaterial(i, m)) {
-                if (composition.get(i) == null) {
-                    return 0;
+        if (MineUtils.containsRelativeItemStackInComposition(this, m)) {
+            m = MineUtils.getItemStackInComposition(this, m);
+            for (ItemStack i : composition.keySet()) {
+                if (ItemUtils.equalMaterial(i, m)) {
+                    if (composition.get(i) == null) {
+                        return 0;
+                    }
+                    return composition.get(i);
                 }
-                return composition.get(i);
             }
+            return 0;
+        } else {
+            return 0;
         }
-        return 0;
 
     }
 

@@ -17,12 +17,16 @@
 package me.ddevil.mineme.messages;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.ddevil.core.chat.BasicMessageManager;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.exception.ItemConversionException;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
 import me.ddevil.mineme.storage.StorageManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -126,13 +130,16 @@ public class MineMeMessageManager extends BasicMessageManager {
                 break;
             }
             String itemName = get.substring(start, end);
+            ItemStack item = null;
             try {
-                ItemStack item = ItemUtils.convertFromInput(itemName);
-                get = get.replaceAll("%composition:" + ItemUtils.toString(item) + "%", String.valueOf(m.getPercentage(item)));
-                translateComposition = get.contains("%composition:");
-            } catch (Exception e) {
+                item = ItemUtils.convertFromInput(itemName);
+            } catch (ItemConversionException ex) {
+                MineMe.instance.printException(get, ex);
                 break;
             }
+            String find = "%composition:" + itemName + "%";
+            get = get.replace(find, String.valueOf(m.getPercentage(item)));
+            translateComposition = get.contains("%composition:");
 
         }
         return translateColors(get);

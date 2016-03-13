@@ -25,6 +25,7 @@ import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Instrument;
 import org.bukkit.Material;
@@ -179,15 +180,15 @@ public class MineMenu implements Listener {
                                     if (cursor.getType().isBlock()) {
                                         //Check was clicked on an empty panel
                                         //Check if already contains material
-                                        if (!owner.containsMaterial(MineUtils.getItemStackInComposition(owner, cursor))) {
+                                        if (!owner.containsMaterial(cursor)) {
                                             cursor.setAmount(1);
                                             owner.setMaterialPercentage(cursor, 0.0d);
                                             update();
                                         } else {
-                                            MineMe.messageManager.sendMessage(p, "$1" + owner.getName() + " $4already contains $2" + ItemUtils.toString(i) + "$4!");
+                                            MineMe.messageManager.sendMessage(p, "$1" + owner.getName() + " $4already contains $2" + ItemUtils.toString(cursor) + "$4!");
                                         }
                                     } else {
-                                        MineMe.messageManager.sendMessage(p, "$4This isn't a placeable item!");
+                                        MineMe.messageManager.sendMessage(p, "$1" + ItemUtils.toString(cursor) + "$1 isn't a placeable item!");
                                     }
                                 } else {
                                     MineMe.messageManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
