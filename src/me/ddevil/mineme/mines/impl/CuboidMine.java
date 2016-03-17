@@ -68,7 +68,6 @@ public class CuboidMine extends BasicHologramMine {
         super(name, loc1.getWorld(), ItemUtils.createItem(Material.STONE, name));
         this.pos1 = loc1.toVector();
         this.pos2 = loc2.toVector();
-        this.config = getBasicSavedConfig();
         config.set("X1", pos1.getBlockX());
         config.set("Y1", pos1.getBlockY());
         config.set("Z1", pos1.getBlockZ());

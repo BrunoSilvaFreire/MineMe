@@ -56,7 +56,7 @@ public abstract class BasicMine implements Mine {
     //General
     protected final String name;
     protected String alias;
-    protected FileConfiguration config;
+    protected final FileConfiguration config;
     protected File saveFile = MineMe.getMineFile(this);
     protected boolean enabled = true;
 
@@ -138,6 +138,7 @@ public abstract class BasicMine implements Mine {
         this.totalResetDelay = 300;
         this.currentResetDelay = totalResetDelay;
         this.icon = icon;
+        this.config = MineMe.getYAMLMineFile(this);
     }
 
     @Override
@@ -299,7 +300,7 @@ public abstract class BasicMine implements Mine {
 
     @Override
     public float getPercentageRemaining() {
-        if (getRemainingBlocks() == 0) {
+        if (getRemainingBlocks() <= 0) {
             return 0;
         } else {
             double percentage = (getRemainingBlocks() * 100) / getVolume();

@@ -18,12 +18,14 @@ package me.ddevil.mineme.mines.impl;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineResetEvent;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -34,6 +36,7 @@ import me.ddevil.mineme.storage.StorageManager;
 import me.ddevil.mineme.utils.WorldEditIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -62,11 +65,13 @@ public class PolygonMine extends BasicHologramMine {
 
         Integer lowestPoint = null;
         Integer hightestPoint = null;
-        for (String pointPath : pointsConfig.getKeys(enabled)) {
+        for (String pointsPath : pointsConfig.getKeys(false)) {
+            String pointPath = "points." + pointsPath;
             int x = fileConfig.getInt(pointPath + ".x");
             int y = fileConfig.getInt(pointPath + ".y");
             int z = fileConfig.getInt(pointPath + ".z");
-            vectors.add(new Vector(x, y, z));
+            Vector v = new Vector(x, y, z);
+            vectors.add(v);
             BlockVector2D bv = new BlockVector2D(x, z);
             bvectors.add(bv);
             if (lowestPoint == null) {
@@ -85,7 +90,7 @@ public class PolygonMine extends BasicHologramMine {
         this.height = hightestPoint - lowestPoint;
     }
 
-    public PolygonMine(Vector[] points, int height, String name, World world, ItemStack icon) {
+    public PolygonMine(Vector[] points, String name, World world, ItemStack icon) {
         super(name, world, icon);
         this.points = points;
         ArrayList<BlockVector2D> bvectors = new ArrayList();
@@ -111,10 +116,64 @@ public class PolygonMine extends BasicHologramMine {
 
     }
 
+    public PolygonMine(Polygonal2DRegion region, String name, World world) {
+        super(name, world, ItemUtils.createItem(Material.REDSTONE_BLOCK, name));
+        Integer lowestPoint = null;
+        Integer hightestPoint = null;
+        ArrayList<Vector> vectors = new ArrayList();
+        boolean min = false;
+        for (BlockVector2D bv : region.getPoints()) {
+            Vector point = new Vector(bv.getBlockX(), min ? region.getMinimumY() : region.getMaximumY(), bv.getBlockZ());
+            min = !min;
+            vectors.add(point);
+            if (lowestPoint == null) {
+                lowestPoint = point.getBlockY();
+            } else if (point.getBlockY() < lowestPoint) {
+                lowestPoint = point.getBlockY();
+            }
+            if (hightestPoint == null) {
+                hightestPoint = point.getBlockY();
+            } else if (point.getBlockY() > hightestPoint) {
+                hightestPoint = point.getBlockY();
+            }
+        }
+        this.points = vectors.toArray(new Vector[vectors.size()]);
+        this.area = region;
+        this.height = hightestPoint - lowestPoint;
+
+    }
+
+    public PolygonMine(Polygonal2DSelection region, String name, World world) {
+        super(name, world, ItemUtils.createItem(Material.REDSTONE_BLOCK, name));
+        Integer lowestPoint = null;
+        Integer hightestPoint = null;
+        ArrayList<Vector> vectors = new ArrayList();
+        boolean min = false;
+        for (BlockVector2D bv : region.getNativePoints()) {
+            Vector point = new Vector(bv.getBlockX(), min ? region.getMinimumPoint().getBlockY() : region.getMaximumPoint().getBlockY(), bv.getBlockZ());
+            min = !min;
+            vectors.add(point);
+            if (lowestPoint == null) {
+                lowestPoint = point.getBlockY();
+            } else if (point.getBlockY() < lowestPoint) {
+                lowestPoint = point.getBlockY();
+            }
+            if (hightestPoint == null) {
+                hightestPoint = point.getBlockY();
+            } else if (point.getBlockY() > hightestPoint) {
+                hightestPoint = point.getBlockY();
+            }
+        }
+        this.points = vectors.toArray(new Vector[vectors.size()]);
+        this.area = new Polygonal2DRegion(new BukkitWorld(world), region.getNativePoints(), lowestPoint, hightestPoint);
+        this.height = hightestPoint - lowestPoint;
+
+    }
+
     @Override
     public void placeHolograms() {
         for (Vector v : points) {
-            holograms.add(MineMe.hologramAdapter.createHologram(v.clone().setY(getUpperY()).toLocation(world)));
+            holograms.add(MineMe.hologramAdapter.createHologram(v.clone().setY(getUpperY() + 4).toLocation(world)));
         }
     }
 

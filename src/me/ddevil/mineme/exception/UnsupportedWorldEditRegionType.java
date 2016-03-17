@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Selma
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.mines;
+package me.ddevil.mineme.exception;
+
+import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.regions.Region;
 
 /**
- * The various mine's types you can set to mines :D
  *
  * @author Selma
  */
-public enum MineType {
+public class UnsupportedWorldEditRegionType extends Exception {
 
-    CUBOID,
-    MULTI_CUBOID,
-    CIRCULAR,
-    POLYGON,
-    CUSTOM;
+    public UnsupportedWorldEditRegionType(Selection selection) {
+        super("Selection type " + selection.getClass().getSimpleName() + " isn't supported! (Yet :D)");
+    }
 
 }

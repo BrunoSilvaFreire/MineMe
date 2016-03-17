@@ -24,18 +24,54 @@ composition:
     - REDSTONE_ORE=60
     - REDSTONE_BLOCK=5
 points:
-    point1:
-        x: 20
-        y: 64
-        z: 40
-    point2:
+    point0:
         x: 0
-        y: 64
-        z: 40
+        y: 100
+        z: -20
+    point1:
+        x: -4
+        y: 105
+        z: -9
+    point2:
+        x: -17
+        y: 100
+        z: -10
     point3:
-        x: 40
-        y: 64
-        z: 60
+        x: -10
+        y: 105
+        z: 0
+    point4:
+        x: -17
+        y: 100
+        z: 10
+    point5:
+        x: -4
+        y: 105
+        z: 9
+    point6:
+        x: 0
+        y: 100
+        z: 20
+    point7:
+        x: 4
+        y: 105
+        z: 9
+    point8:
+        x: 17
+        y: 100
+        z: 10
+    point9:
+        x: 10
+        y: 105
+        z: 0
+    point10:
+        x: 17
+        y: 100
+        z: -10
+    point11:
+        x: 4
+        y: 105
+        z: -9
 useCustomHologramText: false
 #This will only be used in case HolographicDisplays is available and enabled
 #in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D

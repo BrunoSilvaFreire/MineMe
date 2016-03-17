@@ -106,7 +106,6 @@ public class CircularMine extends BasicHologramMine {
         );
         center.setX(center.getX() + 0.5);
         center.setZ(center.getZ() + 0.5);
-        this.config = getBasicSavedConfig();
         config.set("X", center.getBlockX());
         config.set("Y", center.getBlockY());
         config.set("Z", center.getBlockZ());

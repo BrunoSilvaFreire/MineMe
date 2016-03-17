@@ -188,13 +188,17 @@ public class PluginLoader extends CustomThread {
             plugin.debug("Mines folder is empty! Adding examplemines...", 3);
             plugin.saveResource("examplemine.yml", false);
             plugin.saveResource("examplecircularmine.yml", false);
+            plugin.saveResource("examplepoligonalmine.yml", false);
             File examplecircularmine = new File(plugin.getDataFolder() + "/examplecircularmine.yml");
             File examplecuboidmine = new File(plugin.getDataFolder() + "/examplemine.yml");
+            File examplepoligonalmine = new File(plugin.getDataFolder() + "/examplepoligonalmine.yml");
             try {
                 FileUtils.moveFileToDirectory(examplecuboidmine, MineMe.minesFolder, false);
                 plugin.debug("examplemine.yml added!", 3);
                 FileUtils.moveFileToDirectory(examplecircularmine, MineMe.minesFolder, false);
                 plugin.debug("examplecircularmine.yml added!", 3);
+                FileUtils.moveFileToDirectory(examplepoligonalmine, MineMe.minesFolder, false);
+                plugin.debug("examplepoligonalmine.yml added!", 3);
             } catch (IOException ex) {
                 examplecuboidmine.delete();
                 plugin.debug("There was a problem trying to copy the example mines to the mines folder. Skipping.", true);

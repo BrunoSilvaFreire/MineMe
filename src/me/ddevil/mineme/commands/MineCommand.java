@@ -16,15 +16,23 @@
  */
 package me.ddevil.mineme.commands;
 
+import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.CylinderSelection;
+import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.ddevil.core.commands.CustomCommand;
 import me.ddevil.core.commands.SubCommand;
 import me.ddevil.core.utils.ItemUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.exception.UnsupportedWorldEditRegionType;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.messages.MessageColor;
 import me.ddevil.mineme.mines.HologramCompatible;
@@ -32,6 +40,7 @@ import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.mines.impl.CuboidMine;
+import me.ddevil.mineme.mines.impl.PolygonMine;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -408,10 +417,13 @@ public class MineCommand extends CustomCommand {
             fl2.setY(Math.max(loc1.getBlockY(), loc2.getBlockY()));
             fl2.setZ(Math.max(loc1.getBlockZ(), loc2.getBlockZ()));
             m = new CuboidMine(name, fl1, fl2);
+        } else if (selection instanceof Polygonal2DSelection) {
+            Polygonal2DSelection polySel = (Polygonal2DSelection) selection;
+            m = new PolygonMine(polySel, name, p.getLocation().getWorld());
         }
         if (m == null) {
-            MineMe.messageManager.sendMessage(p, "$4There was an error in mine creation! Check the console!");
-            MineMe.instance.printException(name, new Error("Could not instancializate mine"));
+            MineMe.messageManager.sendMessage(p, "$4Selection type $1" + selection.getClass().getSimpleName() + "$4 isn't supported! (Yet :D)");
+            MineMe.instance.printException(name, new UnsupportedWorldEditRegionType(selection));
             return;
         }
         for (Block m1 : m) {
