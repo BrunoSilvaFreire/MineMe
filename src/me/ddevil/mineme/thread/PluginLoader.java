@@ -33,6 +33,7 @@ import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.mines.impl.CuboidMine;
+import me.ddevil.mineme.mines.impl.PolygonMine;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -236,6 +237,8 @@ public class PluginLoader extends CustomThread {
                 Mine m;
                 if (config.getType().equals(MineType.CIRCULAR)) {
                     m = new CircularMine(config);
+                } else if (config.getType().equals(MineType.POLYGON)) {
+                    m = new PolygonMine(config);
                 } else {
                     m = new CuboidMine(config);
                 }

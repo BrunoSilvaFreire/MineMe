@@ -41,6 +41,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -567,4 +568,13 @@ public abstract class BasicMine implements Mine {
         return composition.keySet().size();
     }
 
+    @Override
+    public boolean contains(Block block) {
+        return contains(block.getLocation());
+    }
+
+    @Override
+    public boolean contains(Player p) {
+        return contains(p.getLocation());
+    }
 }

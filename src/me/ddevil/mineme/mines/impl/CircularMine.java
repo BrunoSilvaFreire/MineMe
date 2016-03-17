@@ -35,6 +35,7 @@ import me.ddevil.mineme.mines.MineRepopulator;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.storage.StorageManager;
+import me.ddevil.mineme.utils.WorldEditIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -181,21 +182,6 @@ public class CircularMine extends BasicHologramMine {
     }
 
     @Override
-    public boolean contains(Block b) {
-        return contains(b.getLocation());
-    }
-
-    @Override
-    public boolean contains(Location l) {
-        return contains(l.getX(), l.getY(), l.getZ());
-    }
-
-    @Override
-    public boolean contains(Player p) {
-        return contains(p.getLocation());
-    }
-
-    @Override
     public Location getCenter() {
         return center.toLocation(world);
     }
@@ -207,7 +193,7 @@ public class CircularMine extends BasicHologramMine {
 
     @Override
     public Iterator<Block> iterator() {
-        return new CircularIterator();
+        return new WorldEditIterator(area);
     }
 
     public int getArea() {
@@ -236,32 +222,10 @@ public class CircularMine extends BasicHologramMine {
         return maxY;
     }
     //Holograms
-    protected final ArrayList<CompatibleHologram> holograms = new ArrayList();
-    protected List<String> hologramsLines;
-
-    @Override
-    public List<String> getHologramsLines() {
-        return hologramsLines;
-    }
-
-    @Override
-    public void setHologramsLines(List<String> lines) {
-        this.hologramsLines = lines;
-    }
 
     @Override
     public void placeHolograms() {
         MineMe.getInstance().debug("Creating holograms for " + name + "...");
-        if (MineMe.forceDefaultHolograms) {
-            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
-            hologramsLines = MineMe.defaultHologramText;
-        } else if (config.getBoolean("useCustomHologramText")) {
-            MineMe.getInstance().debug("Setting custom hologram text for mine " + name);
-            hologramsLines = config.getStringList("hologramsText");
-        } else {
-            MineMe.getInstance().debug("Setting default hologram text for mine " + name + " since useCustomHologramText is disabled");
-            hologramsLines = MineMe.defaultHologramText;
-        }
         Location l = getVectorCenter().toLocation(world);
         Location temp;
         temp = l.clone();
@@ -285,28 +249,4 @@ public class CircularMine extends BasicHologramMine {
         hologramsReady = true;
     }
 
-    @Override
-    public List<CompatibleHologram> getHolograms() {
-        return holograms;
-    }
-
-    public class CircularIterator implements Iterator<Block> {
-
-        private final Iterator<BlockVector> bviterator;
-
-        public CircularIterator() {
-            bviterator = area.iterator();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return bviterator.hasNext();
-        }
-
-        @Override
-        public Block next() {
-            BlockVector next = bviterator.next();
-            return new Location(world, next.getX(), next.getY(), next.getZ()).getBlock();
-        }
-    }
 }

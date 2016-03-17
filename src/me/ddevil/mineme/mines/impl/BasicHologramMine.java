@@ -25,6 +25,7 @@ import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
@@ -148,5 +149,26 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
     public boolean useCustomHologramText() {
         return useCustomHologramText;
     }
+    protected final ArrayList<CompatibleHologram> holograms = new ArrayList();
+    protected List<String> hologramsLines;
 
+    @Override
+    public List<CompatibleHologram> getHolograms() {
+        return holograms;
+    }
+
+    @Override
+    public List<String> getHologramsLines() {
+        return hologramsLines;
+    }
+
+    @Override
+    public boolean contains(Location l) {
+        return contains(l.getX(), l.getY(), l.getZ());
+    }
+
+    @Override
+    public void setHologramsLines(List<String> lines) {
+        this.hologramsLines = lines;
+    }
 }
