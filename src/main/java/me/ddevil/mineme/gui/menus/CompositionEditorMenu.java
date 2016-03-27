@@ -16,8 +16,9 @@
  */
 package me.ddevil.mineme.gui.menus;
 
-import me.ddevil.core.utils.InventoryUtils;
-import me.ddevil.core.utils.ItemUtils;
+import java.util.Arrays;
+import me.ddevil.core.utils.inventory.InventoryUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
@@ -46,7 +47,7 @@ public class CompositionEditorMenu implements Listener {
     public CompositionEditorMenu(Mine owner, ItemStack item, int inventorySize) {
         this.owner = owner;
         this.item = MineUtils.getItemStackInComposition(owner, item);
-        String title = MineMeMessageManager.getInstance().translateTagsAndColor("$2" + item.getType() + "$3:$1" + item.getData().getData());
+        String title = MineMeMessageManager.getInstance().translateAll("$2" + item.getType() + "$3:$1" + item.getData().getData());
         this.main = InventoryUtils.createInventory(title, inventorySize / 9);
     }
 
@@ -59,9 +60,9 @@ public class CompositionEditorMenu implements Listener {
                 main.getTitle(),
                 //Lore
                 MineMeMessageManager.getInstance().translateAll(
-                        new String[]{
+                        Arrays.asList(new String[]{
                             "$3Current: $1" + owner.getPercentage(item) + "%"
-                        }));
+                        })));
         double currentAddPercentage = 50;
         //Top left 4 add buttons
         for (int i : InventoryUtils.getPartialLane(main, 0, 0, 3)) {

@@ -18,8 +18,8 @@ package me.ddevil.mineme.gui.menus;
 
 import java.util.HashMap;
 import java.util.List;
-import me.ddevil.core.utils.InventoryUtils;
-import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.core.utils.inventory.InventoryUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
@@ -185,16 +185,16 @@ public class MineMenu implements Listener {
                                             owner.setMaterialPercentage(cursor, 0.0d);
                                             update();
                                         } else {
-                                            MineMe.messageManager.sendMessage(p, "$1" + owner.getName() + " $4already contains $2" + ItemUtils.toString(cursor) + "$4!");
+                                            MineMe.chatManager.sendMessage(p, "$1" + owner.getName() + " $4already contains $2" + ItemUtils.toString(cursor) + "$4!");
                                         }
                                     } else {
-                                        MineMe.messageManager.sendMessage(p, "$1" + ItemUtils.toString(cursor) + "$1 isn't a placeable item!");
+                                        MineMe.chatManager.sendMessage(p, "$1" + ItemUtils.toString(cursor) + "$1 isn't a placeable item!");
                                     }
                                 } else {
-                                    MineMe.messageManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
+                                    MineMe.chatManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
                                 }
                             } else {
-                                MineMe.messageManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
+                                MineMe.chatManager.sendMessage(p, "$4Please have an item in your hand for us to add!");
                             }
                         }
                     } //Check edit percentage

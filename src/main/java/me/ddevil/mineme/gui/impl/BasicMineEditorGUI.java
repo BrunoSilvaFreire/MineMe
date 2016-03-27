@@ -19,8 +19,8 @@ package me.ddevil.mineme.gui.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import me.ddevil.core.utils.InventoryUtils;
-import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.core.utils.inventory.InventoryUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineUpdateEvent;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
@@ -29,7 +29,6 @@ import me.ddevil.mineme.gui.menus.MineMenu;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
-import me.ddevil.mineme.mines.MineUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -59,9 +58,9 @@ public class BasicMineEditorGUI implements MineEditorGUI {
         mainInventory = Bukkit.createInventory(null, mainInventorySize, mainInventoryName);
         mainInventoryConfig = MineMe.guiConfig.getConfigurationSection("mainMenu");
         ConfigurationSection miIconConfig = mainInventoryConfig.getConfigurationSection("icons.main");
-        String name = MineMeMessageManager.getInstance().translateTagsAndColor(miIconConfig.getString("name"));
+        String name = MineMeMessageManager.getInstance().translateAll(miIconConfig.getString("name"));
         List<String> loreList = miIconConfig.getStringList("lore");
-        String[] lore = MineMeMessageManager.getInstance().translateAll(loreList.toArray(new String[loreList.size()]));
+        List<String> lore = MineMeMessageManager.getInstance().translateAll(loreList);
         this.mainInventoryIcon = ItemUtils.createItem(
                 Material.valueOf(miIconConfig.getString("type")),
                 name,

@@ -17,14 +17,14 @@
 package me.ddevil.mineme.messages;
 
 import java.util.ArrayList;
+import java.util.List;
 import me.ddevil.core.chat.BasicMessageManager;
 import me.ddevil.core.utils.StringUtils;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.storage.StorageManager;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public class MineMeMessageManager extends BasicMessageManager {
@@ -40,7 +40,7 @@ public class MineMeMessageManager extends BasicMessageManager {
 
     //Mine Messages
     public static String globalResetMessage;
-    public String mineCreateMessage;
+    public static String mineCreateMessage;
 
     //Error Messages
     public static String noPermission;
@@ -61,7 +61,7 @@ public class MineMeMessageManager extends BasicMessageManager {
             //Global Messages
             messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
             pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
-            header = BasicMessageManager.this.translateAll(MineMe.messagesConfig.getString("messages.header"));
+            header = translateAll(MineMe.messagesConfig.getString("messages.header"));
 
             //Error Messages
             noPermission = translateColors(MineMe.messagesConfig.getString("messages.noPermission"));
@@ -74,6 +74,14 @@ public class MineMeMessageManager extends BasicMessageManager {
             e.printStackTrace();
             mineMe.debug("--== Error ==--");
         }
+    }
+
+    public List<String> translateAll(Iterable<String> get, Mine m) {
+        ArrayList<String> strings = new ArrayList();
+        for (String s : get) {
+            strings.add(translateAll(s));
+        }
+        return strings;
     }
 
     public String translateAll(String get, Mine m) {
@@ -125,7 +133,7 @@ public class MineMeMessageManager extends BasicMessageManager {
             translateComposition = get.contains("%composition:");
 
         }
-        return BasicMessageManager.this.translateAll(get);
+        return translateAll(get);
     }
 
     public String getResetMessage(Mine m) {
@@ -137,11 +145,11 @@ public class MineMeMessageManager extends BasicMessageManager {
         if (pluginPrefix != null) {
             input = input.replaceAll("%prefix%", pluginPrefix);
         }
-        if (header != null) {
-            input = input.replaceAll("%header%", header);
-        }
         if (messageSeparator != null) {
             input = input.replaceAll("%separator%", messageSeparator);
+        }
+        if (header != null) {
+            input = input.replaceAll("%header%", header);
         }
         return input;
     }

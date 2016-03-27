@@ -1,0 +1,59 @@
+config:
+    clickToSeeMine: '$2Click to see mine configuration!'
+    clickToRemove: '$4Click to remove!'
+    clickToEdit: '$2Click to edit!'
+    dropAddMaterial: '$1Drop a material here to add!'
+globalItems:
+#DO NOT DELETE ANY OF THESE!!!
+#But you can edit them AS LONG AS YOU DON'T DELETE THEM
+    splitter:
+        type: IRON_FENCE
+        data: 0
+        name: '&r'
+    teleporter:
+        type: ENDER_PEARL
+        data: 0
+        name: '$2Teleport to mine location!'
+    removeMaterial:
+        type: BARRIER
+        data: 0
+        name: '$4Click to remove'
+    resetNow:
+        type: WOOD_PICKAXE
+        data: 0
+        name: '$2Reset mine'
+    deleteMine:
+        type: TNT
+        data: 0
+        name: '$2Delete mine'
+    back:
+        type: EMERALD
+        data: 0
+        name: '&a&lGo back'
+    empty:
+        type: STAINED_GLASS_PANE
+        data: 15
+        name: '$4None'
+    info:
+        type: BOOK
+        data: 0
+        name: '$2Stats'
+        lore:
+            - '$3Total percentage: $1%totalpercentage%'
+            - '$3Total materials: $1%totalmaterials%'
+mainMenu:
+    name: "$2&lMegui"
+    #The total lanes the main menu will have
+    totalLanes: 6
+    icons:
+        #DON'T DELETE THIS
+        main:
+            type: DIAMOND_PICKAXE
+            data: 0
+            name: '$2&lMine editor'
+            lore:
+            - '$3An editor provided by' 
+            - '%prefix% $3to easily edit mines! :)'
+mineMenu:
+    #DO, NOOOT CHANGE THIS, unless you want some weird menus, then that's fine :D
+    totalLanes: 6

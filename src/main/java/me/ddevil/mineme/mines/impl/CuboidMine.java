@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.MineType;

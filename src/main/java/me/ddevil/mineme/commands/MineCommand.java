@@ -377,7 +377,7 @@ public class MineCommand extends CustomCommand {
                         editCommand.handleExecute(p, args);
                     } else if (func.equalsIgnoreCase("help")) {
                         //lies
-                        MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateTagsAndColor(MessageColor.ERROR + "The help is a lie! " + MessageColor.PRIMARY + "Use /mineme"));
+                        MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateAll(MessageColor.ERROR + "The help is a lie! " + MessageColor.PRIMARY + "Use /mineme"));
                     } else if (func.equalsIgnoreCase("gui") || func.equalsIgnoreCase("megui")) {
                         //MineEditorGUI
                         GUIManager.mineEditorGUI.open(p);
@@ -442,7 +442,8 @@ public class MineCommand extends CustomCommand {
             }
         }
         MineManager.registerMine(m);
-        MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateAll(MineMeMessageManager.mineCreateMessage, m));
+        MineMe.chatManager.sendMessage(p,
+                MineMeMessageManager.getInstance().translateAll(MineMeMessageManager.mineCreateMessage, m));
         m.save();
         if (MineMe.useHolograms) {
             if (m instanceof HologramCompatible) {
@@ -461,7 +462,7 @@ public class MineCommand extends CustomCommand {
                 s = s.concat(MessageColor.SECONDARY + ", " + MessageColor.PRIMARY);
             }
         }
-        MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateTagsAndColor(MessageColor.SECONDARY + "Available mines: " + MessageColor.PRIMARY + "" + s));
+        MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateAll(MessageColor.SECONDARY + "Available mines: " + MessageColor.PRIMARY + "" + s));
     }
 
     @Override

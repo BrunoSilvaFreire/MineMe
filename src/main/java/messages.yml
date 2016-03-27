@@ -1,0 +1,43 @@
+#Color pallete, inspired by PlotSquared, take a look at it! Best plot plugin ever 10/10 would use again.
+ #These are colors which you can use and modify however you like :D
+ #They are very useful when "designing" chat appearrence, because any 
+ #change you make to them will update on all the messages
+ #They were made to make messages easier to customize.
+ #If you can't remember which is which, try this:
+ # Use $1 on messages about ALL the mines
+ # Use $2 on messages about a single mine
+ # Use $3 on simple messages / The one who no one ever reads
+ # Use $4 on warning/error messages, I believe red would be the better
+ # for this, but I won't stop from putting that bright shiny and beautiful pink color on warnings :D
+ 
+ # And of course you don't need to use global colors at all, you still use '&a', thats fine :)
+ 
+ #Actual color pallete below
+ # This is $1
+ primaryColor: "e"
+ # This is $2
+ secondaryColor: "a"
+ # This is $3
+ neutralColor: "7"
+ # This is $4
+ warningColor: "c"
+ # Check tags @ https://www.spigotmc.org/resources/mineme.19380/
+ # Messages
+ messages:
+    #Chat messages
+    messagePrefix: "$1&lMine$2&lMe"
+    messageSeparator: " &6&l>$3 "
+    header: "$4&m----&r %prefix% $4&m----"
+
+  # Mine messages
+    
+  # This is displayed when you create a mine... What did you expect?
+    mineCreate: "$2Mine %mine% $2has been created!"
+    
+  # If forceDefaultBroadcastMessage is enabled, this message will be used on all mines
+  # on reset... ALL... MINES...
+    mineReset: "%prefix%%separator%$2The mine %alias% $2has been reseted!"
+    
+  #Warning messages
+    noPermission: "$4You don't have permission to do this!"
+    invalidArguments: "$4Invalid arguments! Check usage!"

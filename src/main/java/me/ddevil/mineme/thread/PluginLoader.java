@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import me.ddevil.core.thread.CustomThread;
+import me.ddevil.core.utils.FileUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineLoadEvent;
@@ -33,7 +34,6 @@ import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.mines.impl.CircularMine;
 import me.ddevil.mineme.mines.impl.CuboidMine;
 import me.ddevil.mineme.mines.impl.PolygonMine;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -192,20 +192,19 @@ public class PluginLoader extends CustomThread {
             File examplecuboidmine = new File(plugin.getDataFolder() + "/examplemine.yml");
             File examplepoligonalmine = new File(plugin.getDataFolder() + "/examplepoligonalmine.yml");
             try {
-                FileUtils.moveFileToDirectory(examplecuboidmine, MineMe.minesFolder, false);
+                FileUtils.moveFileToDirectory(examplecuboidmine, MineMe.minesFolder);
                 plugin.debug("examplemine.yml added!", 3);
-                FileUtils.moveFileToDirectory(examplecircularmine, MineMe.minesFolder, false);
+                FileUtils.moveFileToDirectory(examplecircularmine, MineMe.minesFolder);
                 plugin.debug("examplecircularmine.yml added!", 3);
-                FileUtils.moveFileToDirectory(examplepoligonalmine, MineMe.minesFolder, false);
+                FileUtils.moveFileToDirectory(examplepoligonalmine, MineMe.minesFolder);
                 plugin.debug("examplepoligonalmine.yml added!", 3);
-            } catch (IOException ex) {
-                examplecuboidmine.delete();
-                plugin.debug("There was a problem trying to copy the example mines to the mines folder. Skipping.", true);
+            } catch (SecurityException ex) {
+                plugin.printException("There was a problem trying to copy the example mines to the mines folder. Skipping.", ex);
             }
         }
         if (MineMe.useHolograms && MineMe.hologramAdapter == null) {
             plugin.debug("Holograms were enabled in the config, but we didn't find an hologram adapter! Fixing...", true);
-            plugin.setInConfig(MineMe.pluginConfig, "settings.holograms.enableHolograms", false);
+            MineMe.pluginConfig.set("settings.holograms.enableHolograms", false);
             MineMe.useHolograms = false;
         }
         plugin.debug();
@@ -236,7 +235,7 @@ public class PluginLoader extends CustomThread {
                 plugin.debug("Loading...");
                 MineConfig config = new MineConfig(mine);
                 //Instanciate
-                Mine m;
+                final Mine m;
                 if (config.getType().equals(MineType.CIRCULAR)) {
                     m = new CircularMine(config);
                 } else if (config.getType().equals(MineType.POLYGON)) {

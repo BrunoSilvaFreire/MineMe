@@ -103,7 +103,7 @@ public class MineManager {
     }
 
     public static void sendInfo(Player p, Mine m) {
-        MineMe.messageManager.sendMessage(p, MineMeMessageManager.getInstance().translateAll(m.getInfo().toArray(new String[m.getInfo().size()]), m));
+        MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateAll(m.getInfo(), m));
     }
 
     private static void notifyBlockChange(Block b) {

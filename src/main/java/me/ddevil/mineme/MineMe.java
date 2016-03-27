@@ -24,11 +24,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import me.ddevil.core.CustomPlugin;
-import me.ddevil.core.thread.FinishListener;
+import me.ddevil.core.chat.ChatManager;
+import me.ddevil.core.chat.MessageManager;
+import me.ddevil.core.chat.PluginChatManager;
+import me.ddevil.core.thread.ThreadFinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.conversion.MRLConverter;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.holograms.HologramAdapter;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -42,10 +46,8 @@ import org.bukkit.entity.Player;
 public class MineMe extends CustomPlugin {
 
     //Configs
-    public static FileConfiguration pluginConfig;
     public static FileConfiguration guiConfig;
     public static FileConfiguration messagesConfig;
-    public static File pluginFolder;
     public static File minesFolder;
     //Storage
     public static File storageFolder;
@@ -81,7 +83,7 @@ public class MineMe extends CustomPlugin {
         super.onEnable();
         PluginLoader pLoader = new PluginLoader();
         pLoader.start();
-        pLoader.addListener(new FinishListener() {
+        pLoader.addListener(new ThreadFinishListener() {
 
             @Override
             public void onFinish() {
@@ -157,20 +159,21 @@ public class MineMe extends CustomPlugin {
         });
     }
 
-    public void reload(Player p) {
-        messageManager.sendMessage(p, "Reloading config...");
+    @Override
+    public void reload(final Player p) {
+        chatManager.sendMessage(p, "Reloading config...");
         debug("Stopping reseter task...");
         Bukkit.getScheduler().cancelTask(timerID);
         debug("Unloading...");
         unloadEverything();
         PluginLoader l = new PluginLoader();
         l.start();
-        l.addListener(new FinishListener() {
+        l.addListener(new ThreadFinishListener() {
 
             @Override
             public void onFinish() {
                 debug("Reload complete!");
-                messageManager.sendMessage(p, "Reloaded! :D");
+                chatManager.sendMessage(p, "Reloaded! :D");
             }
         });
     }
@@ -252,5 +255,25 @@ public class MineMe extends CustomPlugin {
                 }
             }, 20l, 20l);
         }
+    }
+
+    @Override
+    public ChatManager getPluginChatManager() {
+        return PluginChatManager.getInstance(instance);
+    }
+
+    @Override
+    public MessageManager getPluginMessageManager() {
+        return MineMeMessageManager.getInstance();
+    }
+
+    @Override
+    public String getPluginName() {
+        return "MineMe";
+    }
+
+    @Override
+    public FileConfiguration getMessagesConfig() {
+        return messagesConfig;
     }
 }

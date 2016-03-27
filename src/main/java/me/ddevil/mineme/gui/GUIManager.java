@@ -18,20 +18,15 @@ package me.ddevil.mineme.gui;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.core.exceptions.ItemConversionException;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
-import me.ddevil.mineme.exception.ItemConversionException;
 import me.ddevil.mineme.gui.impl.BasicMineEditorGUI;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  *
@@ -44,10 +39,10 @@ public class GUIManager {
 
     public static void setup() {
         //Load Strings
-        GUIResourcesUtils.clickToSee = MineMeMessageManager.getInstance().translateTagsAndColor(MineMe.guiConfig.getString("config.clickToSeeMine"));
-        GUIResourcesUtils.clickToRemove = MineMeMessageManager.getInstance().translateTagsAndColor(MineMe.guiConfig.getString("config.clickToRemove"));
-        GUIResourcesUtils.clickToEdit = MineMeMessageManager.getInstance().translateTagsAndColor(MineMe.guiConfig.getString("config.clickToEdit"));
-        GUIResourcesUtils.dropAddMaterial = MineMeMessageManager.getInstance().translateTagsAndColor(MineMe.guiConfig.getString("config.dropAddMaterial"));
+        GUIResourcesUtils.clickToSee = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.clickToSeeMine"));
+        GUIResourcesUtils.clickToRemove = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.clickToRemove"));
+        GUIResourcesUtils.clickToEdit = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.clickToEdit"));
+        GUIResourcesUtils.dropAddMaterial = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.dropAddMaterial"));
         //Load items
         //Load splitter
         GUIResourcesUtils.splitter = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.splitter"));
@@ -63,15 +58,14 @@ public class GUIManager {
         //Load info item
         ConfigurationSection infoConfig = MineMe.guiConfig.getConfigurationSection("globalItems.info");
         GUIResourcesUtils.information = loadFromConfig(infoConfig);
-        List<String> ilore = infoConfig.getStringList("lore");
-        GUIResourcesUtils.infomationLore = ilore.toArray(new String[ilore.size()]);
+        GUIResourcesUtils.infomationLore = infoConfig.getStringList("lore");
         //Load reset item
         GUIResourcesUtils.resetButton = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.resetNow"));
         //Load reset item
         GUIResourcesUtils.deleteMineButton = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.deleteMine"));
         //Load mainMenu
         ConfigurationSection mainMenu = MineMe.guiConfig.getConfigurationSection("mainMenu");
-        String mainMenuName = MineMeMessageManager.getInstance().translateTagsAndColor(mainMenu.getString("name"));
+        String mainMenuName = MineMeMessageManager.getInstance().translateAll(mainMenu.getString("name"));
         int mainMenuSize = mainMenu.getInt("totalLanes") * 9;
         //Load mineMenu
         ConfigurationSection mineMenu = MineMe.guiConfig.getConfigurationSection("mineMenu");
@@ -92,18 +86,26 @@ public class GUIManager {
         String configName = configSection.getName().replace("globalItems.", "");
         Material material = Material.valueOf(configSection.getString("type"));
         byte data = ((Integer) configSection.get("data")).byteValue();
-        String name = MineMeMessageManager.getInstance().translateTagsAndColor(configSection.getString("name"));
+        String name = MineMeMessageManager.getInstance().translateAll(configSection.getString("name"));
         boolean containsLore = configSection.contains("lore");
+
+        ItemStack i;
         try {
-            ItemStack i = ItemUtils.convertFromInput(material + ":" + data, name);
-            if (containsLore) {
-                i = ItemUtils.addToLore(i, configSection.getStringList("lore"));
-            }
-            return i;
+            i = ItemUtils.convertFromInput(material + ":" + data, name);
         } catch (ItemConversionException ex) {
             MineMe.instance.printException("There was a problem loading GUIItem reset, is it configured correctly?", ex);
-            return ItemUtils.createItem(Material.TNT, "§4Error", MineMeMessageManager.getInstance().translateAll(new String[]{"§4There was a problem loading GUIItem §1" + configName, "§4Is it configured correctly?"}));
+            return ItemUtils.createItem(Material.TNT, "§4Error", MineMeMessageManager.getInstance().translateAll(
+                    Arrays.asList(new String[]{
+                        "§4There was a problem loading GUIItem §1" + configName, "§4Is it configured correctly?"
+                    }
+                    ))
+            );
         }
+        if (containsLore) {
+            i = ItemUtils.addToLore(i, configSection.getStringList("lore"));
+        }
+        return i;
+
     }
 
     public static void registerItem(String name, ItemStack i) {

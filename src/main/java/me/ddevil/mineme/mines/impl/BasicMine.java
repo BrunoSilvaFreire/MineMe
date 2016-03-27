@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.core.utils.PotionUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
@@ -86,7 +86,7 @@ public abstract class BasicMine implements Mine {
     protected boolean deleted = false;
     protected ItemStack icon;
 
-    public BasicMine(MineConfig config) {
+    public BasicMine(final MineConfig config) {
         this.broadcastMessage = MineMe.forceDefaultBroadcastMessage
                 ? MineMeMessageManager.globalResetMessage
                 : config.isUseCustomBroadcast() ? config.getBroadcastMessage() : MineMeMessageManager.globalResetMessage;
@@ -114,7 +114,7 @@ public abstract class BasicMine implements Mine {
                                 iconsection.getString("name"),
                                 BasicMine.this),
                         MineMeMessageManager.getInstance().translateAll(
-                                lore.toArray(new String[lore.size()]),
+                                lore,
                                 BasicMine.this));
                 icon.getData().setData(((Integer) iconsection.get("data")).byteValue());
                 ItemMeta im = icon.getItemMeta();

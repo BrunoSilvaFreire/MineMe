@@ -20,6 +20,7 @@ import be.maximvdw.placeholderapi.PlaceholderAPI;
 import be.maximvdw.placeholderapi.PlaceholderReplaceEvent;
 import be.maximvdw.placeholderapi.PlaceholderReplacer;
 import java.util.ArrayList;
+import me.ddevil.core.utils.StringUtils;
 import me.ddevil.mineme.MineMe;
 import static me.ddevil.mineme.MineMe.useMVdWPlaceholderAPI;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -56,7 +57,7 @@ public class MVdWPlaceholderManager {
                 @Override
                 public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
                     Player p = e.getPlayer();
-                    return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(MineMeMessageManager.secondsToString(MineManager.getMineWith(p).getTimeToNextReset()));
+                    return !MineManager.isPlayerInAMine(p) ? "" : String.valueOf(StringUtils.secondsToString(MineManager.getMineWith(p).getTimeToNextReset()));
                 }
             });
             PlaceholderAPI.registerPlaceholder(MineMe.instance, "minememinemined", new PlaceholderReplacer() {
@@ -107,7 +108,7 @@ public class MVdWPlaceholderManager {
     }
     private final static ArrayList<Mine> registeredMines = new ArrayList();
 
-    public static void registerMinePlaceholders(Mine m) {
+    public static void registerMinePlaceholders(final Mine m) {
         PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":remaining", new PlaceholderReplacer() {
             @Override
             public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
@@ -141,7 +142,7 @@ public class MVdWPlaceholderManager {
         PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":resettime", new PlaceholderReplacer() {
             @Override
             public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                return MineMeMessageManager.secondsToString(m.getTimeToNextReset());
+                return StringUtils.secondsToString(m.getTimeToNextReset());
             }
         });
         PlaceholderAPI.registerPlaceholder(MineMe.instance, "mineme:" + m.getName() + ":minedpercent", new PlaceholderReplacer() {

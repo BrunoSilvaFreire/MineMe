@@ -19,18 +19,16 @@ package me.ddevil.mineme.conversion;
 import com.koletar.jj.mineresetlite.MineResetLite;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.ddevil.core.utils.FileUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.mines.impl.CuboidMine;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -74,9 +72,8 @@ public class MRLConverter {
         template.renameTo(name);
         template = name;
         try {
-            FileUtils.moveFileToDirectory(template, MineMe.minesFolder, false);
-        } catch (IOException ex) {
-            Logger.getLogger(MRLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            FileUtils.moveFileToDirectory(template, MineMe.minesFolder);
+        } catch (SecurityException e) {
         }
         FileConfiguration c = YamlConfiguration.loadConfiguration(template);
         c.set("enabled", true);

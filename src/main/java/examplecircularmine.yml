@@ -1,0 +1,42 @@
+enabled: false
+name: 'examplecircularmine'
+alias: '&cSpiral'
+world: world
+type: CIRCULAR
+icon:
+    type: EYE_OF_ENDER
+    data: 0
+    name: '%alias%'
+    lore:
+        - '$3The basic circular mine'
+        - '$3created by %prefix%'
+        - '$3Name: $2%mine%'
+        - '$3Type: $2%type%'
+resetDelay: 1
+broadcastOnReset: true
+broadcastToNearbyOnly: false
+broadcastRadius: 50.0
+composition:
+ #{Material}:[Data(Optional)]={Percentage}
+ #STONE=25
+ #WOOL:9=25
+    - STONE=35
+    - DIAMOND_ORE=60
+    - DIAMOND_BLOCK=5
+radius: 10
+height: 30
+X: 30.0
+Y: 64.0
+Z: 30.0
+effects:
+    use: true
+    list:
+        - 'FAST_DIGGING:1:2'
+useCustomHologramText: false
+#This will only be used in case HolographicDisplays is available and enabled
+#in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
+hologramsText:
+    - '%alias%'
+    - '$1Mined: $2%minedblocks% $1blocks'
+    - '$2%remainingblockspercent%$1% remaining'
+    - '$3This is a custom hologram text! :D'

@@ -16,10 +16,10 @@
  */
 package me.ddevil.mineme.gui;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import me.ddevil.core.CustomPlugin;
-import me.ddevil.core.utils.ItemUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
@@ -44,7 +44,7 @@ public class GUIResourcesUtils {
     public static ItemStack resetButton;
     public static ItemStack deleteMineButton;
     protected static ItemStack information;
-    public static String[] infomationLore;
+    public static List<String> infomationLore;
 
     //Mine utils
     public static String mineItemNameFormat;
@@ -55,7 +55,7 @@ public class GUIResourcesUtils {
     public static ItemStack generateCompositionItemStack(Mine m, ItemStack i) {
         ItemStack is = new ItemStack(i);
         ItemMeta im = is.getItemMeta();
-        im.setDisplayName(MineMeMessageManager.getInstance().translateTagsAndColor("$1" + is.getType() + "$3:$2" + i.getData().getData() + "$3-$1" + m.getComposition().get(i) + "%"));
+        im.setDisplayName(MineMeMessageManager.getInstance().translateAll("$1" + is.getType() + "$3:$2" + i.getData().getData() + "$3-$1" + m.getComposition().get(i) + "%"));
         List<String> lore = ItemUtils.getLore(i);
         lore.add(GUIResourcesUtils.clickToEdit);
         im.setLore(lore);
@@ -69,7 +69,7 @@ public class GUIResourcesUtils {
         Material m = add ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
         ItemStack is = new ItemStack(m);
         ItemMeta im = is.getItemMeta();
-        im.setDisplayName(MineMeMessageManager.getInstance().translateTagsAndColor(prefix + change + "%"));
+        im.setDisplayName(MineMeMessageManager.getInstance().translateAll(prefix + change + "%"));
         is.setItemMeta(im);
         return is;
     }
@@ -95,7 +95,9 @@ public class GUIResourcesUtils {
     public static ItemStack generateInformationItem(Mine mine) {
         ItemStack i = new ItemStack(information);
         i = ItemUtils.addToLore(i,
-                MineMeMessageManager.getInstance().translateAll(infomationLore, mine));
+                MineMeMessageManager.getInstance().translateAll(
+                        infomationLore,
+                        mine));
         return i;
     }
 }
