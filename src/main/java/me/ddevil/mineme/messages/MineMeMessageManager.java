@@ -19,12 +19,13 @@ package me.ddevil.mineme.messages;
 import java.util.ArrayList;
 import java.util.List;
 import me.ddevil.core.chat.BasicMessageManager;
+import me.ddevil.core.exceptions.ItemConversionException;
 import me.ddevil.core.utils.StringUtils;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.storage.StorageManager;
-import org.bukkit.block.Block;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 public class MineMeMessageManager extends BasicMessageManager {
@@ -69,10 +70,8 @@ public class MineMeMessageManager extends BasicMessageManager {
             mineMe.debug("Messages loaded!");
             mineMe.debug();
         } catch (Exception e) {
-            mineMe.debug("Something went wrong while loading messages :(");
-            mineMe.debug("--== Error ==--");
-            e.printStackTrace();
-            mineMe.debug("--== Error ==--");
+            mineMe.printException("Something went wrong while loading messages :(", e);
+
         }
     }
 
@@ -84,33 +83,33 @@ public class MineMeMessageManager extends BasicMessageManager {
         return strings;
     }
 
-    public String translateAll(String get, Mine m) {
+    public String translateAll(String input, Mine m) {
         //Mine
         if (m != null) {
-            get = get.replaceAll("%mine%", m.getName());
-            get = get.replaceAll("%minedblocks%", String.valueOf(m.getMinedBlocks()));
-            get = get.replaceAll("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
-            get = get.replaceAll("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
-            get = get.replaceAll("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
-            get = get.replaceAll("%volume%", m.getVolume() + "");
-            get = get.replaceAll("%resettime%", StringUtils.secondsToString(m.getTimeToNextReset()));
-            get = get.replaceAll("%alias%", m.getAlias());
-            get = get.replaceAll("%type%", m.getType().name());
-            get = get.replaceAll("%totalpercentage%", String.valueOf(m.getTotalPercentage()));
-            get = get.replaceAll("%totalmaterials%", String.valueOf(m.getTotalMaterials()));
-            get = get.replaceAll("%avgspeed%", String.valueOf(m.averageBreakSpeed()));
+            input = input.replace("%mine%", m.getName());
+            input = input.replace("%minedblocks%", String.valueOf(m.getMinedBlocks()));
+            input = input.replace("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
+            input = input.replace("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
+            input = input.replace("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
+            input = input.replace("%volume%", m.getVolume() + "");
+            input = input.replace("%resettime%", StringUtils.secondsToString(m.getTimeToNextReset()));
+            input = input.replace("%alias%", m.getAlias());
+            input = input.replace("%type%", m.getType().name());
+            input = input.replace("%totalpercentage%", String.valueOf(m.getTotalPercentage()));
+            input = input.replace("%totalmaterials%", String.valueOf(m.getTotalMaterials()));
+            input = input.replace("%avgspeed%", String.valueOf(m.averageBreakSpeed()));
             //LifeTime stats
-            get = get.replaceAll("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
-            get = get.replaceAll("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
+            input = input.replace("%totalminedblocks%", String.valueOf(StorageManager.getTotalBrokenBlocks(m)));
+            input = input.replace("%totalresets%", String.valueOf(StorageManager.getTotalResets(m)));
         } else {
-            MineMe.instance.debug("The mine used to translate " + get + " is null! Skipping mine tags...", true);
+            MineMe.instance.debug("The mine used to translate " + input + " is null! Skipping mine tags...", true);
         }
-        boolean translateComposition = get.contains("%composition:");
+        boolean translateComposition = input.contains("%composition:");
         while (translateComposition) {
-            int start = get.indexOf("%composition:") + 13;
+            int start = input.indexOf("%composition:") + 13;
             Integer end = null;
-            for (int i = start - 12; i < get.length(); i++) {
-                char c = get.charAt(i);
+            for (int i = start - 12; i < input.length(); i++) {
+                char c = input.charAt(i);
                 if (c == '%') {
                     end = i;
                 }
@@ -118,22 +117,22 @@ public class MineMeMessageManager extends BasicMessageManager {
             if (end == null) {
                 break;
             }
-            String itemName = get.substring(start, end);
-            ItemStack item = null;
+            String itemName = input.substring(start, end);
+            ItemStack item;
 
             try {
                 item = ItemUtils.convertFromInput(itemName);
-            } catch (me.ddevil.core.exceptions.ItemConversionException ex) {
-                MineMe.instance.printException(get, ex);
-
+            } catch (ItemConversionException ex) {
+                MineMe.instance.printException(input, ex);
+                break;
             }
 
             String find = "%composition:" + itemName + "%";
-            get = get.replace(find, String.valueOf(m.getPercentage(item)));
-            translateComposition = get.contains("%composition:");
+            input = input.replace(find, String.valueOf(m.getPercentage(item)));
+            translateComposition = input.contains("%composition:");
 
         }
-        return translateAll(get);
+        return translateAll(input);
     }
 
     public String getResetMessage(Mine m) {
@@ -143,13 +142,13 @@ public class MineMeMessageManager extends BasicMessageManager {
     @Override
     public String translateTags(String input) {
         if (pluginPrefix != null) {
-            input = input.replaceAll("%prefix%", pluginPrefix);
+            input = input.replace("%prefix%", pluginPrefix);
         }
         if (messageSeparator != null) {
-            input = input.replaceAll("%separator%", messageSeparator);
+            input = input.replace("%separator%", messageSeparator);
         }
         if (header != null) {
-            input = input.replaceAll("%header%", header);
+            input = input.replace("%header%", header);
         }
         return input;
     }

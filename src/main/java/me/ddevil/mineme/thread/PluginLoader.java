@@ -20,6 +20,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.ddevil.core.thread.CustomThread;
 import me.ddevil.core.utils.FileUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -198,7 +200,7 @@ public class PluginLoader extends CustomThread {
                 plugin.debug("examplecircularmine.yml added!", 3);
                 FileUtils.moveFileToDirectory(examplepoligonalmine, MineMe.minesFolder);
                 plugin.debug("examplepoligonalmine.yml added!", 3);
-            } catch (SecurityException ex) {
+            } catch (SecurityException | IOException ex) {
                 plugin.printException("There was a problem trying to copy the example mines to the mines folder. Skipping.", ex);
             }
         }

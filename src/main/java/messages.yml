@@ -13,14 +13,15 @@
  # And of course you don't need to use global colors at all, you still use '&a', thats fine :)
  
  #Actual color pallete below
- # This is $1
- primaryColor: "e"
- # This is $2
- secondaryColor: "a"
- # This is $3
- neutralColor: "7"
- # This is $4
- warningColor: "c"
+ colors:
+    # This is $1
+    primaryColor: "e"
+    # This is $2
+    secondaryColor: "a"
+    # This is $3
+    neutralColor: "7"
+    # This is $4
+    warningColor: "c"
  # Check tags @ https://www.spigotmc.org/resources/mineme.19380/
  # Messages
  messages:

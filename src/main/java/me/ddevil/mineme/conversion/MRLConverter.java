@@ -44,7 +44,13 @@ public class MRLConverter {
         int i = 0;
         for (com.koletar.jj.mineresetlite.Mine m : MineResetLite.instance.mines) {
             MineMe.instance.debug("Converting mine " + m.getName() + "...", true);
-            CuboidMine cm = new CuboidMine(new MineConfig(createBasicConfig(m)));
+            CuboidMine cm;
+            try {
+                cm = new CuboidMine(new MineConfig(createBasicConfig(m)));
+            } catch (SecurityException | IOException ex) {
+                MineMe.instance.printException("There was a problem attempting to create a config for " + m.getName() + ", skipping...", ex);
+                continue;
+            }
             MineManager.registerMine(cm);
             mines.add(cm);
             MineMe.instance.debug("Converted!", true);
@@ -65,16 +71,15 @@ public class MRLConverter {
         return mines;
     }
 
-    public static FileConfiguration createBasicConfig(com.koletar.jj.mineresetlite.Mine mine) {
+    public static FileConfiguration createBasicConfig(com.koletar.jj.mineresetlite.Mine mine) throws SecurityException, IOException {
         MineMe.getInstance().saveResource("examplemine.yml", true);
         File template = new File(MineMe.pluginFolder, "examplemine.yml");
         File name = new File(MineMe.pluginFolder, mine.getName() + ".yml");
         template.renameTo(name);
         template = name;
-        try {
-            FileUtils.moveFileToDirectory(template, MineMe.minesFolder);
-        } catch (SecurityException e) {
-        }
+
+        FileUtils.moveFileToDirectory(template, MineMe.minesFolder);
+
         FileConfiguration c = YamlConfiguration.loadConfiguration(template);
         c.set("enabled", true);
         c.set("name", mine.getName());
