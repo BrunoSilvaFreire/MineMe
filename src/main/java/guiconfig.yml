@@ -13,22 +13,38 @@ globalItems:
         type: ENDER_PEARL
         data: 0
         name: '$2Teleport to mine location!'
+        lore:
+            - '$1The spawn location will be'
+            - '$1the top-y-center of the mine :)'
     clearMaterials:
         type: BARRIER
         data: 0
         name: '$2Remove all the materials!'
+        lore:
+            - '$1Remember that by removing all'
+            - '$1the materials, the mine reset'
+            - '$1will kinda be ignored until you add'
+            - '$1some materials to the composition :P'
     removeMaterial:
         type: BARRIER
         data: 0
         name: '$4Click to remove'
+        lore:
+            - '$1Removes the material'
+            - '$1from the composition'
     resetNow:
         type: WOOD_PICKAXE
         data: 0
         name: '$2Reset mine'
+        lore:
+            - '$1Forces the mine to reset'
+            - '$1like... $4RIGHT NOW!'
     deleteMine:
         type: TNT
         data: 0
         name: '$2Delete mine'
+        lore: 
+            - '$1Deletes this mine, file included.'
     back:
         type: EMERALD
         data: 0
@@ -37,7 +53,8 @@ globalItems:
         type: STAINED_GLASS_PANE
         data: 15
         name: '$4None'
-        lore: '$1Drop a material here to add!'
+        lore: 
+            -'$1Drop a material here to add!'
     info:
         type: BOOK
         data: 0

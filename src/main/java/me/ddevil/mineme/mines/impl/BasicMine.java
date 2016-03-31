@@ -386,10 +386,10 @@ public abstract class BasicMine implements Mine {
                 if (!wasAlreadyBroken(b)) {
                     brokenBlocks.add(b);
                     lastSecond.add(b);
-                    new MineUpdateEvent(this).call();
                 }
             }
         }
+        new MineUpdateEvent(this).call();
         if (this instanceof HologramCompatible) {
             HologramCompatible hc = (HologramCompatible) this;
             hc.softHologramUpdate();

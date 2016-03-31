@@ -76,11 +76,18 @@ effects:
     use: true
     list:
         - 'FAST_DIGGING:1:2'
-useCustomHologramText: false
-#This will only be used in case HolographicDisplays is available and enabled
-#in config.yml and useCustomHologramText is enabled AAAAND forceDefaultHologramOnAllMines isn't enabled in config.yml :D
+useCustomHologramText: true
 hologramsText:
+    - '%header%'
     - '%alias%'
-    - '$1Mined: $2%minedblocks% $1blocks'
-    - '$2%remainingblockspercent%$1% remaining'
-    - '$3This is a custom hologram text! :D'
+    - '%icon%'
+    - '&cMined: &f%minedblocks%$4/&f%volume% &cblocks'
+    - '&f%remainingblockspercent%&c% remaining'
+    - '&cBreak speed: &f%avgspeed%&cblocks/s'
+    - '&7Stone &cpercentage:&f %composition:STONE%'
+    - '&4Redstone (Ore) &cpercentage&f %composition:REDSTONE_ORE%'
+    - '&4Redstone (Block) &cpercentage&f %composition:REDSTONE_BLOCK%'
+    - '&cTime until next reset: &f%resettime%'
+    - '&cLifetime mined blocks: &f%totalminedblocks%'
+    - '&4&lI am a custom hologram! :D'
+    - '%header%'

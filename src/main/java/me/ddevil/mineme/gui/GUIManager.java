@@ -102,7 +102,7 @@ public class GUIManager {
             );
         }
         if (containsLore) {
-            i = ItemUtils.addToLore(i, configSection.getStringList("lore"));
+            i = ItemUtils.addToLore(i, MineMe.messageManager.translateAll(configSection.getStringList("lore")));
         }
         return i;
 

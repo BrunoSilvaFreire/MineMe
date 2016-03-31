@@ -173,6 +173,7 @@ public class MineMenu implements Listener {
                         owner.delete();
                     } else if (itemName.equalsIgnoreCase(GUIResourcesUtils.clearMaterials.getItemMeta().getDisplayName())) {
                         owner.clearMaterials();
+                        update();
                     } else if (InventoryUtils.wasClickedInLane(inv, e.getRawSlot(), InventoryUtils.getTotalLanes(inv) - 2) && ItemUtils.equals(i, GUIResourcesUtils.empty)) {
                         //Check is item is valid
                         if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
