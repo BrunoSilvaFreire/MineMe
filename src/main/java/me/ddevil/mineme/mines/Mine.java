@@ -373,4 +373,5 @@ public interface Mine extends Iterable<Block>, Listener {
 
     public List<PotionEffect> getEffects();
 
+    public void clearMaterials();
 }

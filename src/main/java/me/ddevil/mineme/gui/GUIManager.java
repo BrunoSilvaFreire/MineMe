@@ -42,7 +42,6 @@ public class GUIManager {
         GUIResourcesUtils.clickToSee = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.clickToSeeMine"));
         GUIResourcesUtils.clickToRemove = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.clickToRemove"));
         GUIResourcesUtils.clickToEdit = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.clickToEdit"));
-        GUIResourcesUtils.dropAddMaterial = MineMeMessageManager.getInstance().translateAll(MineMe.guiConfig.getString("config.dropAddMaterial"));
         //Load items
         //Load splitter
         GUIResourcesUtils.splitter = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.splitter"));
@@ -52,7 +51,6 @@ public class GUIManager {
         GUIResourcesUtils.removeButton = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.removeMaterial"));
         //Load emptyitem
         GUIResourcesUtils.empty = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.empty"));
-        ItemUtils.addToLore(GUIResourcesUtils.empty, GUIResourcesUtils.dropAddMaterial);
         //Load teleporter
         GUIResourcesUtils.teleporter = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.teleporter"));
         //Load info item
@@ -63,6 +61,7 @@ public class GUIManager {
         GUIResourcesUtils.resetButton = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.resetNow"));
         //Load reset item
         GUIResourcesUtils.deleteMineButton = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.deleteMine"));
+        GUIResourcesUtils.clearMaterials = loadFromConfig(MineMe.guiConfig.getConfigurationSection("globalItems.clearMaterials"));
         //Load mainMenu
         ConfigurationSection mainMenu = MineMe.guiConfig.getConfigurationSection("mainMenu");
         String mainMenuName = MineMeMessageManager.getInstance().translateAll(mainMenu.getString("name"));
@@ -83,14 +82,15 @@ public class GUIManager {
     }
 
     private static ItemStack loadFromConfig(ConfigurationSection configSection) {
-        String configName = configSection.getName().replace("globalItems.", "");
-        Material material = Material.valueOf(configSection.getString("type"));
-        byte data = ((Integer) configSection.get("data")).byteValue();
-        String name = MineMeMessageManager.getInstance().translateAll(configSection.getString("name"));
-        boolean containsLore = configSection.contains("lore");
-
+        String configName = configSection.getName();
+        boolean containsLore;
         ItemStack i;
+
         try {
+            Material material = Material.valueOf(configSection.getString("type"));
+            byte data = ((Integer) configSection.get("data")).byteValue();
+            String name = MineMeMessageManager.getInstance().translateAll(configSection.getString("name"));
+            containsLore = configSection.contains("lore");
             i = ItemUtils.convertFromInput(material + ":" + data, name);
         } catch (ItemConversionException ex) {
             MineMe.instance.printException("There was a problem loading GUIItem reset, is it configured correctly?", ex);

@@ -16,7 +16,6 @@
  */
 package me.ddevil.mineme.gui.menus;
 
-import com.gmail.filoghost.holographicdisplays.util.Validator;
 import java.util.Arrays;
 import me.ddevil.core.utils.inventory.InventoryUtils;
 import me.ddevil.core.utils.items.ItemUtils;
@@ -26,7 +25,6 @@ import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -698,4 +698,9 @@ public abstract class BasicMine implements Mine {
         }
     }
 
+    @Override
+    public void clearMaterials() {
+        composition.clear();
+    }
+
 }

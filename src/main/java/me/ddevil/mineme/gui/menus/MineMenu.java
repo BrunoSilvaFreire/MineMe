@@ -171,6 +171,8 @@ public class MineMenu implements Listener {
                         owner.reset();
                     } else if (itemName.equalsIgnoreCase(GUIResourcesUtils.deleteMineButton.getItemMeta().getDisplayName())) {
                         owner.delete();
+                    } else if (itemName.equalsIgnoreCase(GUIResourcesUtils.clearMaterials.getItemMeta().getDisplayName())) {
+                        owner.clearMaterials();
                     } else if (InventoryUtils.wasClickedInLane(inv, e.getRawSlot(), InventoryUtils.getTotalLanes(inv) - 2) && ItemUtils.equals(i, GUIResourcesUtils.empty)) {
                         //Check is item is valid
                         if (ItemUtils.equals(i, GUIResourcesUtils.empty)) {
@@ -223,6 +225,7 @@ public class MineMenu implements Listener {
         mainInventory.setItem(InventoryUtils.getBottomMiddlePoint(mainInventory), owner.getIcon());
         mainInventory.setItem(0, GUIResourcesUtils.teleporter);
         mainInventory.setItem(1, GUIResourcesUtils.resetButton);
+        mainInventory.setItem(2, GUIResourcesUtils.clearMaterials);
         Integer[] lane = InventoryUtils.getLane(mainInventory, 2);
         mainInventory.setItem(lane[lane.length - 1], GUIResourcesUtils.deleteMineButton);
     }
