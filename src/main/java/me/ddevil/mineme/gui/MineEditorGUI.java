@@ -38,7 +38,6 @@ public interface MineEditorGUI extends Listener {
 
     public void updateMainInventory();
 
-
     public Mine ownerOf(Inventory inv);
 
     public boolean isMainInventory(Inventory inv);

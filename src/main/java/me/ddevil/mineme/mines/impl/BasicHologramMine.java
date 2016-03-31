@@ -26,6 +26,7 @@ import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +37,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class BasicHologramMine extends BasicMine implements HologramCompatible {
 
     protected boolean hologramsReady = false;
-    private boolean useCustomHologramText;
+    private final boolean useCustomHologramText;
 
     public BasicHologramMine(String name, World world, ItemStack icon) {
         super(name, world, icon);
@@ -72,7 +73,9 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
         //Place holograms
         placeHolograms();
         //Inicial holograms setup
+        int totallines = getHologramsLines().size();
         for (CompatibleHologram h : getHolograms()) {
+            h.move(h.getLocation().clone().add(0, 0.3 * totallines + 1.3, 0));
             h.clearLines();
             for (String text : getHologramsLines()) {
                 if (text.equalsIgnoreCase("%icon%")) {

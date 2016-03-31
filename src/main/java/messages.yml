@@ -15,13 +15,19 @@
  #Actual color pallete below
  colors:
     # This is $1
-    primaryColor: "e"
+    primaryColor: 'e'
     # This is $2
-    secondaryColor: "a"
+    secondaryColor: 'a'
     # This is $3
-    neutralColor: "7"
+    neutralColor: '7'
     # This is $4
-    warningColor: "c"
+    warningColor: 'c'
+    enableCustomColors: false
+    custom:
+        #Terciary color
+        5: '6'
+        #Some random color
+        6: 'd'
  # Check tags @ https://www.spigotmc.org/resources/mineme.19380/
  # Messages
  messages:

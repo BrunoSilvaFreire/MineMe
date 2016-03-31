@@ -16,6 +16,7 @@
  */
 package me.ddevil.mineme.gui.menus;
 
+import com.gmail.filoghost.holographicdisplays.util.Validator;
 import java.util.Arrays;
 import me.ddevil.core.utils.inventory.InventoryUtils;
 import me.ddevil.core.utils.items.ItemUtils;
@@ -130,22 +131,24 @@ public class CompositionEditorMenu implements Listener {
                 e.setCancelled(true);
                 ItemStack i = e.getCurrentItem();
                 ItemMeta itemMeta = i.getItemMeta();
-                String itemName = itemMeta.getDisplayName();
-                //Check go back
-                if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                    GUIManager.mineEditorGUI.openMineMenu(owner, p);
-                }
-                //Check remove
-                if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
-                    owner.removeMaterial(item);
-                    GUIManager.mineEditorGUI.openMineMenu(owner, p);
-                }
-                //Check change percentage
-                if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
-                        || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
-                    double finalValue = GUIResourcesUtils.getCompositionChangeValue(i) + owner.getPercentage(item);
-                    owner.setMaterialPercentage(item, finalValue);
-                    open(p);
+                if (itemMeta.getDisplayName() != null) {
+                    String itemName = itemMeta.getDisplayName();
+                    //Check go back
+                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
+                        GUIManager.mineEditorGUI.openMineMenu(owner, p);
+                    }
+                    //Check remove
+                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
+                        owner.removeMaterial(item);
+                        GUIManager.mineEditorGUI.openMineMenu(owner, p);
+                    }
+                    //Check change percentage
+                    if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
+                            || InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), InventoryUtils.getTotalLanes(inventory) - 1)) {
+                        double finalValue = GUIResourcesUtils.getCompositionChangeValue(i) + owner.getPercentage(item);
+                        owner.setMaterialPercentage(item, finalValue);
+                        open(p);
+                    }
                 }
             }
         }

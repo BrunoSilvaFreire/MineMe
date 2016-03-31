@@ -28,7 +28,6 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.utils.WorldEditIterator;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -180,7 +179,7 @@ public class CircularMine extends BasicHologramMine {
         Location l = getVectorCenter().toLocation(world);
         Location temp;
         temp = l.clone();
-        temp.setY(getUpperY() + 4 + (hologramsLines.size() * 0.15));
+        temp.setY(getUpperY());
         holograms.add(MineMe.hologramAdapter.createHologram(temp));
         temp = l.clone();
         temp.add(area.getRadius().getX() + 1, 0, 0);

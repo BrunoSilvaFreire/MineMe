@@ -16,7 +16,6 @@
  */
 package me.ddevil.mineme.mines.impl;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -274,7 +273,7 @@ public class CuboidMine extends BasicHologramMine {
             Location l = getCenter();
             Location temp;
             temp = l.clone();
-            temp.setY(getUpperY() + 4 + (hologramsLines.size() * 0.15));
+            temp.setY(getUpperY());
             holograms.add(MineMe.hologramAdapter.createHologram(temp));
             temp = l.clone();
             temp.add(getSizeX() / 2 + 1, 0, 0);

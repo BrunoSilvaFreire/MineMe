@@ -167,7 +167,7 @@ public class PolygonMine extends BasicHologramMine {
     @Override
     public void placeHolograms() {
         for (Vector v : points) {
-            holograms.add(MineMe.hologramAdapter.createHologram(v.clone().setY(getUpperY() + 4).toLocation(world)));
+            holograms.add(MineMe.hologramAdapter.createHologram(v.clone().setY(getUpperY()).toLocation(world)));
         }
     }
 

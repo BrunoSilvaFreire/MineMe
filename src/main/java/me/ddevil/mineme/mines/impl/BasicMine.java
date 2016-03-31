@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import me.ddevil.core.utils.items.ItemUtils;
-import me.ddevil.core.utils.PotionUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.challenge.Challenge;
@@ -86,6 +85,10 @@ public abstract class BasicMine implements Mine {
     protected boolean deleted = false;
     protected ItemStack icon;
 
+    //Potions
+    private boolean useEffects;
+    private final List<PotionEffect> potionEffects;
+
     public BasicMine(final MineConfig config) {
         this.broadcastMessage = MineMe.forceDefaultBroadcastMessage
                 ? MineMeMessageManager.globalResetMessage
@@ -101,6 +104,7 @@ public abstract class BasicMine implements Mine {
         this.composition = config.getComposition();
         this.config = config.getConfig();
         this.useEffects = config.getConfig().getBoolean("effects.use");
+        this.potionEffects = config.getEffects();
         Bukkit.getScheduler().runTask(MineMe.instance, new Runnable() {
 
             @Override
@@ -120,16 +124,6 @@ public abstract class BasicMine implements Mine {
                 ItemMeta im = icon.getItemMeta();
                 im.addItemFlags(ItemFlag.values());
                 icon.setItemMeta(im);
-
-                //Load effects
-                List<String> stringList = config.getConfig().getStringList("effects.list");
-                for (String s : stringList) {
-                    try {
-                        potionEffects.add(PotionUtils.parsePotionEffect(s));
-                    } catch (PotionUtils.PotionParseException ex) {
-                        MineMe.instance.printException("There was an error parsing " + s + " from the effect list!", ex);
-                    }
-                }
             }
         });
 
@@ -160,6 +154,7 @@ public abstract class BasicMine implements Mine {
         this.currentResetDelay = totalResetDelay;
         this.icon = icon;
         this.config = MineMe.getYAMLMineFile(this);
+        this.potionEffects = new ArrayList();
     }
 
     @Override
@@ -251,7 +246,6 @@ public abstract class BasicMine implements Mine {
     @Override
     public void secondCountdown() {
         currentResetDelay--;
-        lastSecond.clear();
         if (useEffects) {
             for (Player p : getPlayersInside()) {
                 for (PotionEffect e : getEffects()) {
@@ -262,6 +256,7 @@ public abstract class BasicMine implements Mine {
         if (currentResetDelay <= 0) {
             reset();
         }
+        lastSecond.clear();
     }
 
     @Override
@@ -591,9 +586,6 @@ public abstract class BasicMine implements Mine {
     public boolean contains(Player p) {
         return contains(p.getLocation());
     }
-    //Potions
-    private boolean useEffects;
-    private final List<PotionEffect> potionEffects = new ArrayList();
 
     @Override
     public boolean useEffects() {

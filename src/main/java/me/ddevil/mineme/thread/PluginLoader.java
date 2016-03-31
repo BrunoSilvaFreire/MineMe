@@ -20,14 +20,14 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import me.ddevil.core.chat.ColorDesign;
+import me.ddevil.core.chat.PluginChatManager;
 import me.ddevil.core.thread.CustomThread;
 import me.ddevil.core.utils.FileUtils;
-import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.events.MineLoadEvent;
 import me.ddevil.mineme.holograms.impl.HolographicDisplaysAdapter;
+import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -49,11 +49,6 @@ public class PluginLoader extends CustomThread {
         long startms = System.currentTimeMillis();
         plugin.debug("Loading config...");
         setupConfig();
-        plugin.debug("Config loaded!");
-        plugin.debug("Loading Message Manager...");
-        MineMe.messageManager = new MineMeMessageManager();
-        MineMe.messageManager.setup();
-        plugin.debug("Message Manager loaded!");
         plugin.debug("Looking for extra dependencies...");
         setupDependencies();
         plugin.debug("Loading Plugin...");
@@ -209,6 +204,9 @@ public class PluginLoader extends CustomThread {
             MineMe.pluginConfig.set("settings.holograms.enableHolograms", false);
             MineMe.useHolograms = false;
         }
+        MineMe.chatManager = (PluginChatManager) PluginChatManager.getInstance(plugin).setup();
+        MineMe.messageManager = (MineMeMessageManager) MineMeMessageManager.getInstance().setup();
+        MineMe.defaultColorDesign = new ColorDesign('a', 'e', '7', 'c');
         plugin.debug();
         //load mines
         plugin.debug("Loading mines", true);
@@ -218,6 +216,8 @@ public class PluginLoader extends CustomThread {
         //Start loading mines
         for (File file : mineFiles) {
             String filename = file.getName();
+            plugin.debug("-------------------------------", 3);
+
             plugin.debug("Attempting to load " + filename + "...", 3);
 
             String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());

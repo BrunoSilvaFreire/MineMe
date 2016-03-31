@@ -407,7 +407,7 @@ public class MineCommand extends CustomCommand {
             return;
         }
         Mine m = null;
-        MineMe.chatManager.sendMessage(p, "$2WorldEdit selection type: $4" + selection.getClass().getSimpleName());
+        MineMe.chatManager.sendMessage(p, MineMe.messageManager.translateAll("$2WorldEdit selection type: $4" + selection.getClass().getSimpleName()));
         if (selection instanceof CylinderSelection) {
             CylinderSelection cs = (CylinderSelection) selection;
             Location center = new Location(p.getWorld(), cs.getCenter().getX(), cs.getMinimumPoint().getBlockY(), cs.getCenter().getZ());
@@ -431,7 +431,7 @@ public class MineCommand extends CustomCommand {
             m = new PolygonMine(polySel, name, p.getLocation().getWorld());
         }
         if (m == null) {
-            MineMe.chatManager.sendMessage(p, "$4Selection type $1" + selection.getClass().getSimpleName() + "$4 isn't supported! (Yet :D)");
+            MineMe.chatManager.sendMessage(p, MineMe.messageManager.translateAll("$4Selection type $1" + selection.getClass().getSimpleName() + "$4 isn't supported! (Yet :D)"));
             MineMe.instance.printException(name, new UnsupportedWorldEditRegionType(selection));
             return;
         }

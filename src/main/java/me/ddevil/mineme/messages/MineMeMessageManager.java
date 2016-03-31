@@ -25,7 +25,6 @@ import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.storage.StorageManager;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 public class MineMeMessageManager extends BasicMessageManager {
@@ -78,7 +77,7 @@ public class MineMeMessageManager extends BasicMessageManager {
     public List<String> translateAll(Iterable<String> get, Mine m) {
         ArrayList<String> strings = new ArrayList();
         for (String s : get) {
-            strings.add(translateAll(s));
+            strings.add(translateAll(s, m));
         }
         return strings;
     }

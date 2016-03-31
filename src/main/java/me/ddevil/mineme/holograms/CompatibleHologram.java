@@ -16,6 +16,8 @@
  */
 package me.ddevil.mineme.holograms;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -35,6 +37,12 @@ public interface CompatibleHologram {
     public void delete();
 
     public void removeLine(int line);
+
+    public void move(World w, double x, double y, double z);
+
+    public void move(Location l);
+
+    public Location getLocation();
 
     public int size();
 

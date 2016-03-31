@@ -32,7 +32,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author Selma
  */
 public class GUIResourcesUtils {
-
+    
     static final HashMap<String, ItemStack> customItems = new HashMap();
     public static String clickToRemove;
     //Global items
@@ -43,7 +43,7 @@ public class GUIResourcesUtils {
     public static ItemStack teleporter;
     public static ItemStack resetButton;
     public static ItemStack deleteMineButton;
-    protected static ItemStack information;
+    public static ItemStack information;
     public static List<String> infomationLore;
 
     //Mine utils
@@ -51,7 +51,7 @@ public class GUIResourcesUtils {
     public static String clickToEdit;
     public static String clickToSee;
     public static String dropAddMaterial;
-
+    
     public static ItemStack generateCompositionItemStack(Mine m, ItemStack i) {
         ItemStack is = new ItemStack(i);
         ItemMeta im = is.getItemMeta();
@@ -62,7 +62,7 @@ public class GUIResourcesUtils {
         is.setItemMeta(im);
         return is;
     }
-
+    
     public static ItemStack generateCompositionChangeItemStack(double change) {
         boolean add = change > 0;
         String prefix = add ? "§a+" : "§c";
@@ -73,7 +73,7 @@ public class GUIResourcesUtils {
         is.setItemMeta(im);
         return is;
     }
-
+    
     public static double getCompositionChangeValue(ItemStack i) {
         if (ItemUtils.checkDisplayName(i)) {
             String intString = i.getItemMeta().
@@ -91,10 +91,11 @@ public class GUIResourcesUtils {
             return 0;
         }
     }
-
+    
     public static ItemStack generateInformationItem(Mine mine) {
         ItemStack i = new ItemStack(information);
-        i = ItemUtils.addToLore(i,
+        
+        i = ItemUtils.addToLore(ItemUtils.clearLore(i),
                 MineMeMessageManager.getInstance().translateAll(
                         infomationLore,
                         mine));

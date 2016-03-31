@@ -24,8 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import me.ddevil.core.CustomPlugin;
-import me.ddevil.core.chat.ChatManager;
-import me.ddevil.core.chat.MessageManager;
+import me.ddevil.core.chat.ColorDesign;
 import me.ddevil.core.chat.PluginChatManager;
 import me.ddevil.core.thread.ThreadFinishListener;
 import me.ddevil.mineme.commands.MineCommand;
@@ -211,11 +210,11 @@ public class MineMe extends CustomPlugin {
                     @Override
                     public void run() {
                         for (Mine mine : MineManager.getMines()) {
-                            mine.secondCountdown();
                             if (mine instanceof HologramCompatible) {
                                 HologramCompatible hc = (HologramCompatible) mine;
                                 hc.updateHolograms();
                             }
+                            mine.secondCountdown();
                         }
                     }
                 }, 20l, 20l);
@@ -255,16 +254,6 @@ public class MineMe extends CustomPlugin {
                 }
             }, 20l, 20l);
         }
-    }
-
-    @Override
-    public ChatManager getPluginChatManager() {
-        return PluginChatManager.getInstance(instance);
-    }
-
-    @Override
-    public MessageManager getPluginMessageManager() {
-        return MineMeMessageManager.getInstance();
     }
 
     @Override

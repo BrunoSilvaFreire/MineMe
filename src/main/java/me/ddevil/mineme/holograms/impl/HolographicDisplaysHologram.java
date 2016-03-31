@@ -22,7 +22,9 @@ import com.gmail.filoghost.holographicdisplays.object.CraftHologram;
 import com.gmail.filoghost.holographicdisplays.object.line.CraftHologramLine;
 import com.gmail.filoghost.holographicdisplays.object.line.CraftTextLine;
 import me.ddevil.mineme.holograms.CompatibleHologram;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -73,6 +75,11 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
     }
 
     @Override
+    public Location getLocation() {
+        return hologram.getLocation();
+    }
+
+    @Override
     public int size() {
         return hologram.size();
     }
@@ -90,4 +97,15 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
     public boolean isItemLine(int line) {
         return hologram.getLine(line) instanceof ItemLine;
     }
+
+    @Override
+    public void move(World w, double x, double y, double z) {
+        hologram.teleport(w, z, z, z);
+    }
+
+    @Override
+    public void move(Location l) {
+        hologram.teleport(l);
+    }
+
 }
