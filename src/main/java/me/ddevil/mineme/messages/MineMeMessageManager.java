@@ -23,9 +23,12 @@ import me.ddevil.core.exceptions.ItemConversionException;
 import me.ddevil.core.utils.StringUtils;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.storage.StorageManager;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class MineMeMessageManager extends BasicMessageManager {
 
@@ -46,6 +49,22 @@ public class MineMeMessageManager extends BasicMessageManager {
     public static String noPermission;
     public static String invalidArguments;
 
+    public ItemStack createIcon(ConfigurationSection iconsection, Mine m) {
+        return translateItemStack(ItemUtils.createItem(iconsection), m);
+    }
+
+    public ItemStack translateItemStack(ItemStack itemStack, Mine m) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta.hasDisplayName()) {
+            itemMeta.setDisplayName(translateAll(itemMeta.getDisplayName(), m));
+        }
+        if (itemMeta.hasLore()) {
+            itemMeta.setLore(translateAll(itemMeta.getLore(), m));
+        }
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
     //Colors
     private MineMe mineMe;
 
@@ -55,17 +74,17 @@ public class MineMeMessageManager extends BasicMessageManager {
         try {
             mineMe.debug("Loading messages...");
             //Mine Messages
-            globalResetMessage = translateColors(MineMe.messagesConfig.getString("messages.mineReset"));
-            mineCreateMessage = translateColors(MineMe.messagesConfig.getString("messages.mineCreate"));
+            globalResetMessage = translateColors(MineMeConfiguration.messagesConfig.getString("messages.mineReset"));
+            mineCreateMessage = translateColors(MineMeConfiguration.messagesConfig.getString("messages.mineCreate"));
 
             //Global Messages
-            messageSeparator = translateColors(MineMe.messagesConfig.getString("messages.messageSeparator"));
-            pluginPrefix = translateColors(MineMe.messagesConfig.getString("messages.messagePrefix"));
-            header = translateAll(MineMe.messagesConfig.getString("messages.header"));
+            messageSeparator = translateColors(MineMeConfiguration.messagesConfig.getString("messages.messageSeparator"));
+            pluginPrefix = translateColors(MineMeConfiguration.messagesConfig.getString("messages.messagePrefix"));
+            header = translateAll(MineMeConfiguration.messagesConfig.getString("messages.header"));
 
             //Error Messages
-            noPermission = translateColors(MineMe.messagesConfig.getString("messages.noPermission"));
-            invalidArguments = translateColors(MineMe.messagesConfig.getString("messages.invalidArguments"));
+            noPermission = translateColors(MineMeConfiguration.messagesConfig.getString("messages.noPermission"));
+            invalidArguments = translateColors(MineMeConfiguration.messagesConfig.getString("messages.invalidArguments"));
             mineMe.debug("Messages loaded!");
             mineMe.debug();
         } catch (Exception e) {
@@ -90,7 +109,7 @@ public class MineMeMessageManager extends BasicMessageManager {
             input = input.replace("%minedblockspercent%", String.valueOf(m.getPercentageMined()));
             input = input.replace("%remainingblocks%", String.valueOf(m.getRemainingBlocks()));
             input = input.replace("%remainingblockspercent%", String.valueOf(m.getPercentageRemaining()));
-            input = input.replace("%volume%", m.getVolume() + "");
+            input = input.replace("%volume%", String.valueOf(m.getVolume()));
             input = input.replace("%resettime%", StringUtils.secondsToString(m.getTimeToNextReset()));
             input = input.replace("%alias%", m.getAlias());
             input = input.replace("%type%", m.getType().name());
@@ -152,4 +171,19 @@ public class MineMeMessageManager extends BasicMessageManager {
         return input;
     }
 
+    public ItemStack createIcon(ConfigurationSection iconSection) {
+        return translateItemStack(ItemUtils.createItem(iconSection));
+    }
+
+    public ItemStack translateItemStack(ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta.hasDisplayName()) {
+            itemMeta.setDisplayName(translateAll(itemMeta.getDisplayName()));
+        }
+        if (itemMeta.hasLore()) {
+            itemMeta.setLore(translateAll(itemMeta.getLore()));
+        }
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
 }

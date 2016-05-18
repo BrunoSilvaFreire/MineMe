@@ -24,17 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import me.ddevil.core.CustomPlugin;
-import me.ddevil.core.chat.ColorDesign;
-import me.ddevil.core.chat.PluginChatManager;
-import me.ddevil.core.thread.ThreadFinishListener;
 import me.ddevil.mineme.commands.MineCommand;
 import me.ddevil.mineme.conversion.MRLConverter;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.holograms.HologramAdapter;
-import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
+import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.thread.PluginLoader;
 import me.ddevil.mineme.utils.MVdWPlaceholderManager;
 import org.bukkit.Bukkit;
@@ -44,23 +41,14 @@ import org.bukkit.entity.Player;
 
 public class MineMe extends CustomPlugin {
 
-    //Configs
-    public static FileConfiguration guiConfig;
-    public static FileConfiguration messagesConfig;
-    public static File minesFolder;
     //Storage
+    public static File minesFolder;
     public static File storageFolder;
     //World Edit
     public static WorldEditPlugin WEP;
     //Scheduler ids
     public static Integer timerID;
     public static Integer hologramUpdaterID;
-    //MineMe
-    public static boolean useHolograms = false;
-    public static boolean forceDefaultBroadcastMessage = true;
-    public static boolean forceDefaultHolograms = false;
-    public static boolean useHologramMineSync = false;
-    public static long hologramRefreshRate;
 
     public static MineMe getInstance() {
         return (MineMe) instance;
@@ -80,46 +68,41 @@ public class MineMe extends CustomPlugin {
     @Override
     public void onEnable() {
         super.onEnable();
-        PluginLoader pLoader = new PluginLoader();
-        pLoader.start();
-        pLoader.addListener(new ThreadFinishListener() {
-
-            @Override
-            public void onFinish() {
-                //Register commands and World Edit
-                WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
-                registerBaseCommands();
-                if (useMVdWPlaceholderAPI) {
-                    try {
-                        MVdWPlaceholderManager.setupPlaceholders();
-                    } catch (Exception ex) {
-                        printException("There was an error creting MVdWPlaceholder! Skipping", ex);
-                    }
-                }
-                if (convertMineResetLite) {
-                    MineMe.instance.debug("Converting MineResetLite...", true);
-                    MRLConverter.convert();
-                    MineMe.instance.debug("Converted MineResetLite!", true);
-                }
-                debug("Starting metrics...", 3);
-                try {
-                    Metrics metrics = new Metrics(MineMe.this);
-                    metrics.start();
-                    debug("Metrics started!", 3);
-                } catch (IOException ex) {
-                    printException("There was an error start metrics! Skipping", ex);
-                }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
+        PluginLoader.load();
+        WorldEdit.getInstance().getEventBus().register(new me.ddevil.mineme.mines.MineManager.WorldEditManager());
+        registerBaseCommands();
+        if (useMVdWPlaceholderAPI) {
+            try {
+                MVdWPlaceholderManager.setupPlaceholders();
+            } catch (Exception ex) {
+                printException("There was an error creting MVdWPlaceholder! Skipping", ex);
+            }
+        }
+        if (convertMineResetLite) {
+            MineMe.instance.debug("Converting MineResetLite...", true);
+            MRLConverter.convert();
+            MineMe.instance.debug("Converted MineResetLite!", true);
+        }
+        debug("Starting metrics...", 3);
+        try {
+            Metrics metrics = new Metrics(MineMe.this);
+            metrics.start();
+            debug("Metrics started!", 3);
+        } catch (IOException ex) {
+            printException("There was an error start metrics! Skipping", ex);
+        }
+        debug("Starting MineEditorGUI...", 3);
+        GUIManager.setup();
+        debug("MineEditorGUI started!", 3);
+        debug("Waiting the server before loading mines...", 3);
+        Bukkit.getScheduler().runTaskLater(this,
+                new Runnable() {
 
                     @Override
                     public void run() {
-                        debug("Starting MineEditorGUI...", 3);
-                        GUIManager.setup();
-                        debug("MineEditorGUI started!", 3);
+                        loadMines();
                     }
-                }, 2l);
-            }
-        });
+                }, 3l);
     }
 
     @Override
@@ -141,11 +124,11 @@ public class MineMe extends CustomPlugin {
     }
 
     public static void setForceHologramsUse(boolean forceHologramsUse) {
-        MineMe.forceDefaultHolograms = forceHologramsUse;
+        MineMeConfiguration.forceDefaultHolograms = forceHologramsUse;
     }
 
     public static boolean isForceHologramsUse() {
-        return forceDefaultHolograms;
+        return MineMeConfiguration.forceDefaultHolograms;
     }
 
     private void registerBaseCommands() {
@@ -165,20 +148,61 @@ public class MineMe extends CustomPlugin {
         Bukkit.getScheduler().cancelTask(timerID);
         debug("Unloading...");
         unloadEverything();
-        PluginLoader l = new PluginLoader();
-        l.start();
-        l.addListener(new ThreadFinishListener() {
+        PluginLoader.load();
+        loadMines();
+        debug("Reload complete!");
+        chatManager.sendMessage(p, "Reloaded! :D");
+    }
 
-            @Override
-            public void onFinish() {
-                debug("Reload complete!");
-                chatManager.sendMessage(p, "Reloaded! :D");
+    public void loadMines() {//load mines
+        debug("Loading mines", true);
+        debug();
+        File[] mineFiles = MineMe.minesFolder.listFiles();
+        int i = 0;
+        //Start loading mines
+        for (File file : mineFiles) {
+            String filename = file.getName();
+            debug("-------------------------------", 3);
+
+            debug("Attempting to load " + filename + "...", 3);
+
+            String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
+            if (!"yml".equals(extension)) {
+                debug(filename + " isn't a .yml file! This shouldn't be here! Skipping.", true);
+                continue;
             }
-        });
+            FileConfiguration mine = YamlConfiguration.loadConfiguration(file);
+            //Get name
+            String name = mine.getString("name");
+            if (!mine.getBoolean("enabled")) {
+                debug("Mine " + name + " is disabled, skipping.", 3);
+                continue;
+            }
+            //Load mine
+            try {
+                debug("Loading...");
+                //Instanciate
+                final MineConfig m = new MineConfig(mine);
+                //Setup mines after bukkit is loaded
+                Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        MineManager.loadMine(m);
+                    }
+                }, 5l);
+
+                debug("Loaded mine " + m.getName() + ".", true);
+                debug();
+                i++;
+            } catch (Throwable t) {
+                printException("Something went wrong while loading " + file.getName() + " :( Are you sure you did everything right?", t);
+            }
+        }
+        debug("Loaded " + i + " mines :D", true);
     }
 
     private void unloadEverything() {
-        if (useHolograms) {
+        if (MineMeConfiguration.useHolograms) {
             for (Hologram h : HologramsAPI.getHolograms(this)) {
                 h.delete();
             }
@@ -186,7 +210,7 @@ public class MineMe extends CustomPlugin {
         MineManager.unregisterMines();
         pluginConfig = null;
         pluginFolder = null;
-        messagesConfig = null;
+        MineMeConfiguration.messagesConfig = null;
         timerID = null;
     }
 
@@ -199,12 +223,12 @@ public class MineMe extends CustomPlugin {
             Bukkit.getScheduler().cancelTask(MineMe.hologramUpdaterID);
             hologramUpdaterID = null;
         }
-        MineMe.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.customHologramRefreshRate")).longValue();
-        MineMe.useHologramMineSync = MineMe.pluginConfig.getBoolean("settings.holograms.useHologramResetSync");
+        MineMeConfiguration.hologramRefreshRate = ((Integer) MineMe.pluginConfig.getInt("settings.holograms.customHologramRefreshRate")).longValue();
+        MineMeConfiguration.useHologramMineSync = MineMe.pluginConfig.getBoolean("settings.holograms.useHologramResetSync");
 
-        if (MineMe.useHolograms) {
+        if (MineMeConfiguration.useHolograms) {
             //Start timer
-            if (useHologramMineSync) {
+            if (MineMeConfiguration.useHologramMineSync) {
                 instance.debug("Setting up hologram updater syncronized with mine reseter.", 3);
                 MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
                     @Override
@@ -227,7 +251,7 @@ public class MineMe extends CustomPlugin {
                         }
                     }
                 }, 20l, 20l);
-                instance.debug("Setting up hologram updater @ " + hologramRefreshRate + " refresh speed.", 3);
+                instance.debug("Setting up hologram updater @ " + MineMeConfiguration.hologramRefreshRate + " refresh speed.", 3);
                 MineMe.hologramUpdaterID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
                     long last = System.currentTimeMillis();
 
@@ -242,7 +266,7 @@ public class MineMe extends CustomPlugin {
                         }
                         last = now;
                     }
-                }, MineMe.hologramRefreshRate, MineMe.hologramRefreshRate);
+                }, MineMeConfiguration.hologramRefreshRate, MineMeConfiguration.hologramRefreshRate);
             }
         } else {
             MineMe.timerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, new Runnable() {
@@ -263,6 +287,7 @@ public class MineMe extends CustomPlugin {
 
     @Override
     public FileConfiguration getMessagesConfig() {
-        return messagesConfig;
+        return MineMeConfiguration.messagesConfig;
     }
+
 }

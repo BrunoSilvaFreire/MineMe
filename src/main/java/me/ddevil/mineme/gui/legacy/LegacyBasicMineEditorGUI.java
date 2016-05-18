@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.gui.impl;
+package me.ddevil.mineme.gui.legacy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +22,10 @@ import java.util.List;
 import me.ddevil.core.utils.inventory.InventoryUtils;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.events.MineUpdateEvent;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.gui.MineEditorGUI;
-import me.ddevil.mineme.gui.menus.MineMenu;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -44,9 +44,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  *
  * @author Selma
  */
-public class BasicMineEditorGUI implements MineEditorGUI {
+@Deprecated
+public class LegacyBasicMineEditorGUI implements MineEditorGUI {
 
-    public BasicMineEditorGUI(String inventoryName, int mainInventorySize, int minesInventorySize) {
+    public LegacyBasicMineEditorGUI(String inventoryName, int mainInventorySize, int minesInventorySize) {
         this.mainInventoryName = inventoryName;
         this.mainInventorySize = mainInventorySize;
         this.minesInventorySize = minesInventorySize;
@@ -56,7 +57,7 @@ public class BasicMineEditorGUI implements MineEditorGUI {
     public MineEditorGUI setup() {
         MineMe.registerListener(this);
         mainInventory = Bukkit.createInventory(null, mainInventorySize, mainInventoryName);
-        mainInventoryConfig = MineMe.guiConfig.getConfigurationSection("mainMenu");
+        mainInventoryConfig = MineMeConfiguration.guiConfig.getConfigurationSection("mainMenu");
         ConfigurationSection miIconConfig = mainInventoryConfig.getConfigurationSection("icons.main");
         String name = MineMeMessageManager.getInstance().translateAll(miIconConfig.getString("name"));
         List<String> loreList = miIconConfig.getStringList("lore");
@@ -104,7 +105,7 @@ public class BasicMineEditorGUI implements MineEditorGUI {
     }
 
     @Override
-    public synchronized MineMenu getMineInventory(Mine m) {
+    public MineMenu getMineInventory(Mine m) {
         if (inventories.containsKey(m)) {
             return inventories.get(m);
         } else {
@@ -117,8 +118,7 @@ public class BasicMineEditorGUI implements MineEditorGUI {
     }
 
     @Override
-    public void open(Player p
-    ) {
+    public void open(Player p) {
         updateMainInventory();
         p.openInventory(mainInventory);
     }
@@ -127,7 +127,7 @@ public class BasicMineEditorGUI implements MineEditorGUI {
     @Override
     public void updateMainInventory() {
         for (int i : InventoryUtils.getLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 1)) {
-            mainInventory.setItem(i, GUIResourcesUtils.splitter);
+            mainInventory.setItem(i, GUIResourcesUtils.SPLITTER);
         }
         mainInventory.setItem(InventoryUtils.getBottomMiddlePoint(mainInventory), mainInventoryIcon);
         int i = 0;
@@ -140,7 +140,7 @@ public class BasicMineEditorGUI implements MineEditorGUI {
             } else {
                 lore = new ArrayList();
             }
-            lore.add(GUIResourcesUtils.clickToSee);
+            lore.add(GUIResourcesUtils.CLICK_TO_SEE);
             ItemMeta im = is.getItemMeta();
             im.setLore(lore);
             is.setItemMeta(im);

@@ -42,6 +42,21 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>sk89q-repo</id>
+      <url>http://maven.sk89q.com/repo/</url>
+    </repository>
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>mvdw-software</id>
+      <name>MVdW Public Repositories</name>
+      <url>http://repo.mvdw-software.be/content/groups/public/</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>
@@ -112,27 +127,65 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>mvdw</groupId>
-      <artifactId>mvdw-placeholder-api</artifactId>
-      <version>v1.0.0</version>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldedit</artifactId>
+      <version>LATEST</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>truezip</artifactId>
+          <groupId>de.schlichtherle</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>js</artifactId>
+          <groupId>rhino</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jsr305</artifactId>
+          <groupId>com.google.code.findbugs</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>guava</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldguard</artifactId>
+      <version>LATEST</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>bukkit-classloader-check</artifactId>
+          <groupId>com.sk89q.spigot</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commandbook</artifactId>
+          <groupId>com.sk89q</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jsr305</artifactId>
+          <groupId>com.google.code.findbugs</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>be.maximvdw</groupId>
+      <artifactId>MVdWPlaceholderAPI</artifactId>
+      <version>LATEST</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>minecraft</groupId>
+      <artifactId>holographicdisplays</artifactId>
+      <version>2.1.12</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>sk89q</groupId>
-      <artifactId>world-edit</artifactId>
-      <version>v6.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>filoghost</groupId>
-      <artifactId>HolographicDisplays</artifactId>
-      <version>v2.1.10</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>jjkoletar</groupId>
-      <artifactId>mine-reset-lite</artifactId>
-      <version>v0.4.6</version>
+      <groupId>minecraft</groupId>
+      <artifactId>mineresetlite</artifactId>
+      <version>0.4.6</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

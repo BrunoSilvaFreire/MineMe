@@ -19,6 +19,7 @@ package me.ddevil.mineme.mines;
 import java.util.List;
 import java.util.Map;
 import me.ddevil.mineme.challenge.Challenge;
+import static me.ddevil.mineme.mines.MineUtils.getItemStackInComposition;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -60,7 +61,7 @@ public interface Mine extends Iterable<Block>, Listener {
      *
      * @return The materials used in the mine's composition
      */
-    public ItemStack[] getMaterials();
+    public List<ItemStack> getMaterials();
 
     /**
      * Checks if this mine is deleted (Garbage Collector hasn't finalized this
@@ -374,4 +375,10 @@ public interface Mine extends Iterable<Block>, Listener {
     public List<PotionEffect> getEffects();
 
     public void clearMaterials();
+
+    public ItemStack getItemStackInComposition(ItemStack item);
+
+    public boolean containsRelativeItemStackInComposition(ItemStack i);
+
+    public void disable();
 }

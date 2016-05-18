@@ -19,6 +19,7 @@ package me.ddevil.mineme.mines.impl;
 import java.util.ArrayList;
 import java.util.List;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.events.MineHologramUpdateEvent;
 import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.messages.MineMeMessageManager;
@@ -53,7 +54,7 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
     @Override
     public void setupHolograms() {
         //Load hologram pattern
-        if (MineMe.forceDefaultHolograms) {
+        if (MineMeConfiguration.forceDefaultHolograms) {
             MineMe.getInstance().debug("Setting default hologram text for mine " + name + " because forceDefaultHologramOnAllMines is enabled on the config");
             setHologramsLines(MineMe.defaultHologramText);
         } else if (config.getBoolean("useCustomHologramText")) {
@@ -173,7 +174,7 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
     @Override
     public void reset() {
         super.reset();
-        if (MineMe.useHolograms) {
+        if (MineMeConfiguration.useHolograms) {
             updateHolograms();
         }
     }

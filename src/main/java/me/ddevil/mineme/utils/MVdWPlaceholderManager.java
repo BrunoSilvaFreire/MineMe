@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import me.ddevil.core.utils.StringUtils;
 import me.ddevil.mineme.MineMe;
 import static me.ddevil.mineme.MineMe.useMVdWPlaceholderAPI;
-import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.storage.StorageManager;

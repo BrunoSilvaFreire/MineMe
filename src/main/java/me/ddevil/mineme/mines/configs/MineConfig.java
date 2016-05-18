@@ -21,7 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import me.ddevil.core.utils.PotionUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineType;
+import me.ddevil.mineme.mines.impl.CircularMine;
+import me.ddevil.mineme.mines.impl.CuboidMine;
+import me.ddevil.mineme.mines.impl.PolygonMine;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,6 +38,20 @@ import org.bukkit.potion.PotionEffect;
  * @author Selma
  */
 public class MineConfig {
+
+    public static Mine loadMine(MineConfig c) {
+        MineType type = c.getType();
+        switch (type) {
+            case CUBOID:
+                return new CuboidMine(c);
+            case CIRCULAR:
+                return new CircularMine(c);
+            case POLYGON:
+                return new PolygonMine(c);
+            default:
+                return null;
+        }
+    }
 
     //General info
     private final boolean enabled;

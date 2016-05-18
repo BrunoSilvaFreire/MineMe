@@ -22,30 +22,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import me.ddevil.core.chat.ColorDesign;
 import me.ddevil.core.chat.PluginChatManager;
-import me.ddevil.core.thread.CustomThread;
 import me.ddevil.core.utils.FileUtils;
 import me.ddevil.mineme.MineMe;
-import me.ddevil.mineme.events.MineLoadEvent;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.holograms.impl.HolographicDisplaysAdapter;
 import me.ddevil.mineme.messages.MineMeMessageManager;
-import me.ddevil.mineme.mines.HologramCompatible;
-import me.ddevil.mineme.mines.Mine;
-import me.ddevil.mineme.mines.MineManager;
-import me.ddevil.mineme.mines.MineType;
-import me.ddevil.mineme.mines.configs.MineConfig;
-import me.ddevil.mineme.mines.impl.CircularMine;
-import me.ddevil.mineme.mines.impl.CuboidMine;
-import me.ddevil.mineme.mines.impl.PolygonMine;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class PluginLoader extends CustomThread {
+public class PluginLoader {
 
-    private final MineMe plugin = MineMe.getInstance();
+    private static final MineMe plugin = MineMe.getInstance();
 
-    @Override
-    public void doRun() {
+    public static void load() {
         long startms = System.currentTimeMillis();
         plugin.debug("Loading config...");
         setupConfig();
@@ -58,7 +47,7 @@ public class PluginLoader extends CustomThread {
         plugin.debug("Plugin loaded after " + (startupTime / 1000) + " seconds(" + startupTime + "ms)!", true);
     }
 
-    private void setupConfig() {
+    private static void setupConfig() {
         MineMe.pluginFolder = plugin.getDataFolder();
         if (!MineMe.pluginFolder.exists()) {
             plugin.debug("Plugin folder not found! Making one...", 3);
@@ -77,7 +66,7 @@ public class PluginLoader extends CustomThread {
             plugin.debug("GUI config file not found! Making one...", 3);
             MineMe.instance.loadResource(guiconfig, "guiconfig.yml");
         }
-        MineMe.guiConfig = YamlConfiguration.loadConfiguration(guiconfig);
+        MineMeConfiguration.guiConfig = YamlConfiguration.loadConfiguration(guiconfig);
         plugin.minimumDebugPriotity = MineMe.pluginConfig.getInt("settings.minimumDebugLevel");
         MineMe.storageFolder = new File(MineMe.pluginFolder.getPath(), "storage");
         if (!MineMe.storageFolder.exists()) {
@@ -108,12 +97,12 @@ public class PluginLoader extends CustomThread {
             plugin.saveResource("messages.yml", false);
         }
         MineMe.defaultHologramText = MineMe.pluginConfig.getStringList("settings.holograms.defaultHologramText");
-        MineMe.messagesConfig = YamlConfiguration.loadConfiguration(messages);
-        MineMe.forceDefaultBroadcastMessage = MineMe.messagesConfig.getBoolean("global.forceDefaultBroadcastMessage");
+        MineMeConfiguration.messagesConfig = YamlConfiguration.loadConfiguration(messages);
+        MineMeConfiguration.forceDefaultBroadcastMessage = MineMeConfiguration.messagesConfig.getBoolean("global.forceDefaultBroadcastMessage");
         MineMe.convertMineResetLite = MineMe.pluginConfig.getBoolean("global.convertFromMineResetLite");
     }
 
-    public void setupDependencies() {
+    public static void setupDependencies() {
         //Try to get dependencies
         if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
             MineMe.WEP = (WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit");
@@ -126,11 +115,11 @@ public class PluginLoader extends CustomThread {
         }
         MineMe.useMVdWPlaceholderAPI = Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI");
         //Holograms
-        MineMe.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
+        MineMeConfiguration.useHolograms = MineMe.pluginConfig.getBoolean("settings.holograms.enableHolograms");
         //Holographic Displays
-        MineMe.forceDefaultHolograms = MineMe.pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
+        MineMeConfiguration.forceDefaultHolograms = MineMe.pluginConfig.getBoolean("global.forceDefaultHologramOnAllMines");
         MineMe.useHolographicDisplay = MineMe.pluginConfig.getBoolean("settings.holograms.useHolographicDisplaysAPI");
-        if (MineMe.useHolograms) {
+        if (MineMeConfiguration.useHolograms) {
             //Check if HD is available
             MineMe.holographicDisplaysUsable = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
             //useHolographicDisplaysAPI is true in config
@@ -141,7 +130,7 @@ public class PluginLoader extends CustomThread {
                     plugin.debug("Using Holographic Displays as the hologram adapter...", 3);
                     //Set the hologram adapter
                     MineMe.hologramAdapter = new HolographicDisplaysAdapter();
-                    if (MineMe.forceDefaultHolograms) {
+                    if (MineMeConfiguration.forceDefaultHolograms) {
                         plugin.debug("Forcing all holograms to use default preset.", 3);
                     }
                     plugin.debug();
@@ -159,7 +148,7 @@ public class PluginLoader extends CustomThread {
             }
             //Check hologram adapter
             if (MineMe.hologramAdapter == null) {
-                MineMe.useHolograms = false;
+                MineMeConfiguration.useHolograms = false;
                 plugin.debug("Holograms were set enabled, but not HologramAdapter was setup. Are you sure you enabled an API in the config? Disabling holograms...", 3);
                 try {
                     MineMe.pluginConfig.set("settings.holograms.enableHolograms", false);
@@ -172,7 +161,7 @@ public class PluginLoader extends CustomThread {
         }
     }
 
-    private void setupPlugin() {
+    private static void setupPlugin() {
         //Get mines folder
         MineMe.minesFolder = new File(plugin.getDataFolder(), "mines");
         if (!MineMe.minesFolder.exists()) {
@@ -199,82 +188,15 @@ public class PluginLoader extends CustomThread {
                 plugin.printException("There was a problem trying to copy the example mines to the mines folder. Skipping.", ex);
             }
         }
-        if (MineMe.useHolograms && MineMe.hologramAdapter == null) {
+        if (MineMeConfiguration.useHolograms && MineMe.hologramAdapter == null) {
             plugin.debug("Holograms were enabled in the config, but we didn't find an hologram adapter! Fixing...", true);
             MineMe.pluginConfig.set("settings.holograms.enableHolograms", false);
-            MineMe.useHolograms = false;
+            MineMeConfiguration.useHolograms = false;
         }
         MineMe.chatManager = (PluginChatManager) PluginChatManager.getInstance(plugin).setup();
         MineMe.messageManager = (MineMeMessageManager) MineMeMessageManager.getInstance().setup();
         MineMe.defaultColorDesign = new ColorDesign('a', 'e', '7', 'c');
         plugin.debug();
-        //load mines
-        plugin.debug("Loading mines", true);
-        plugin.debug();
-        File[] mineFiles = MineMe.minesFolder.listFiles();
-        int i = 0;
-        //Start loading mines
-        for (File file : mineFiles) {
-            String filename = file.getName();
-            plugin.debug("-------------------------------", 3);
-
-            plugin.debug("Attempting to load " + filename + "...", 3);
-
-            String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
-            if (!"yml".equals(extension)) {
-                plugin.debug(filename + " isn't a .yml file! This shouldn't be here! Skipping.", true);
-                continue;
-            }
-            FileConfiguration mine = YamlConfiguration.loadConfiguration(file);
-            //Get name
-            String name = mine.getString("name");
-            if (!mine.getBoolean("enabled")) {
-                plugin.debug("Mine " + name + " is disabled, skipping.", 3);
-                continue;
-            }
-            //Load mine
-            try {
-                plugin.debug("Loading...");
-                MineConfig config = new MineConfig(mine);
-                //Instanciate
-                final Mine m;
-                if (config.getType().equals(MineType.CIRCULAR)) {
-                    m = new CircularMine(config);
-                } else if (config.getType().equals(MineType.POLYGON)) {
-                    m = new PolygonMine(config);
-                } else {
-                    m = new CuboidMine(config);
-                }
-                //Setup mines after bukkit is loaded
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (MineMe.useHolograms) {
-                                if (m instanceof HologramCompatible) {
-                                    plugin.debug("Mine " + m.getName() + " is Holograms compatible! Creating holograms...", 3);
-                                    HologramCompatible h = (HologramCompatible) m;
-                                    if (m.getIcon() != null) {
-                                        h.setupHolograms();
-                                    }
-
-                                }
-                            }
-                        } finally {
-                            m.reset();
-                        }
-                    }
-                }, 5l);
-                MineManager.registerMine(m);
-                new MineLoadEvent(m).call();
-                plugin.debug("Loaded mine " + m.getName() + ".", true);
-                plugin.debug();
-                i++;
-            } catch (Throwable t) {
-                plugin.printException("Something went wrong while loading " + file.getName() + " :( Are you sure you did everything right?", t);
-            }
-        }
-        plugin.debug("Loaded " + i + " mines :D", true);
         plugin.debug("Starting timer...", 2);
         MineMe.startTimers();
         plugin.debug("Timer started!", 2);

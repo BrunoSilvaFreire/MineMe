@@ -24,9 +24,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import me.ddevil.core.utils.CustomListener;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.challenge.Challenge;
 import me.ddevil.mineme.challenge.ChallengeEndListener;
 import me.ddevil.mineme.events.MineResetEvent;
@@ -59,7 +61,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-public abstract class BasicMine implements Mine {
+public abstract class BasicMine extends CustomListener implements Mine {
 
     //General
     protected final String name;
@@ -90,7 +92,7 @@ public abstract class BasicMine implements Mine {
     private final List<PotionEffect> potionEffects;
 
     public BasicMine(final MineConfig config) {
-        this.broadcastMessage = MineMe.forceDefaultBroadcastMessage
+        this.broadcastMessage = MineMeConfiguration.forceDefaultBroadcastMessage
                 ? MineMeMessageManager.globalResetMessage
                 : config.isUseCustomBroadcast() ? config.getBroadcastMessage() : MineMeMessageManager.globalResetMessage;
         this.broadcastOnReset = config.isBroadcastOnReset();
@@ -105,28 +107,8 @@ public abstract class BasicMine implements Mine {
         this.config = config.getConfig();
         this.useEffects = config.getConfig().getBoolean("effects.use");
         this.potionEffects = config.getEffects();
-        Bukkit.getScheduler().runTask(MineMe.instance, new Runnable() {
-
-            @Override
-            public void run() {
-                //Load Icon
-                ConfigurationSection iconsection = config.getConfig().getConfigurationSection("icon");
-                List<String> lore = iconsection.getStringList("lore");
-                BasicMine.this.icon = ItemUtils.createItem(
-                        Material.valueOf(iconsection.getString("type")),
-                        MineMeMessageManager.getInstance().translateAll(
-                                iconsection.getString("name"),
-                                BasicMine.this),
-                        MineMeMessageManager.getInstance().translateAll(
-                                lore,
-                                BasicMine.this));
-                icon.getData().setData(((Integer) iconsection.get("data")).byteValue());
-                ItemMeta im = icon.getItemMeta();
-                im.addItemFlags(ItemFlag.values());
-                icon.setItemMeta(im);
-            }
-        });
-
+        ConfigurationSection iconsection = config.getConfig().getConfigurationSection("icon");
+        this.icon = MineMeMessageManager.getInstance().createIcon(iconsection, this);
     }
 
     /**
@@ -481,8 +463,10 @@ public abstract class BasicMine implements Mine {
     }
 
     @Override
-    public ItemStack[] getMaterials() {
-        return composition.keySet().toArray(new ItemStack[composition.keySet().size()]);
+    public List<ItemStack> getMaterials() {
+        ArrayList<ItemStack> s = new ArrayList();
+        s.addAll(composition.keySet());
+        return s;
     }
     protected final World world;
 
@@ -523,6 +507,19 @@ public abstract class BasicMine implements Mine {
     @Override
     public void setAlias(String alias) {
         this.alias = alias;
+        save();
+    }
+
+    @Override
+    public void disable() {
+        setEnabled(false);
+        if (this instanceof HologramCompatible) {
+            HologramCompatible hc = (HologramCompatible) this;
+            for (CompatibleHologram hologram : hc.getHolograms()) {
+                hologram.delete();
+            }
+        }
+        MineManager.unregisterMine(this);
         save();
     }
 
@@ -703,4 +700,21 @@ public abstract class BasicMine implements Mine {
         composition.clear();
     }
 
+    @Override
+    public ItemStack getItemStackInComposition(ItemStack item) {
+
+        for (ItemStack a : composition.keySet()) {
+            if (a.getType() == item.getType()) {
+                if (a.getData().getData() == item.getData().getData()) {
+                    return a;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean containsRelativeItemStackInComposition(ItemStack i) {
+        return getItemStackInComposition(i) != null;
+    }
 }

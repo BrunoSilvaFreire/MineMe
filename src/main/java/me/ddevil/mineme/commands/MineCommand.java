@@ -27,6 +27,7 @@ import me.ddevil.core.utils.MessageColor;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.exception.UnsupportedWorldEditRegionType;
 import me.ddevil.mineme.gui.GUIManager;
 import me.ddevil.mineme.mines.HologramCompatible;
@@ -197,7 +198,7 @@ public class MineCommand extends CustomCommand {
                             );
                         }
                     } else {
-                        GUIManager.mineEditorGUI.open(p);
+                        GUIManager.mainMenu.open(p);
                     }
                 } else {
                     sendInvalidArguments(p,
@@ -380,7 +381,7 @@ public class MineCommand extends CustomCommand {
                         MineMe.chatManager.sendMessage(p, MineMeMessageManager.getInstance().translateAll(MessageColor.ERROR + "The help is a lie! " + MessageColor.PRIMARY + "Use /mineme"));
                     } else if (func.equalsIgnoreCase("gui") || func.equalsIgnoreCase("megui")) {
                         //MineEditorGUI
-                        GUIManager.mineEditorGUI.open(p);
+                        GUIManager.mainMenu.open(p);
                     } else {
                         //none
                         sendUsage(p);
@@ -445,7 +446,7 @@ public class MineCommand extends CustomCommand {
         MineMe.chatManager.sendMessage(p,
                 MineMeMessageManager.getInstance().translateAll(MineMeMessageManager.mineCreateMessage, m));
         m.save();
-        if (MineMe.useHolograms) {
+        if (MineMeConfiguration.useHolograms) {
             if (m instanceof HologramCompatible) {
                 HologramCompatible h = (HologramCompatible) m;
                 h.setupHolograms();

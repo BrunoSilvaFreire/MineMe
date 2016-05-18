@@ -16,7 +16,6 @@
  */
 package me.ddevil.mineme.gui;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import me.ddevil.core.utils.items.ItemUtils;
@@ -34,33 +33,48 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class GUIResourcesUtils {
 
     static final HashMap<String, ItemStack> customItems = new HashMap();
-    public static String clickToRemove;
+    public static String CLICK_TO_REMOVE;
     //Global items
-    public static ItemStack splitter;
-    public static ItemStack empty;
-    public static ItemStack removeButton;
-    public static ItemStack backButton;
-    public static ItemStack teleporter;
-    public static ItemStack resetButton;
-    public static ItemStack deleteMineButton;
-    public static ItemStack information;
-    public static ItemStack clearMaterials;
-    public static List<String> infomationLore;
-
+    public static ItemStack SPLITTER;
+    public static ItemStack EMPTY_MATERIAL;
+    public static ItemStack EMPTY_EFFECTS;
+    public static ItemStack REMOVE_BUTTON;
+    public static ItemStack BACK_BUTTON;
+    public static ItemStack TELEPORTER;
+    public static ItemStack RESET_BUTTON;
+    public static ItemStack DELETE_MINE_BUTTON;
+    public static ItemStack INFORMATION;
+    public static ItemStack CLEAR_MATERIALS;
+    public static ItemStack TOOGLE_MATERIALS_EFFECTS_SELECTION;
+    public static List<String> INFORMATION_LORE;
+    public static ItemStack DISABLE_MINE_BUTTON;
+    public static ItemStack NOT_LOADED_MINES;
+    public static ItemStack COULD_NOT_LOAD_FILES;
+    public static ItemStack NOT_LOADED_ICON;
+    public static ItemStack NO_MINE_TO_DISPLAY;
+    public static ItemStack REFRESH;
     //Mine utils
-    public static String mineItemNameFormat;
-    public static String clickToEdit;
-    public static String clickToSee;
+    public static String FOUND_MINE_FILES;
+    public static String NO_MISFORMATTED_FILES;
+    public static String CLICK_TO_EDIT;
+    public static String CLICK_TO_SEE;
+    public static String CLICK_TO_LOAD;
+    public static final int INVENTORY_SIZE = 6;
 
     public static ItemStack generateCompositionItemStack(Mine m, ItemStack i) {
         ItemStack is = new ItemStack(i);
         ItemMeta im = is.getItemMeta();
         im.setDisplayName(MineMeMessageManager.getInstance().translateAll("$1" + is.getType() + "$3:$2" + i.getData().getData() + "$3-$1" + m.getComposition().get(i) + "%"));
         List<String> lore = ItemUtils.getLore(i);
-        lore.add(GUIResourcesUtils.clickToEdit);
+        lore.add(GUIResourcesUtils.CLICK_TO_EDIT);
         im.setLore(lore);
         is.setItemMeta(im);
         return is;
+    }
+
+    public static ItemStack generateNotYetLoadedIcon(Mine m) {
+        ItemStack itemStack = new ItemStack(NOT_LOADED_ICON);
+        return MineMeMessageManager.getInstance().translateItemStack(itemStack, m);
     }
 
     public static ItemStack generateCompositionChangeItemStack(double change) {
@@ -93,11 +107,10 @@ public class GUIResourcesUtils {
     }
 
     public static ItemStack generateInformationItem(Mine mine) {
-        ItemStack i = new ItemStack(information);
+        ItemStack i = new ItemStack(INFORMATION);
 
         i = ItemUtils.addToLore(ItemUtils.clearLore(i),
-                MineMeMessageManager.getInstance().translateAll(
-                        infomationLore,
+                MineMeMessageManager.getInstance().translateAll(INFORMATION_LORE,
                         mine));
         return i;
     }

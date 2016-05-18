@@ -43,7 +43,7 @@
     
   # If forceDefaultBroadcastMessage is enabled, this message will be used on all mines
   # on reset... ALL... MINES...
-    mineReset: "%prefix%%separator%$2The mine %alias% $2has been reseted!"
+    mineReset: "%prefix%%separator%$2The mine %alias% $2has been reset!"
     
   #Warning messages
     noPermission: "$4You don't have permission to do this!"

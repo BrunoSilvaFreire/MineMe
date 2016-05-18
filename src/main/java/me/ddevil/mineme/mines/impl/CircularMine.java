@@ -138,6 +138,9 @@ public class CircularMine extends BasicHologramMine {
 
     @Override
     public int getVolume() {
+        if (area == null) {
+            return 0;
+        }
         return area.getArea();
     }
 

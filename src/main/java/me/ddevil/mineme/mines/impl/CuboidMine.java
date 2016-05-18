@@ -271,22 +271,22 @@ public class CuboidMine extends BasicHologramMine {
         MineMe.getInstance().debug("Creating holograms for " + name + "...");
         try {
             Location l = getCenter();
-            Location temp;
-            temp = l.clone();
-            temp.setY(getUpperY());
-            holograms.add(MineMe.hologramAdapter.createHologram(temp));
-            temp = l.clone();
-            temp.add(getSizeX() / 2 + 1, 0, 0);
-            holograms.add(MineMe.hologramAdapter.createHologram(temp));
-            temp = l.clone();
-            temp.add(((getSizeX() / 2) * -1) - 1, 0, 0);
-            holograms.add(MineMe.hologramAdapter.createHologram(temp));
-            temp = l.clone();
-            temp.add(0, 0, (getSizeZ() / 2) + 1);
-            holograms.add(MineMe.hologramAdapter.createHologram(temp));
-            temp = l.clone();
-            temp.add(0, 0, ((getSizeZ() / 2) * -1) - 1);
-            holograms.add(MineMe.hologramAdapter.createHologram(temp));
+            Location hololoc;
+            hololoc = l.clone();
+            hololoc.setY(getUpperY());
+            holograms.add(MineMe.hologramAdapter.createHologram(hololoc));
+            hololoc = l.clone();
+            hololoc.add(getSizeX() / 2 + 1, 0, 0);
+            holograms.add(MineMe.hologramAdapter.createHologram(hololoc));
+            hololoc = l.clone();
+            hololoc.add(((getSizeX() / 2) * -1) - 1, 0, 0);
+            holograms.add(MineMe.hologramAdapter.createHologram(hololoc));
+            hololoc = l.clone();
+            hololoc.add(0, 0, (getSizeZ() / 2) + 1);
+            holograms.add(MineMe.hologramAdapter.createHologram(hololoc));
+            hololoc = l.clone();
+            hololoc.add(0, 0, ((getSizeZ() / 2) * -1) - 1);
+            holograms.add(MineMe.hologramAdapter.createHologram(hololoc));
             MineMe.getInstance().debug("Created " + holograms.size() + " holograms.");
             hologramsReady = true;
         } catch (Exception e) {
@@ -297,6 +297,9 @@ public class CuboidMine extends BasicHologramMine {
     //Statistics
     @Override
     public int getVolume() {
+        if (pos1 == null || pos2 == null) {
+            return 0;
+        }
         return this.getSizeX() * this.getSizeY() * this.getSizeZ();
 
     }

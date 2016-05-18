@@ -30,7 +30,6 @@ import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.utils.WorldEditIterator;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -222,6 +221,9 @@ public class PolygonMine extends BasicHologramMine {
 
     @Override
     public int getVolume() {
+        if (area == null) {
+            return 0;
+        }
         return area.getArea();
     }
 

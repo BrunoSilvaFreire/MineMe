@@ -26,7 +26,10 @@ import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
+import me.ddevil.mineme.events.MineLoadEvent;
 import me.ddevil.mineme.messages.MineMeMessageManager;
+import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.utils.MVdWPlaceholderManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,15 +42,15 @@ import org.bukkit.entity.Player;
  */
 public class MineManager {
 
-    private static final ArrayList<Mine> mines = new ArrayList();
+    private static final ArrayList<Mine> MINES = new ArrayList();
     private static final MineMe mineMe = MineMe.getInstance();
 
     public static ArrayList<Mine> getMines() {
-        return mines;
+        return MINES;
     }
 
     public static boolean isNameAvailable(String name) {
-        for (Mine mine : mines) {
+        for (Mine mine : MINES) {
             if (mine.getName().equalsIgnoreCase(name)) {
                 return false;
             }
@@ -55,8 +58,29 @@ public class MineManager {
         return true;
     }
 
+    public static Mine loadMine(MineConfig c) {
+        Mine m = MineConfig.loadMine(c);
+        try {
+            if (MineMeConfiguration.useHolograms) {
+                if (m instanceof HologramCompatible) {
+                    MineMe.instance.debug("Mine " + m.getName() + " is Holograms compatible! Creating holograms...", 3);
+                    HologramCompatible h = (HologramCompatible) m;
+                    if (m.getIcon() != null) {
+                        h.setupHolograms();
+                    }
+
+                }
+            }
+        } finally {
+            m.reset();
+        }
+        registerMine(m);
+        new MineLoadEvent(m).call();
+        return m;
+    }
+
     public static void registerMine(Mine m) {
-        mines.add(m);
+        MINES.add(m);
         MineMe.registerListener(m);
         if (MineMe.useMVdWPlaceholderAPI) {
             if (!MVdWPlaceholderManager.isPlaceholderRegistered(m)) {
@@ -67,21 +91,21 @@ public class MineManager {
     }
 
     public static void unregisterMines() {
-        mines.clear();
-        for (Mine mine : mines) {
+        MINES.clear();
+        for (Mine mine : MINES) {
             MineMe.unregisterListener(mine);
         }
         MineMe.getInstance().debug("Unloaded all mines!");
     }
 
     public static void unregisterMine(Mine mine) {
-        mines.remove(mine);
+        MINES.remove(mine);
         MineMe.unregisterListener(mine);
         MineMe.getInstance().debug("Unloaded mine " + mine.getName() + "!");
     }
 
     public static Mine getMine(String name) {
-        for (Mine mine : mines) {
+        for (Mine mine : MINES) {
             if (mine.getName().equalsIgnoreCase(name)) {
                 return mine;
             }
@@ -94,7 +118,7 @@ public class MineManager {
     }
 
     public static Mine getMineWith(Player p) {
-        for (Mine m : mines) {
+        for (Mine m : MINES) {
             if (m.contains(p)) {
                 return m;
             }
@@ -107,7 +131,7 @@ public class MineManager {
     }
 
     private static void notifyBlockChange(Block b) {
-        for (Mine mine : mines) {
+        for (Mine mine : MINES) {
             if (mine.contains(b)) {
                 if (!mine.wasAlreadyBroken(b)) {
                     mine.setBlockAsBroken(b);
@@ -117,7 +141,7 @@ public class MineManager {
     }
 
     public static boolean isPartOfMine(Block b) {
-        for (Mine mine : mines) {
+        for (Mine mine : MINES) {
             if (mine.contains(b)) {
                 return true;
             }
@@ -126,7 +150,7 @@ public class MineManager {
     }
 
     public static void saveAll() {
-        for (Mine mine : mines) {
+        for (Mine mine : MINES) {
             mine.save();
         }
     }

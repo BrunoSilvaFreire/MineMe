@@ -2,9 +2,12 @@ config:
     clickToSeeMine: '$2Click to see mine configuration!'
     clickToRemove: '$4Click to remove!'
     clickToEdit: '$2Click to edit!'
+    clickToLoad: '$2Click to load this file!'
+    noMisformattedFiles: '$2No misformated files!'
+    foundFiles: '$2Found a total of $1%total% $2not loaded mines'
 globalItems:
 #DO NOT DELETE ANY OF THESE!!!
-#But you can edit them AS LONG AS YOU DON'T DELETE THEM
+#You can edit them AS LONG AS YOU DON'T DELETE THEM
     splitter:
         type: IRON_FENCE
         data: 0
@@ -39,22 +42,83 @@ globalItems:
         lore:
             - '$1Forces the mine to reset'
             - '$1like... $4RIGHT NOW!'
+    toogleMaterialEditor:
+        type: SLIME_BALL
+        data: 0
+        name: '$2Toogle Materials/Effects'
+        lore:
+            - '$1Toogles between editing'
+            - '$1materials and effects.'
+    noMine:
+        type: STAINED_GLASS_PANE
+        data: 15
+        name: '$4No mine found'
+        lore:
+            - '$1There are no mines'
+            - '$1to display here'
+    unloadedMines:
+        type: STAINED_GLASS_PANE
+        data: 15
+        name: '$4No file found'
+        lore:
+            - '$1Unloaded mine files'
+            - '$1will appear here!'
+            - '$1Once they appear, click'
+            - '$1them to load the mine!'
+    couldNotLoadFiles:
+        type: BOOK
+        data: 0
+        name: '$2Misconfigured Files'
+        lore:
+            - '$3The followings files could not be read.'
+    iconNotLoaded:
+        type: BARRIER
+        data: 0
+        name: '$2%name%'
+        lore:
+            - '$3The icon for this mine is not loaded yet!'
+            - '$3But fear not my dear server owner!'
+            - '$3This will be replaced with the mine icon'
+            - '$3once it''s loaded :)'
+    refresh:
+        type: DIAMOND
+        data: 0
+        name: '$2Refresh menu'
+        lore:
+            - '$3Refreshes this menu!'
     deleteMine:
         type: TNT
         data: 0
         name: '$2Delete mine'
         lore: 
             - '$1Deletes this mine, file included.'
+            - '$1You won''t be able to load it again.'
+            - '$1If you want to simply unload this'
+            - '$1mine, check $2Disable mine'
+    disableMine:
+        type: REDSTONE
+        data: 0
+        name: '$2Disable mine'
+        lore: 
+            - '$1Disables/Unloads this mine.'
+            - '$1You can enable it again on it''s'
+            - '$1config file or through the Main Menu'
     back:
         type: EMERALD
         data: 0
         name: '&a&lGo back'
-    empty:
+    emptyMaterial:
         type: STAINED_GLASS_PANE
         data: 15
-        name: '$4None'
+        name: '$4No material'
         lore: 
             -'$1Drop a material here to add!'
+    emptyEffect:
+        type: STAINED_GLASS_PANE
+        data: 15
+        name: '$4No effect'
+        lore: 
+            -'$1Drop a potion here to add it''s effects!'
     info:
         type: BOOK
         data: 0
@@ -69,12 +133,9 @@ mainMenu:
     icons:
         #DON'T DELETE THIS
         main:
-            type: DIAMOND_PICKAXE
+            type: GOLD_PICKAXE
             data: 0
-            name: '$2&lMine editor'
+            name: '$2&lMine Editor (MEGUI)'
             lore:
             - '$3An editor provided by' 
             - '%prefix% $3to easily edit mines! :)'
-mineMenu:
-    #DO, NOOOT CHANGE THIS, unless you want some weird menus, then that's fine :D
-    totalLanes: 6

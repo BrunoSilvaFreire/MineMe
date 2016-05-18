@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.ddevil.mineme.gui.menus;
+package me.ddevil.mineme.gui.legacy;
 
 import java.util.Arrays;
 import me.ddevil.core.utils.inventory.InventoryUtils;
@@ -89,21 +89,21 @@ public class CompositionEditorMenu implements Listener {
         }
         //Containers
         for (int i : InventoryUtils.getLane(main, InventoryUtils.getTotalLanes(main) - 2)) {
-            main.setItem(i, GUIResourcesUtils.splitter);
+            main.setItem(i, GUIResourcesUtils.SPLITTER);
         }
         for (int i : InventoryUtils.getLane(main, 1)) {
-            main.setItem(i, GUIResourcesUtils.splitter);
+            main.setItem(i, GUIResourcesUtils.SPLITTER);
         }
         //Extra items
-        main.setItem(InventoryUtils.getTopMiddlePoint(main), GUIResourcesUtils.splitter);
-        main.setItem(InventoryUtils.getBottomMiddlePoint(main), GUIResourcesUtils.splitter);
+        main.setItem(InventoryUtils.getTopMiddlePoint(main), GUIResourcesUtils.SPLITTER);
+        main.setItem(InventoryUtils.getBottomMiddlePoint(main), GUIResourcesUtils.SPLITTER);
         int middle = InventoryUtils.getMiddlePoint(main);
         InventoryUtils.drawSquare(main, 18, 35, invIcon);
         main.setItem(middle, owner.getIcon());
         main.setItem(middle - 18, GUIResourcesUtils.generateInformationItem(owner));
 
-        main.setItem(middle - 9, GUIResourcesUtils.backButton);
-        main.setItem(middle + 9, GUIResourcesUtils.removeButton);
+        main.setItem(middle - 9, GUIResourcesUtils.BACK_BUTTON);
+        main.setItem(middle + 9, GUIResourcesUtils.REMOVE_BUTTON);
     }
 
     public boolean isThis(Inventory i) {
@@ -132,13 +132,13 @@ public class CompositionEditorMenu implements Listener {
                 if (itemMeta.getDisplayName() != null) {
                     String itemName = itemMeta.getDisplayName();
                     //Check go back
-                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.backButton.getItemMeta().getDisplayName())) {
-                        GUIManager.mineEditorGUI.openMineMenu(owner, p);
+                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.BACK_BUTTON.getItemMeta().getDisplayName())) {
+                        GUIManager.mainMenu.openMineMenu(owner, p);
                     }
                     //Check remove
-                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.removeButton.getItemMeta().getDisplayName())) {
+                    if (itemName.equalsIgnoreCase(GUIResourcesUtils.REMOVE_BUTTON.getItemMeta().getDisplayName())) {
                         owner.removeMaterial(item);
-                        GUIManager.mineEditorGUI.openMineMenu(owner, p);
+                        GUIManager.mainMenu.openMineMenu(owner, p);
                     }
                     //Check change percentage
                     if (InventoryUtils.wasClickedInLane(inventory, e.getRawSlot(), 0)
