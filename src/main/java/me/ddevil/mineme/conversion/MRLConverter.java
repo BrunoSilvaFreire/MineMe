@@ -17,13 +17,17 @@
 package me.ddevil.mineme.conversion;
 
 import com.koletar.jj.mineresetlite.MineResetLite;
+import com.koletar.jj.mineresetlite.SerializableBlock;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.core.utils.FileUtils;
+import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.mines.Mine;
 import me.ddevil.mineme.mines.MineManager;
@@ -32,13 +36,14 @@ import me.ddevil.mineme.mines.impl.CuboidMine;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
  * @author Selma
  */
 public class MRLConverter {
-
+    
     public static List<Mine> convert() {
         ArrayList<Mine> mines = new ArrayList<>();
         int i = 0;
@@ -70,17 +75,24 @@ public class MRLConverter {
         }
         return mines;
     }
-
+    
     public static FileConfiguration createBasicConfig(com.koletar.jj.mineresetlite.Mine mine) throws SecurityException, IOException {
         MineMe.getInstance().saveResource("examplemine.yml", true);
         File template = new File(MineMe.pluginFolder, "examplemine.yml");
         File name = new File(MineMe.pluginFolder, mine.getName() + ".yml");
         template.renameTo(name);
         template = name;
-
+        
         FileUtils.moveFileToDirectory(template, MineMe.minesFolder);
-
+        
         FileConfiguration c = YamlConfiguration.loadConfiguration(template);
+        Map<SerializableBlock, Double> composition = mine.getComposition();
+        ArrayList<String> comp = new ArrayList();
+        
+        for (SerializableBlock b : composition.keySet()) {
+            ItemStack i = new ItemStack(b.getBlockId(), 1, b.getData());
+            comp.add(ItemUtils.toString(i) + "=" + composition.get(b));
+        }
         c.set("enabled", true);
         c.set("name", mine.getName());
         c.set("alias", mine.getName());
@@ -90,8 +102,6 @@ public class MRLConverter {
         c.set("broadcastOnReset", true);
         c.set("broadcastToNearbyOnly", false);
         c.set("broadcastRadius", 50.0);
-        ArrayList<String> comp = new ArrayList();
-        comp.add("STONE=100");
         c.set("composition", comp);
         c.set("X1", mine.getMinX());
         c.set("Y1", mine.getMinY());

@@ -4,7 +4,7 @@ config:
     clickToEdit: '$2Click to edit!'
     clickToLoad: '$2Click to load this file!'
     noMisformattedFiles: '$2No misformated files!'
-    foundFiles: '$2Found a total of $1%total% $2not loaded mines'
+    foundFiles: '$1Found a total of $2%total% $1not loaded mines'
 globalItems:
 #DO NOT DELETE ANY OF THESE!!!
 #You can edit them AS LONG AS YOU DON'T DELETE THEM
@@ -61,10 +61,18 @@ globalItems:
         data: 15
         name: '$4No file found'
         lore:
-            - '$1Unloaded mine files'
+            - '$1Disabled mine files'
             - '$1will appear here!'
             - '$1Once they appear, click'
             - '$1them to load the mine!'
+    fillMine:
+        type: CHEST
+        data: 0
+        name: '$2Fill mine'
+        lore:
+            - '$1Drop a block here'
+            - '$1and we''ll fill the'
+            - '$1mine with it!'
     couldNotLoadFiles:
         type: BOOK
         data: 0
@@ -103,6 +111,13 @@ globalItems:
             - '$1Disables/Unloads this mine.'
             - '$1You can enable it again on it''s'
             - '$1config file or through the Main Menu'
+    clearMine:
+        type: REDSTONE_BLOCK
+        data: 0
+        name: '$2Clear mine'
+        lore: 
+            - '$1Remove''s all the blocks of'
+            - '$1the mine, useful for events.'
     back:
         type: EMERALD
         data: 0
@@ -113,12 +128,17 @@ globalItems:
         name: '$4No material'
         lore: 
             -'$1Drop a material here to add!'
+    empty:
+        type: STAINED_GLASS_PANE
+        data: 15
+        name: '&r'
     emptyEffect:
         type: STAINED_GLASS_PANE
         data: 15
         name: '$4No effect'
         lore: 
             -'$1Drop a potion here to add it''s effects!'
+            -'$1Right click to remove the potion!'
     info:
         type: BOOK
         data: 0
@@ -126,6 +146,22 @@ globalItems:
         lore:
             - '$3Total percentage: $1%totalpercentage%'
             - '$3Total materials: $1%totalmaterials%'
+    balanceMaterials:
+        type: IRON_INGOT
+        data: 0
+        name: '$2Balance materials'
+        lore:
+            - '$1Divides the percentage'
+            - '$1through all the materials'
+    resetMaterials:
+        type: GOLD_INGOT
+        data: 0
+        name: '$2Reset materials'
+        lore:
+            - '$1Sets all the materials'
+            - '$1to 5% percent. useful if'
+            - '$1you want to set percentages'
+            - '$1again without removing materials'
 mainMenu:
     name: "$2&lMegui"
     #The total lanes the main menu will have

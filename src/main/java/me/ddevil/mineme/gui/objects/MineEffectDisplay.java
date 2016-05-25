@@ -5,89 +5,97 @@
  */
 package me.ddevil.mineme.gui.objects;
 
-import java.util.List;
-import me.ddevil.core.CustomPlugin;
 import me.ddevil.core.events.inventory.InventoryObjectClickEvent;
 import me.ddevil.core.utils.inventory.objects.BasicClickableInventoryObject;
 import me.ddevil.core.utils.inventory.objects.interfaces.InventoryObjectClickListener;
 import me.ddevil.core.utils.items.ItemUtils;
-import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.gui.menus.MineMenu;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 /**
  *
  * @author BRUNO II
  */
 public class MineEffectDisplay extends BasicClickableInventoryObject {
-    
+
     protected PotionEffect potionEffect;
     private final Mine mine;
-    
+
     public void setPotionEffect(PotionEffect potionEffect) {
         this.potionEffect = potionEffect;
+        update();
     }
-    
+
     public PotionEffect getPotionEffect() {
         return potionEffect;
     }
-    
+
     public MineEffectDisplay(Mine m, final MineMenu menu) {
-        super(GUIResourcesUtils.EMPTY_EFFECTS, menu);
+        super(GUIResourcesUtils.EMPTY_EFFECT, menu);
         this.mine = m;
         this.interactListener = new InventoryObjectClickListener() {
-            
+
             @Override
             public void onInteract(InventoryObjectClickEvent e) {
                 if (potionEffect == null) {
-                    ItemStack item = e.getItemInHand();
-                    if (item != null) {
-                        if (item.getType() != Material.AIR) {
-                            ItemMeta meta = item.getItemMeta();
-                            if (meta instanceof PotionMeta) {
-                                PotionMeta potionMeta = (PotionMeta) meta;
-                                List<PotionEffect> customEffects = potionMeta.getCustomEffects();
-                                if (!customEffects.isEmpty()) {
-                                    potionEffect = customEffects.get(0);
-                                }
+                    ItemStack itemInHand = e.getItemInHand();
+                    if (itemInHand != null) {
+                        if (itemInHand.hasItemMeta()) {
+                            ItemMeta itemMeta = itemInHand.getItemMeta();
+                            if (itemMeta instanceof PotionMeta) {
+                                PotionMeta m = (PotionMeta) itemMeta;
+                                PotionType type = m.getBasePotionData().getType();
+                                potionEffect = type.getEffectType().createEffect(21, type.getMaxLevel());
+                                mine.addPotionEffect(potionEffect);
+                                menu.update();
                             }
-                            update();
                         }
                     }
+                } else if (e.getClickType() == InventoryObjectClickEvent.InteractionType.INVENTORY_CLICK_LEFT) {
+                    PotionEffectType type = potionEffect.getType();
+                    int amplifier = potionEffect.getAmplifier();
+                    PotionEffect newEffect;
+                    if (amplifier >= 10) {
+                        newEffect = new PotionEffect(type, potionEffect.getDuration(), 0);
+                    } else {
+                        newEffect = new PotionEffect(type, potionEffect.getDuration(), amplifier + 1);
+                    }
+                    potionEffect = newEffect;
+                    mine.addPotionEffect(potionEffect);
+                    menu.update();
                 } else if (e.getClickType() == InventoryObjectClickEvent.InteractionType.INVENTORY_CLICK_RIGHT) {
                     mine.removePotionEffect(potionEffect.getType());
+                    potionEffect = null;
+                    menu.update();
                 }
             }
         };
     }
-    
+
     public Mine getMine() {
         return mine;
     }
-    
+
     private static ItemStack generateIcon(PotionEffect e) {
         ItemStack createItem = ItemUtils.createItem(Material.POTION, "§e" + e.getType().getName());
-        createItem = ItemUtils.addToLore(createItem, new String[]{
-            "§7Amplifier: §a" + e.getAmplifier(),
-            "§7Duration: §b" + e.getDuration()
-        });
+        createItem = ItemUtils.addToLore(createItem, "§7Amplifier: §a" + e.getAmplifier());
         return createItem;
     }
-    
+
     @Override
     public void update() {
         if (potionEffect != null) {
             icon = generateIcon(potionEffect);
         } else {
-            icon = GUIResourcesUtils.EMPTY_MATERIAL;
+            icon = GUIResourcesUtils.EMPTY_EFFECT;
         }
-        MineMe.instance.broadcastDebug(icon.serialize().toString());
     }
 }

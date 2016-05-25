@@ -19,7 +19,6 @@ package me.ddevil.mineme.mines;
 import java.util.List;
 import java.util.Map;
 import me.ddevil.mineme.challenge.Challenge;
-import static me.ddevil.mineme.mines.MineUtils.getItemStackInComposition;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -72,6 +71,14 @@ public interface Mine extends Iterable<Block>, Listener {
     public boolean isDeleted();
 
     public double getTotalPercentage();
+
+    public void fill(ItemStack item);
+
+    public void clear();
+
+    public boolean isExceedingMaterials();
+
+    public double getExceedingTotal();
 
     public void setResetDelay(int delayInMinutes);
 
@@ -240,6 +247,13 @@ public interface Mine extends Iterable<Block>, Listener {
     public void setMaterialPercentage(ItemStack material, double percentage);
 
     /**
+     * Add the material to the mine's composition with 0 percentage.
+     *
+     * @param material The material to set
+     */
+    public void addMaterial(ItemStack material);
+
+    /**
      * Remove the material from the mine's composition, if the material is party
      * of the composition.
      *
@@ -381,4 +395,8 @@ public interface Mine extends Iterable<Block>, Listener {
     public boolean containsRelativeItemStackInComposition(ItemStack i);
 
     public void disable();
+
+    public double getFreePercentage();
+
+    public PotionEffect getEffect(PotionEffectType type);
 }

@@ -76,7 +76,7 @@ effects:
     use: true
     list:
         - 'FAST_DIGGING:1:2'
-useCustomHologramText: true
+useCustomHologramText: false
 hologramsText:
     - '%header%'
     - '%alias%'

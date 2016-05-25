@@ -22,7 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public class MineRepopulator {
-
+    
     public void repopulate(Mine m) {
         try {
             RepopulateMap map = new RepopulateMap(m);
@@ -38,23 +38,25 @@ public class MineRepopulator {
             MineMe.instance.printException("There was an error repopulating mine " + m.getName() + ", is the composition correct?", e);
         }
     }
-
+    
     private static class RepopulateMap {
-
+        
         private final RandomCollection<ItemStack> randomCollection;
-
-        private RepopulateMap(Mine m) {
+        
+        private RepopulateMap(Mine mine) {
             randomCollection = new RandomCollection<>();
-            for (ItemStack m1 : m.getComposition().keySet()) {
-                randomCollection.add(m.getComposition().get(m1), m1);
+            for (ItemStack m : mine.getComposition().keySet()) {
+                randomCollection.add(
+                        mine.getPercentage(m),
+                        m);
             }
-
+            
         }
-
+        
         private boolean isEmpty() {
             return randomCollection.isEmpty();
         }
-
+        
         private ItemStack getRandomBlock() {
             return randomCollection.next();
         }

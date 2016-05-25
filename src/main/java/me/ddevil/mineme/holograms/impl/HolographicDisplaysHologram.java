@@ -100,7 +100,7 @@ public class HolographicDisplaysHologram implements CompatibleHologram {
 
     @Override
     public void move(World w, double x, double y, double z) {
-        hologram.teleport(w, z, z, z);
+        hologram.teleport(w, x, y, z);
     }
 
     @Override

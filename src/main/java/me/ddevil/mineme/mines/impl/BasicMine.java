@@ -229,8 +229,8 @@ public abstract class BasicMine extends CustomListener implements Mine {
     public void secondCountdown() {
         currentResetDelay--;
         if (useEffects) {
-            for (Player p : getPlayersInside()) {
-                for (PotionEffect e : getEffects()) {
+            for (PotionEffect e : getEffects()) {
+                for (Player p : getPlayersInside()) {
                     p.addPotionEffect(e, true);
                 }
             }
@@ -425,14 +425,31 @@ public abstract class BasicMine extends CustomListener implements Mine {
     }
 
     @Override
+    public double getFreePercentage() {
+        if (isExceedingMaterials()) {
+            return 0;
+        }
+        return 100 - getTotalPercentage();
+    }
+
+    @Override
+    public double getExceedingTotal() {
+        if (isExceedingMaterials()) {
+            return getTotalPercentage() - 100;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
     public void setMaterialPercentage(ItemStack material, double percentage) {
         if (MineUtils.containsRelativeItemStackInComposition(this, material)) {
             material = MineUtils.getItemStackInComposition(this, material);
         }
-        MineMe.instance.debug("The percentage of " + material.getType() + ":" + material.getData().getData() + " of mine " + name + " was changed to " + percentage + ".", 2);
         if (percentage < 0) {
             percentage = 0;
         }
+        MineMe.instance.debug("The percentage of " + material.getType() + ":" + material.getData().getData() + " of mine " + name + " was changed to " + percentage + ".", 2);
         composition.put(material, percentage);
         save();
     }
@@ -511,7 +528,23 @@ public abstract class BasicMine extends CustomListener implements Mine {
     }
 
     @Override
+    public void clear() {
+        for (Block b : this) {
+            b.setType(Material.AIR);
+        }
+    }
+
+    @Override
+    public void fill(ItemStack item) {
+        for (Block b : this) {
+            b.setType(item.getType());
+            b.setData(item.getData().getData());
+        }
+    }
+
+    @Override
     public void disable() {
+        clear();
         setEnabled(false);
         if (this instanceof HologramCompatible) {
             HologramCompatible hc = (HologramCompatible) this;
@@ -525,6 +558,7 @@ public abstract class BasicMine extends CustomListener implements Mine {
 
     @Override
     public void delete() {
+        clear();
         setEnabled(false);
         MineMe.getMineFile(this).delete();
         MineManager.unregisterMine(this);
@@ -554,15 +588,21 @@ public abstract class BasicMine extends CustomListener implements Mine {
 
     @Override
     public double getTotalPercentage() {
+        if (composition == null) {
+            return 0;
+        }
         double total = 0;
-        for (ItemStack i : composition.keySet()) {
-            total += composition.get(i);
+        for (double i : composition.values()) {
+            total += i;
         }
         return total;
     }
 
     @Override
     public int getTotalMaterials() {
+        if (composition == null) {
+            return 0;
+        }
         return composition.keySet().size();
     }
 
@@ -596,7 +636,12 @@ public abstract class BasicMine extends CustomListener implements Mine {
 
     @Override
     public void addPotionEffect(PotionEffect effect) {
+        PotionEffectType type = effect.getType();
+        if (getEffect(type) != null) {
+            removePotionEffect(type);
+        }
         potionEffects.add(effect);
+
     }
 
     @Override
@@ -604,7 +649,7 @@ public abstract class BasicMine extends CustomListener implements Mine {
         for (Iterator<PotionEffect> it = potionEffects.iterator(); it.hasNext();) {
             PotionEffect e = it.next();
             if (e.getType().equals(effectType)) {
-                potionEffects.remove(e);
+                it.remove();
             }
         }
     }
@@ -635,9 +680,11 @@ public abstract class BasicMine extends CustomListener implements Mine {
         }
         ArrayList<String> effects = new ArrayList();
         for (PotionEffect e : potionEffects) {
-            effects.add(e.getType() + ":" + e.getDuration() + ":" + e.getAmplifier());
+            effects.add(e.getType().getName() + ":" + (e.getDuration() / 20) + ":" + e.getAmplifier());
         }
-        c.set("effects", effects);
+        c.createSection("effects");
+        c.set("effects.use", useEffects);
+        c.set("effects.list", effects);
         ArrayList<String> comp = new ArrayList();
         for (ItemStack m : composition.keySet()) {
             String s = m.getType().name() + ":" + m.getData().getData();
@@ -673,11 +720,13 @@ public abstract class BasicMine extends CustomListener implements Mine {
             if (broadcastOnReset) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (broadcastNearby) {
-                        if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
-                            p.sendMessage(
-                                    MineMeMessageManager.getInstance().translateAll(
-                                            broadcastMessage,
-                                            this));
+                        if (p.getLocation().getWorld() == getCenter().getWorld()) {
+                            if (p.getLocation().distance(getCenter()) <= broadcastRadius) {
+                                p.sendMessage(
+                                        MineMeMessageManager.getInstance().translateAll(
+                                                broadcastMessage,
+                                                this));
+                            }
                         }
                     } else {
                         p.sendMessage(MineMeMessageManager.getInstance().translateAll(broadcastMessage, this));
@@ -702,11 +751,12 @@ public abstract class BasicMine extends CustomListener implements Mine {
 
     @Override
     public ItemStack getItemStackInComposition(ItemStack item) {
-
-        for (ItemStack a : composition.keySet()) {
-            if (a.getType() == item.getType()) {
-                if (a.getData().getData() == item.getData().getData()) {
-                    return a;
+        if (item != null) {
+            for (ItemStack a : composition.keySet()) {
+                if (a.getType() == item.getType()) {
+                    if (a.getData().getData() == item.getData().getData()) {
+                        return a;
+                    }
                 }
             }
         }
@@ -717,4 +767,23 @@ public abstract class BasicMine extends CustomListener implements Mine {
     public boolean containsRelativeItemStackInComposition(ItemStack i) {
         return getItemStackInComposition(i) != null;
     }
+
+    @Override
+    public void addMaterial(ItemStack material) {
+        if (!containsRelativeItemStackInComposition(material)) {
+            setMaterialPercentage(material, 1);
+        }
+    }
+
+    @Override
+    public PotionEffect getEffect(PotionEffectType type) {
+
+        for (PotionEffect effect : getEffects()) {
+            if (effect.getType().equals(type)) {
+                return effect;
+            }
+        }
+        return null;
+    }
+
 }

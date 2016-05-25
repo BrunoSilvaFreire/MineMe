@@ -22,11 +22,14 @@ import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.holograms.CompatibleHologram;
 import me.ddevil.mineme.mines.MineType;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.utils.WorldEditIterator;
@@ -45,7 +48,7 @@ import org.bukkit.util.Vector;
  */
 public class PolygonMine extends BasicHologramMine {
 
-    private final Vector[] points;
+    private final List<Vector> points;
     private final int height;
     private final Polygonal2DRegion area;
 
@@ -79,13 +82,13 @@ public class PolygonMine extends BasicHologramMine {
             }
         }
         this.area = new Polygonal2DRegion(new BukkitWorld(world), bvectors, lowestPoint, hightestPoint);
-        this.points = vectors.toArray(new Vector[vectors.size()]);
+        this.points = vectors;
         this.height = hightestPoint - lowestPoint;
     }
 
     public PolygonMine(Vector[] points, String name, World world, ItemStack icon) {
         super(name, world, icon);
-        this.points = points;
+        this.points = new ArrayList(Arrays.asList(points));
         ArrayList<BlockVector2D> bvectors = new ArrayList();
         Integer lowestPoint = null;
         Integer hightestPoint = null;
@@ -130,7 +133,7 @@ public class PolygonMine extends BasicHologramMine {
                 hightestPoint = point.getBlockY();
             }
         }
-        this.points = vectors.toArray(new Vector[vectors.size()]);
+        this.points = vectors;
         this.area = region;
         this.height = hightestPoint - lowestPoint;
 
@@ -157,7 +160,7 @@ public class PolygonMine extends BasicHologramMine {
                 hightestPoint = point.getBlockY();
             }
         }
-        this.points = vectors.toArray(new Vector[vectors.size()]);
+        this.points = vectors;
         this.area = new Polygonal2DRegion(new BukkitWorld(world), region.getNativePoints(), lowestPoint, hightestPoint);
         this.height = hightestPoint - lowestPoint;
 

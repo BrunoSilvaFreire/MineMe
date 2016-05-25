@@ -11,7 +11,6 @@ import me.ddevil.core.events.inventory.InventoryObjectClickEvent;
 import me.ddevil.core.utils.inventory.objects.BasicClickableInventoryObject;
 import me.ddevil.core.utils.inventory.objects.BasicInventoryContainer;
 import me.ddevil.core.utils.inventory.objects.interfaces.InventoryObjectClickListener;
-import me.ddevil.mineme.MineMe;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
 import me.ddevil.mineme.gui.menus.MineMenu;
 import me.ddevil.mineme.mines.Mine;
@@ -64,11 +63,10 @@ public class MineMEController extends BasicInventoryContainer {
 
     @Override
     public void update() {
-        MineMe.instance.broadcastDebug("Updating controller to showingMaterial = " + showingMaterial);
         clear();
         if (showingMaterial) {
             List<ItemStack> materials = mine.getMaterials();
-            int i = 36;
+            int i = 0;
             for (MineMaterialDisplay m : materialsDisplays) {
                 int index = materialsDisplays.indexOf(m);
                 if (materials.size() > index) {
@@ -81,7 +79,7 @@ public class MineMEController extends BasicInventoryContainer {
             }
         } else {
             List<PotionEffect> effects = mine.getEffects();
-            int i = 36;
+            int i = 0;
             for (MineEffectDisplay m : effectsDisplays) {
                 int index = effectsDisplays.indexOf(m);
                 if (effects.size() > index) {
@@ -93,7 +91,7 @@ public class MineMEController extends BasicInventoryContainer {
                 i++;
             }
         }
-        setObject(44, toogle);
+        setObject(8, toogle);
         super.update();
     }
 

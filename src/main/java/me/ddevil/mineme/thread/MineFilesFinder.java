@@ -59,12 +59,16 @@ public class MineFilesFinder extends CustomThread {
     }
 
     public ItemStack getNotLoadedItemStat() {
-        ItemStack i = ItemUtils.addToLore(GUIResourcesUtils.COULD_NOT_LOAD_FILES, GUIResourcesUtils.FOUND_MINE_FILES.replace("%total%", String.valueOf(mines.size())));
+        ItemStack i;
         if (notLoadedFiles.isEmpty()) {
-            i = ItemUtils.addToLore(i, GUIResourcesUtils.NO_MISFORMATTED_FILES);
+            i = ItemUtils.addToLore(GUIResourcesUtils.FILES_SEARCH_RESULT, GUIResourcesUtils.NO_MISFORMATTED_FILES);
         } else {
-            i = ItemUtils.addToLore(i, notLoadedFiles);
+            i = ItemUtils.addToLore(GUIResourcesUtils.FILES_SEARCH_RESULT, notLoadedFiles);
         }
+        i = ItemUtils.addToLore(
+                GUIResourcesUtils.FILES_SEARCH_RESULT,
+                GUIResourcesUtils.FOUND_MINE_FILES.replace("%total%", String.valueOf(mines.size()))
+        );
         return i;
     }
 

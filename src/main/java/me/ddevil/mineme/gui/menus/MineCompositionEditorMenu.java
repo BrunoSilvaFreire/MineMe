@@ -5,12 +5,17 @@
  */
 package me.ddevil.mineme.gui.menus;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import me.ddevil.core.events.inventory.InventoryObjectClickEvent;
 import me.ddevil.core.utils.inventory.BasicInventoryMenu;
-import me.ddevil.core.utils.inventory.InventoryUtils;
 import me.ddevil.core.utils.inventory.objects.BackButton;
+import me.ddevil.core.utils.inventory.objects.BasicClickableInventoryObject;
+import me.ddevil.core.utils.inventory.objects.BasicInventoryContainer;
+import me.ddevil.core.utils.inventory.objects.interfaces.InventoryObjectClickListener;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.gui.GUIResourcesUtils;
+import me.ddevil.mineme.gui.objects.MaterialCompositionChanger;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
 import org.bukkit.inventory.ItemStack;
@@ -22,73 +27,99 @@ import org.bukkit.inventory.ItemStack;
 public class MineCompositionEditorMenu extends BasicInventoryMenu {
 
     private final ItemStack material;
-    private final Mine owner;
+    private final Mine mine;
+    private final MineMenu mineMenu;
 
-    public MineCompositionEditorMenu(Mine owner, ItemStack material) {
-        super(MineMeMessageManager.getInstance().translateAll("$2" + material.getType() + "$3:$1" + material.getData().getData()), GUIResourcesUtils.INVENTORY_SIZE);
-        this.owner = owner;
-        this.material = owner.getItemStackInComposition(material);
+    private static String getName(ItemStack material) {
+        return MineMeMessageManager.getInstance().translateAll("$2" + material.getType() + "$3:$1" + material.getData().getData());
     }
-    private final BackButton backButton = new BackButton(null, GUIResourcesUtils.BACK_BUTTON, null);
+
+    public MineCompositionEditorMenu(final Mine owner, final ItemStack material, MineMenu menu) {
+        super(getName(material), GUIResourcesUtils.INVENTORY_SIZE);
+        this.mine = owner;
+        this.mineMenu = menu;
+        this.material = owner.getItemStackInComposition(material);
+        this.backButton = new BackButton(mineMenu, GUIResourcesUtils.BACK_BUTTON, this);
+        this.removeButton = new BasicClickableInventoryObject(GUIResourcesUtils.REMOVE_MATERIAL_BUTTON, new InventoryObjectClickListener() {
+
+            @Override
+            public void onInteract(InventoryObjectClickEvent e) {
+                mine.removeMaterial(material);
+                mineMenu.open(e.getPlayer());
+            }
+        }, this);
+        this.changers = new BasicInventoryContainer(this, 9, 25);
+        this.options = new BasicInventoryContainer(this, 36, 43);
+    }
+    private final BackButton backButton;
+    private final BasicInventoryContainer options;
+    private final BasicClickableInventoryObject removeButton;
+    private final double[] percentages = {50, 25, 10, 5, 2, 1, 0.5, 0.1};
+    private final BasicInventoryContainer changers;
 
     @Override
     protected void setupItems() {
-        ItemStack invIcon = ItemUtils.createItem(
-                //Reference item stack
-                material,
-                //Item name
-                mainInventory.getTitle(),
-                //Lore
-                MineMeMessageManager.getInstance().translateAll(
-                        Arrays.asList(new String[]{
-                            "$3Current: $1" + owner.getPercentage(material) + "%"
-                        })));
-        InventoryUtils.drawSquare(mainInventory, 18, 35, GUIResourcesUtils.generateInformationItem(owner));
-        int middle = InventoryUtils.getMiddlePoint(mainInventory);
-        registerInventoryObject(backButton, middle - 9);
-        setItem(owner.getIcon(), middle);
-        setItem(GUIResourcesUtils.generateInformationItem(owner), middle - 18);
-        mainInventory.setItem(middle + 9, GUIResourcesUtils.REMOVE_BUTTON);
+        clearAndFill(GUIResourcesUtils.SPLITTER);
+        registerInventoryObject(changers, 9);
+        registerInventoryObject(options, 36);
+        registerInventoryObject(backButton, 45);
+        options.clearAndFill(GUIResourcesUtils.EMPTY_NEUTRAL);
+        options.addObject(removeButton);
+        int slot = 0;
+        for (double d : percentages) {
+            MaterialCompositionChanger pos = new MaterialCompositionChanger(material, this, mine, d);
+            MaterialCompositionChanger neg = new MaterialCompositionChanger(material, this, mine, d * -1);
+            changers.setObject(slot, pos);
+            changers.setObject(slot + 8, neg);
+            slot++;
+        }
     }
 
     @Override
     public void update() {
-
-        double currentAddPercentage = 50;
-        //Top left 4 add buttons
-        for (int i : InventoryUtils.getPartialLane(mainInventory, 0, 0, 3)) {
-            mainInventory.setItem(i, GUIResourcesUtils.generateCompositionChangeItemStack(currentAddPercentage));
-            currentAddPercentage /= 2;
-        }
-        //Bottom left 4 remove buttons
-        double currentRemovePercentage = -50;
-        for (int i : InventoryUtils.getPartialLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 1, 0, 3)) {
-            mainInventory.setItem(i, GUIResourcesUtils.generateCompositionChangeItemStack(currentRemovePercentage));
-            currentRemovePercentage /= 2;
-        }
-        //Top right 4 add buttons
-        int[] customValues = {1, 5, 10, 20};
-        int currentCustomUpid = 0;
-        for (int i : InventoryUtils.getPartialLane(mainInventory, 0, 5, 8)) {
-            mainInventory.setItem(i, GUIResourcesUtils.generateCompositionChangeItemStack(customValues[currentCustomUpid]));
-            currentCustomUpid++;
-        }
-        //Bottom right 4 add buttons
-        int currentCustomBottomid = 0;
-        for (int i : InventoryUtils.getPartialLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 1, 5, 8)) {
-            mainInventory.setItem(i, GUIResourcesUtils.generateCompositionChangeItemStack(customValues[currentCustomBottomid] * -1));
-            currentCustomBottomid++;
-        }
-        //Containers
-        for (int i : InventoryUtils.getLane(mainInventory, InventoryUtils.getTotalLanes(mainInventory) - 2)) {
-            mainInventory.setItem(i, GUIResourcesUtils.SPLITTER);
-        }
-        for (int i : InventoryUtils.getLane(mainInventory, 1)) {
-            mainInventory.setItem(i, GUIResourcesUtils.SPLITTER);
-        }
-        //Extra items
-        mainInventory.setItem(InventoryUtils.getTopMiddlePoint(mainInventory), GUIResourcesUtils.SPLITTER);
-        mainInventory.setItem(InventoryUtils.getBottomMiddlePoint(mainInventory), GUIResourcesUtils.SPLITTER);
+        changers.update();
+        options.setItem(7, generateItemStat());
     }
 
+    private ItemStack generateItemStat() {
+        ItemStack is = ItemUtils.createItem(material,
+                MineMeMessageManager.getInstance().translateAll(generateItemPrefix()));
+        ArrayList<String> lore = new ArrayList();
+        lore.add("$3Mine total percentage: $2" + mine.getTotalPercentage());
+        if (mine.isExceedingMaterials()) {
+            lore.add("$4Mine is exceeding materials by $2" + mine.getExceedingTotal() + "%$4!");
+        } else {
+            double free = mine.getFreePercentage();
+            if (free == 0) {
+                lore.add("$1Mine is completely filled!");
+            } else {
+                lore.add("$3Space left for materials:$1 " + free + "%");
+            }
+        }
+        lore.add("§r");
+        lore.add("$3Other materials:");
+        List<ItemStack> materials = mine.getMaterials();
+        if (materials.size() - 1 <= 0) {
+            lore.add("$4There are no other materials!!!");
+        } else {
+            for (ItemStack s : materials) {
+                if (!s.equals(material)) {
+                    lore.add(generateItemPrefix(s));
+                }
+            }
+        }
+        is = ItemUtils.addToLore(
+                is,
+                MineMeMessageManager.getInstance().translateAll(lore, mine)
+        );
+        return is;
+    }
+
+    private String generateItemPrefix() {
+        return "$3* $1" + material.getType() + "$3:$2" + material.getData().getData() + "$3-$1" + mine.getPercentage(material) + "%";
+    }
+
+    private String generateItemPrefix(ItemStack material) {
+        return "$3* $1" + material.getType() + "$3:$2" + material.getData().getData() + "$3-$1" + mine.getPercentage(material) + "%";
+    }
 }

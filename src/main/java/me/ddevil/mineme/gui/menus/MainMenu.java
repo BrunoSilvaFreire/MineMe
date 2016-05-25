@@ -26,7 +26,6 @@ import me.ddevil.mineme.mines.MineManager;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import me.ddevil.mineme.thread.MineFilesFinder;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -41,10 +40,9 @@ public class MainMenu extends BasicInventoryMenu {
 
     public MainMenu(String name) {
         super(name, GUIResourcesUtils.INVENTORY_SIZE);
-        this.mineFilesFinder = new MineFilesFinder();
         this.mineList = new BasicInventoryContainer(this, 0, 24);
         this.unloadedMineList = new BasicInventoryContainer(this, UNLOADED_MINE_LIST_SLOT, UNLOADED_MINE_LIST_SLOT + 8);
-        this.refreshButton = new BasicClickableInventoryObject(GUIResourcesUtils.REFRESH, new InventoryObjectClickListener() {
+        this.refreshButton = new BasicClickableInventoryObject(GUIResourcesUtils.REFRESH_MENU, new InventoryObjectClickListener() {
 
             @Override
             public void onInteract(InventoryObjectClickEvent e) {
@@ -56,7 +54,6 @@ public class MainMenu extends BasicInventoryMenu {
     private final BasicClickableInventoryObject refreshButton;
     private final BasicInventoryContainer mineList;
     private final BasicInventoryContainer unloadedMineList;
-    private final MineFilesFinder mineFilesFinder;
 
     @Override
     public void update() {
@@ -70,15 +67,14 @@ public class MainMenu extends BasicInventoryMenu {
                 MineMe.instance.printException("There was a problem while loading mine " + mine.getName() + "'s icon", e);
             }
         }
-        MineMe.instance.broadcastDebug(ItemUtils.toString(GUIResourcesUtils.NOT_LOADED_MINES));
-
+        unloadedMineList.clearAndFill(GUIResourcesUtils.NOT_LOADED_MINES);
+        final MineFilesFinder mineFilesFinder = new MineFilesFinder();
         mineFilesFinder.addListener(new ThreadFinishListener() {
 
             @Override
             public void onFinish() {
-                unloadedMineList.clearAndFill(GUIResourcesUtils.NOT_LOADED_MINES);
                 unloadedMineList.setObject(
-                        InventoryUtils.getLastSlotInLane(4),
+                        8,
                         new BasicInventoryItem(MainMenu.this, mineFilesFinder.getNotLoadedItemStat())
                 );
                 List<MineConfig> mines = mineFilesFinder.getMines();

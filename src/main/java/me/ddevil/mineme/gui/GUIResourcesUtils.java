@@ -17,14 +17,13 @@
 package me.ddevil.mineme.gui;
 
 import java.util.HashMap;
-import java.util.List;
 import me.ddevil.core.utils.items.ItemUtils;
 import me.ddevil.mineme.MineMe;
+import me.ddevil.mineme.MineMeConfiguration;
 import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.Mine;
-import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  *
@@ -33,59 +32,49 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class GUIResourcesUtils {
 
     static final HashMap<String, ItemStack> customItems = new HashMap();
-    public static String CLICK_TO_REMOVE;
     //Global items
-    public static ItemStack SPLITTER;
-    public static ItemStack EMPTY_MATERIAL;
-    public static ItemStack EMPTY_EFFECTS;
-    public static ItemStack REMOVE_BUTTON;
-    public static ItemStack BACK_BUTTON;
-    public static ItemStack TELEPORTER;
-    public static ItemStack RESET_BUTTON;
-    public static ItemStack DELETE_MINE_BUTTON;
-    public static ItemStack INFORMATION;
-    public static ItemStack CLEAR_MATERIALS;
-    public static ItemStack TOOGLE_MATERIALS_EFFECTS_SELECTION;
-    public static List<String> INFORMATION_LORE;
-    public static ItemStack DISABLE_MINE_BUTTON;
-    public static ItemStack NOT_LOADED_MINES;
-    public static ItemStack COULD_NOT_LOAD_FILES;
-    public static ItemStack NOT_LOADED_ICON;
-    public static ItemStack NO_MINE_TO_DISPLAY;
-    public static ItemStack REFRESH;
+    private static final ConfigurationSection ITEMS_SECTION = MineMeConfiguration.guiConfig.getConfigurationSection("globalItems");
+    private static final ConfigurationSection STRINGS_SECTION = MineMeConfiguration.guiConfig.getConfigurationSection("config");
+    //Placeholders
+    public static final ItemStack SPLITTER = loadFromConfig("splitter");
+    public static final ItemStack EMPTY_MATERIAL = loadFromConfig("emptyMaterial");
+    public static final ItemStack EMPTY_EFFECT = loadFromConfig("emptyEffect");
+    public static final ItemStack EMPTY_NEUTRAL = loadFromConfig("empty");
+    //Iteraction
+    public static final ItemStack BACK_BUTTON = loadFromConfig("back");
+    public static final ItemStack TELEPORT_TO_MINE_BUTTON = loadFromConfig("teleporter");
+    public static final ItemStack TOOGLE_MATERIALS_EFFECTS_SELECTION = loadFromConfig("toogleMaterialEditor");
+    public static final ItemStack FILL_MINE = loadFromConfig("fillMine");
+    public static final ItemStack BALANCE_MATERIALS = loadFromConfig("balanceMaterials");
+    public static final ItemStack RESET_MATERIALS = loadFromConfig("resetMaterials");
+    //Removers
+    public static final ItemStack REMOVE_MATERIAL_BUTTON = loadFromConfig("removeMaterial");
+    public static final ItemStack RESET_MINE_BUTTON = loadFromConfig("resetNow");
+    public static final ItemStack CLEAR_MINE = loadFromConfig("clearMine");
+    public static final ItemStack DELETE_MINE_BUTTON = loadFromConfig("deleteMine");
+    public static final ItemStack MINE_CLEAR_MATERIALS = loadFromConfig("clearMaterials");
+    public static final ItemStack DISABLE_MINE_BUTTON = loadFromConfig("disableMine");
+    //Loading
+    public static final ItemStack NOT_LOADED_MINES = loadFromConfig("unloadedMines");
+    public static final ItemStack NO_MINE_TO_DISPLAY = loadFromConfig("noMine");
+    public static final ItemStack NOT_LOADED_ICON = loadFromConfig("iconNotLoaded");
+    //Stats
+    public static final ItemStack MINE_COMPOSITION_INFORMATION = loadFromConfig("info");
+    public static final ItemStack REFRESH_MENU = loadFromConfig("refresh");
+    public static final ItemStack FILES_SEARCH_RESULT = loadFromConfig("couldNotLoadFiles");
     //Mine utils
-    public static String FOUND_MINE_FILES;
-    public static String NO_MISFORMATTED_FILES;
-    public static String CLICK_TO_EDIT;
-    public static String CLICK_TO_SEE;
-    public static String CLICK_TO_LOAD;
-    public static final int INVENTORY_SIZE = 6;
+    public static final String FOUND_MINE_FILES = loadStringFromConfig("foundFiles");
+    public static final String NO_MISFORMATTED_FILES = loadStringFromConfig("noMisformattedFiles");
+    public static final String CLICK_TO_EDIT = loadStringFromConfig("clickToEdit");
+    public static final String CLICK_TO_SEE = loadStringFromConfig("clickToSeeMine");
+    public static final String CLICK_TO_LOAD = loadStringFromConfig("clickToLoad");
+    public static final String CLICK_TO_REMOVE = loadStringFromConfig("clickToRemove");
 
-    public static ItemStack generateCompositionItemStack(Mine m, ItemStack i) {
-        ItemStack is = new ItemStack(i);
-        ItemMeta im = is.getItemMeta();
-        im.setDisplayName(MineMeMessageManager.getInstance().translateAll("$1" + is.getType() + "$3:$2" + i.getData().getData() + "$3-$1" + m.getComposition().get(i) + "%"));
-        List<String> lore = ItemUtils.getLore(i);
-        lore.add(GUIResourcesUtils.CLICK_TO_EDIT);
-        im.setLore(lore);
-        is.setItemMeta(im);
-        return is;
-    }
+    public static final int INVENTORY_SIZE = 6;
 
     public static ItemStack generateNotYetLoadedIcon(Mine m) {
         ItemStack itemStack = new ItemStack(NOT_LOADED_ICON);
         return MineMeMessageManager.getInstance().translateItemStack(itemStack, m);
-    }
-
-    public static ItemStack generateCompositionChangeItemStack(double change) {
-        boolean add = change > 0;
-        String prefix = add ? "§a+" : "§c";
-        Material m = add ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
-        ItemStack is = new ItemStack(m);
-        ItemMeta im = is.getItemMeta();
-        im.setDisplayName(MineMeMessageManager.getInstance().translateAll(prefix + change + "%"));
-        is.setItemMeta(im);
-        return is;
     }
 
     public static double getCompositionChangeValue(ItemStack i) {
@@ -107,11 +96,15 @@ public class GUIResourcesUtils {
     }
 
     public static ItemStack generateInformationItem(Mine mine) {
-        ItemStack i = new ItemStack(INFORMATION);
+        return MineMeMessageManager.getInstance().translateItemStack(new ItemStack(MINE_COMPOSITION_INFORMATION),
+                mine);
+    }
 
-        i = ItemUtils.addToLore(ItemUtils.clearLore(i),
-                MineMeMessageManager.getInstance().translateAll(INFORMATION_LORE,
-                        mine));
-        return i;
+    private static String loadStringFromConfig(String configSection) {
+        return MineMeMessageManager.getInstance().translateAll(STRINGS_SECTION.getString(configSection));
+    }
+
+    private static ItemStack loadFromConfig(String configSection) {
+        return ItemUtils.createItem(ITEMS_SECTION.getConfigurationSection(configSection));
     }
 }

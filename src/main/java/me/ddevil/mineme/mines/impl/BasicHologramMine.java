@@ -26,8 +26,6 @@ import me.ddevil.mineme.messages.MineMeMessageManager;
 import me.ddevil.mineme.mines.HologramCompatible;
 import me.ddevil.mineme.mines.configs.MineConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
@@ -177,6 +175,11 @@ public abstract class BasicHologramMine extends BasicMine implements HologramCom
         if (MineMeConfiguration.useHolograms) {
             updateHolograms();
         }
+    }
+
+    @Override
+    public boolean isExceedingMaterials() {
+        return getTotalPercentage() > 100;
     }
 
 }

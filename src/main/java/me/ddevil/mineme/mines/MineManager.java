@@ -63,12 +63,9 @@ public class MineManager {
         try {
             if (MineMeConfiguration.useHolograms) {
                 if (m instanceof HologramCompatible) {
-                    MineMe.instance.debug("Mine " + m.getName() + " is Holograms compatible! Creating holograms...", 3);
+                    MineMe.instance.debug("Mine " + m.getName() + " is holograms compatible! Creating holograms...", 3);
                     HologramCompatible h = (HologramCompatible) m;
-                    if (m.getIcon() != null) {
-                        h.setupHolograms();
-                    }
-
+                    h.setupHolograms();
                 }
             }
         } finally {

@@ -35,31 +35,6 @@ public class GUIManager {
     public static MainMenu mainMenu;
 
     public static void setup() {
-        //Load Strings
-        GUIResourcesUtils.CLICK_TO_SEE = MineMeMessageManager.getInstance().translateAll(MineMeConfiguration.guiConfig.getString("config.clickToSeeMine"));
-        GUIResourcesUtils.CLICK_TO_REMOVE = MineMeMessageManager.getInstance().translateAll(MineMeConfiguration.guiConfig.getString("config.clickToRemove"));
-        GUIResourcesUtils.CLICK_TO_EDIT = MineMeMessageManager.getInstance().translateAll(MineMeConfiguration.guiConfig.getString("config.clickToEdit"));
-        GUIResourcesUtils.CLICK_TO_LOAD = MineMeMessageManager.getInstance().translateAll(MineMeConfiguration.guiConfig.getString("config.clickToLoad"));
-        GUIResourcesUtils.NO_MISFORMATTED_FILES = MineMeMessageManager.getInstance().translateAll(MineMeConfiguration.guiConfig.getString("config.noMisformattedFiles"));
-        GUIResourcesUtils.FOUND_MINE_FILES = MineMeMessageManager.getInstance().translateAll(MineMeConfiguration.guiConfig.getString("config.foundFiles"));
-        GUIResourcesUtils.SPLITTER = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.splitter"));
-        GUIResourcesUtils.BACK_BUTTON = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.back"));
-        GUIResourcesUtils.REMOVE_BUTTON = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.removeMaterial"));
-        GUIResourcesUtils.EMPTY_MATERIAL = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.emptyMaterial"));
-        GUIResourcesUtils.TELEPORTER = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.teleporter"));
-        GUIResourcesUtils.TOOGLE_MATERIALS_EFFECTS_SELECTION = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.toogleMaterialEditor"));
-        GUIResourcesUtils.NOT_LOADED_MINES = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.unloadedMines"));
-        GUIResourcesUtils.NO_MINE_TO_DISPLAY = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.noMine"));
-        GUIResourcesUtils.COULD_NOT_LOAD_FILES = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.couldNotLoadFiles"));
-        ConfigurationSection infoConfig = MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.info");
-        GUIResourcesUtils.INFORMATION = loadFromConfig(infoConfig);
-        GUIResourcesUtils.INFORMATION_LORE = infoConfig.getStringList("lore");
-        GUIResourcesUtils.RESET_BUTTON = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.resetNow"));
-        GUIResourcesUtils.DELETE_MINE_BUTTON = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.deleteMine"));
-        GUIResourcesUtils.DISABLE_MINE_BUTTON = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.disableMine"));
-        GUIResourcesUtils.CLEAR_MATERIALS = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.clearMaterials"));
-        GUIResourcesUtils.REFRESH = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.refresh"));
-        GUIResourcesUtils.NOT_LOADED_ICON = loadFromConfig(MineMeConfiguration.guiConfig.getConfigurationSection("globalItems.iconNotLoaded"));
         ConfigurationSection mmConfig = MineMeConfiguration.guiConfig.getConfigurationSection("mainMenu");
         String mainMenuName = MineMeMessageManager.getInstance().translateAll(mmConfig.getString("name"));
         MineMe.instance.debug();
